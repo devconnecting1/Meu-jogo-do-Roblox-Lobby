@@ -1,27 +1,43 @@
 {
-  "name": "Lobby Prisao",
+  "name": "Prisao",
   "tree": {
     "$className": "DataModel",
     "Workspace": {
       "$className": "Workspace",
-      "Lobby Prisão": {
-        "$path": "build/Lobby.model.json"
+      "Prisão": {
+        "$path": "build/Prisao.model.json"
       }
     },
     "Lighting": {
       "$className": "Lighting",
       "$properties": {
-        "Ambient": [0.376, 0.376, 0.408],
-        "OutdoorAmbient": [0.549, 0.549, 0.588],
-        "Brightness": 2,
-        "ClockTime": 15.5,
+        "Technology": { "Enum": 4 },
+        "ClockTime": 0,
+        "Brightness": 0,
+        "Ambient": [0.27, 0.27, 0.29],
+        "OutdoorAmbient": [0.18, 0.18, 0.2],
+        "EnvironmentDiffuseScale": 0.25,
+        "EnvironmentSpecularScale": 0.35,
+        "ExposureCompensation": 0.3,
+        "ShadowSoftness": 0.3,
         "GlobalShadows": true
-      }
-    },
-    "ServerScriptService": {
-      "$className": "ServerScriptService",
-      "LobbyServer": {
-        "$path": "roblox/LobbyServer.server.lua"
+      },
+      "Correcao de Cor": {
+        "$className": "ColorCorrectionEffect",
+        "$properties": {
+          "Brightness": 0,
+          "Contrast": 0.08,
+          "Saturation": -0.12,
+          "TintColor": [1, 0.985, 0.96]
+        }
+      },
+      "Brilho das Lampadas": {
+        "$className": "BloomEffect",
+        "$properties": {
+          "Intensity": 0.35,
+          "Size": 24,
+          "Threshold": 1.6
+        }
       }
     }
   }

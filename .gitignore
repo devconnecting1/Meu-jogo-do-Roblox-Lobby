@@ -6,3 +6,4 @@
 # Saída gerada (CI recompila)
 build/
 node_modules/
+out/

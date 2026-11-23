@@ -1,13 +1,13 @@
 {
-  "name": "lobby-prisao-roblox",
+  "name": "prisao-roblox",
   "private": true,
   "type": "module",
+  "description": "Prisão em Part clássico para Roblox. Tudo é testado, compilado, renderizado e publicado no GitHub Actions (.github/workflows/ci.yml).",
+  "engines": { "node": ">=22" },
   "scripts": {
-    "build": "node tools/build-place.mjs && rojo build -o build/lobby.rbxl",
-    "serve": "node tools/build-place.mjs && rojo serve",
-    "publish:roblox": "node tools/publish.mjs",
-    "publish:saved": "node tools/publish.mjs --saved",
-    "viewer": "npx --yes http-server -c-1 -p 8080 .",
-    "screenshots": "node tools/screenshots.mjs"
+    "test": "node --test --test-reporter=spec \"tests/**/*.test.mjs\"",
+    "build": "node tools/build-place.mjs && rojo build default.project.json -o build/prisao.rbxl",
+    "render": "node tools/screenshots.mjs out/previews",
+    "publish:roblox": "node tools/publish.mjs build/prisao.rbxl"
   }
 }

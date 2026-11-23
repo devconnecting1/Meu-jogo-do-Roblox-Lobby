@@ -1,75 +1,54 @@
-# Lobby Prisão — Roblox
+# Prisão — Roblox
 
-Lobby de prisão no **estilo clássico** do Roblox. Usa só Part clássico (Block, e Cylinder nas mesas redondas), material Plastic, Neon nas lâmpadas e telas, e studs clássicos nos pisos. Não tem nenhuma textura, decal ou MeshPart. São **2 andares** e **32 celas showcase em tamanho real**, cada uma com um boneco R6 de 5 studs num pedestal, visto pela janela da cela.
+Prisão **fechada** de 2 andares, feita só com **Part clássico** em cores neutras. Não tem UI, NPC nem script: é apenas a construção. O GitHub Actions testa, compila, renderiza e publica tudo automaticamente.
 
-![Átrio](docs/screenshots/atrium.png)
+![Átrio](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/atrium.png)
 
-| Corredor das celas | 2º andar | Cela showcase |
-|---|---|---|
-| ![](docs/screenshots/corridor.png) | ![](docs/screenshots/upper.png) | ![](docs/screenshots/cell.png) |
-| **Escada** | **Zona Jogar** | **Planta** |
-| ![](docs/screenshots/stairs.png) | ![](docs/screenshots/play.png) | ![](docs/screenshots/plan.png) |
-
-## Direção de arte (o que copiamos do builder de referência)
-
-| Princípio | Como aparece no mapa |
+| | |
 |---|---|
-| **Paleta de 3 cores** | Branco nas paredes, laranja queimado nos destaques e azul-marinho nas fachadas das celas. O azul royal só aparece no piso do átrio. |
-| **Listras como assinatura** | Faixas laranja duplas acima de cada cela, nas paredes de topo e na fachada externa. |
-| **Studs só no chão** | Piso do átrio, patamar da escada, meio-fios, rodapés do vidro e plataformas. As paredes são lisas, para não poluir a vista. |
-| **Ritmo estrutural** | Colunas cinza de 2,6 studs a cada 13 studs, alinhadas às divisórias das celas, e vigas no teto na mesma cadência. |
-| **Luz que vira objeto** | Luminárias fluorescentes (carcaça escura com 2 tubos Neon) penduradas no átrio e no 2º andar, e painéis embutidos sob a passarela. |
-| **Transparência no 2º andar** | Guarda-corpo de vidro com rodapé escuro e corrimão cinza, para enxergar as celas do outro lado. |
-| **Celas legíveis** | Fachada marinho com janela de showcase e porta de grade deslizante aberta. Por dentro tem parede branca, fundo marinho, cama com cobertor vermelho, vaso, pia com espelho e luz no teto. |
-| **Escala de jogador** | Pé-direito de 15 por andar, corredores de 5 a 8 studs, degraus de 1 stud e porta de 3×9. |
+| ![Visão geral](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/overview.png) | ![Corredor](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/corridor.png) |
+| ![Galeria](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/upper.png) | ![Cela](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/cell.png) |
 
-## O que tem no mapa
+*As imagens são geradas pelo CI a cada push na `main`. Em PRs, elas aparecem no comentário "📸 Como ficou".*
 
-- **Átrio de pé-direito duplo** com refeitório (mesas redondas e bancos com encosto), caixas de madeira e ponte de vidro no 2º andar.
-- **32 celas** em 2 alas × 2 andares × 8. A roupa do boneco muda por cela: Detento Laranja, Listrado Clássico, Guarda, Diretor, Fugitivo, Cozinheiro, Mecânico e VIP Dourado.
-- **Escada laranja com pórtico** levando ao mezanino.
-- **Hall de entrada** com `SpawnLocation`, recepção e portão.
-- **Depósitos**: os do oeste são fechados e têm janela. Sob o mezanino há estantes abertas.
-- **Zona Jogar**: 3 telas Neon (ciano, branco e magenta) com as plataformas *Fila 1/2/3*.
+## O que tem
 
-São **2942 Parts** ancoradas e 80 `PointLight`.
+- **Envoltória fechada:** piso, teto e 4 paredes opacos. Não há janelas, portas nem exterior.
+- **32 celas** em 2 alas × 2 andares. Cada uma tem fachada com janela de observação, porta de grade deslizante, cama, vaso, pia com espelho, mesa, banqueta, prateleira e luz embutida.
+- **Átrio de pé-direito duplo** com refeitório (mesas redondas), caixas, colunas no ritmo das celas e luminárias fluorescentes.
+- **2º andar** com galerias de guarda-corpo de vidro, ponte central e mezanino, com acesso por uma escada de degraus de 1 stud.
+- **Hall** com SpawnLocation e posto de guarda, **depósitos**, **sala de visitas** e **estoque** com estantes.
+- **Lighting:** tecnologia Future, sem sol (ambiente fechado), ambiente neutro, correção de cor sutil e bloom leve nas lâmpadas.
 
-## Próximas recomendações
+## Como funciona
 
-1. **Iluminação `Future`** em *Lighting → Technology*. O Neon passa a "acender" o ambiente como na referência. Esse valor não pode ser definido por script nem pelo Rojo, então precisa ser mudado uma vez no Studio.
-2. **Teleporte**: preencha `TARGET_PLACE_ID` em `roblox/LobbyServer.server.lua`.
-3. **StreamingEnabled** ligado, para celulares fracos. O mapa já é todo ancorado e não tem física.
-4. **Áudio ambiente** (zumbido de lâmpada e portões) com `Sound` em `SoundService`.
+```
+src/prison.js ─┬─► src/rojo.js ─► Rojo ─► prisao.rbxl ─► Open Cloud ─► Roblox
+               ├─► viewer/main.js (Three.js) ─► capturas do CI / GitHub Pages
+               └─► tests/ (apoio, z-fighting, passagens, guarda-corpo, estilo)
+```
 
-## Como ver no navegador (Three.js)
+Tudo roda em `.github/workflows/ci.yml` (`ubuntu-latest`). Os jobs são **test → build → render → publish** (e **pages** na `main`). Veja as regras completas em [AGENTS.md](AGENTS.md).
 
-- **Prévia do PR**: `https://raw.githack.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/<branch>/index.html`
-- **GitHub Pages**: depois do merge na `main`, com o Pages ativado em *Settings → Pages → Source: GitHub Actions*.
-- **Local**: `npm run viewer` e abra http://localhost:8080.
-
-O visualizador tem 8 vistas prontas, liga e desliga teto e paredes, mostra brilho (bloom) no Neon e tem um modo **Andar (WASD)** com física parecida com a do Roblox (WalkSpeed 16, gravidade 196,2, sobe degraus). Os studs no navegador são só uma simulação visual da superfície *Studs*.
-
-## Sincronização com o jogo
+### Publicação no Roblox
 
 | | |
 |---|---|
 | Universo | `10548333977` |
 | Lugar | `116364339053967` |
 
-```
-src/lobby.js ──► tools/build-place.mjs ──► build/Lobby.model.json ──► rojo build ──► build/lobby.rbxl ──► Open Cloud
-           └──► viewer/main.js (Three.js)
-```
+Configure em *Settings → Secrets and variables → Actions*:
 
-- **Automático (CI)**: todo push na `main` que altera o mapa roda `.github/workflows/roblox-sync.yml`. Esse workflow compila com o Rojo e publica no lugar. Em PRs ele só valida o build.
-  Requer o segredo **`ROBLOX_API_KEY`** em *Settings → Secrets and variables → Actions*, com uma chave Open Cloud que tenha o escopo `universe-places:write` para esse universo.
-- **Manual**:
-  ```bash
-  rokit install                               # instala o Rojo 7.4.4
-  npm run build                               # gera build/lobby.rbxl
-  ROBLOX_API_KEY=... npm run publish:roblox   # publica (vai ao ar)
-  ROBLOX_API_KEY=... npm run publish:saved    # só salva uma versão
-  ```
-- **Ao vivo no Studio**: rode `npm run serve` e conecte o plugin do Rojo.
+- `ROBLOX_CLOUD_API`: chave Open Cloud com o escopo `universe-places:write`. **Use a aba Secrets.** O CI também aceita Variables e mascara a chave nos logs.
+- `ROBLOX_UNIVERSE_ID` e `ROBLOX_LOCAL_ID`: opcionais.
 
-> ⚠️ A publicação substitui o lugar inteiro. Edições feitas direto no Studio são sobrescritas na próxima sincronização, então altere o `src/lobby.js`. As versões antigas continuam no histórico de versões do Creator Hub.
+A publicação acontece em PRs do próprio repositório, em todo push na `main` e manualmente (*Actions → CI → Run workflow*). Ela sempre roda depois dos testes e do build passarem.
+
+> A publicação substitui o lugar inteiro, então não edite a prisão no Studio. As versões anteriores ficam no histórico do Creator Hub.
+
+### Visualizador 3D
+
+- Prévia de qualquer branch: `https://raw.githack.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/<branch>/index.html`
+- GitHub Pages (depois do merge na `main`): ative em *Settings → Pages → Source: GitHub Actions*.
+
+Tem 10 vistas, corte sem teto e modo **Andar (WASD)** com física parecida com a do Roblox.
