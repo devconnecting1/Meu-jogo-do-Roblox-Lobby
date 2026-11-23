@@ -1,0 +1,259 @@
+# Pipeline único do projeto. TUDO roda aqui (nada localmente):
+#   lint     -> ESLint + Prettier (correção automática num branch autoformat/pr-N)
+#   test     -> regras de construção + manual de montagem (node:test, sem dependências)
+#   build    -> Rojo gera o .rbxl e o lugar é verificado
+#   render   -> Three.js + Chromium geram as capturas e o manual, e comentam no PR
+#   publish  -> Open Cloud publica no Roblox (PR do próprio repo, main ou manual)
+#   pages    -> visualizador no GitHub Pages (main)
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publicar no Roblox
+        type: boolean
+        default: true
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+  ROJO_VERSION: 7.4.4
+  PLAYWRIGHT_VERSION: 1.49.1
+  LINT_PACKAGES: eslint@9.15.0 @eslint/js@9.15.0 globals@15.12.0 prettier@3.3.3 eslint-config-prettier@9.1.0
+  # PR de fork não recebe segredos nem permissão de escrita.
+  SAME_REPO: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+
+jobs:
+  lint:
+    name: ESLint + Prettier
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Instalar ESLint e Prettier
+        run: npm install --no-save --no-package-lock $LINT_PACKAGES
+      - name: Prettier
+        id: prettier
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx prettier --check . 2>&1 | tee prettier-report.txt
+      - name: ESLint
+        id: eslint
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx eslint . 2>&1 | tee eslint-report.txt
+      - name: Publicar correção automática (branch autoformat/pr-N)
+        id: autofix
+        if: (steps.prettier.outcome == 'failure' || steps.eslint.outcome == 'failure') && github.event_name == 'pull_request' && env.SAME_REPO == 'true'
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          npx prettier --write . > /dev/null
+          npx eslint --fix . || true
+          if git diff --quiet; then echo "nada a corrigir automaticamente"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "autoformat/pr-$PR"
+          git commit -qam "style: Prettier + ESLint --fix"
+          git push -qf origin "autoformat/pr-$PR"
+          echo "branch=autoformat/pr-$PR" >> "$GITHUB_OUTPUT"
+      - name: Comentar no PR
+        if: always() && github.event_name == 'pull_request' && env.SAME_REPO == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          PRETTIER: ${{ steps.prettier.outcome }}
+          ESLINT: ${{ steps.eslint.outcome }}
+          AUTOFIX_BRANCH: ${{ steps.autofix.outputs.branch }}
+        run: node tools/ci/pr-comment.mjs lint
+      - name: Resultado
+        if: steps.prettier.outcome == 'failure' || steps.eslint.outcome == 'failure'
+        run: |
+          echo "::error::ESLint/Prettier encontraram problemas (veja o comentário no PR)."
+          exit 1
+
+  test:
+    name: Testes da construção
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Rodar testes
+        id: tests
+        run: |
+          set -o pipefail
+          node --test --test-reporter=spec "tests/**/*.test.mjs" 2>&1 | tee test-report.txt
+      - name: Resumo
+        if: always()
+        run: |
+          { echo '### Testes'; echo '```'; tail -n 120 test-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Comentar resultado no PR
+        if: always() && github.event_name == 'pull_request' && env.SAME_REPO == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          OUTCOME: ${{ steps.tests.outcome }}
+        run: node tools/ci/pr-comment.mjs tests test-report.txt
+
+  build:
+    name: Build do lugar (Rojo)
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Instalar Rojo
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/rojo.zip" "https://github.com/rojo-rbx/rojo/releases/download/v${ROJO_VERSION}/rojo-${ROJO_VERSION}-linux-x86_64.zip"
+          unzip -q "$RUNNER_TEMP/rojo.zip" -d "$RUNNER_TEMP/rojo"
+          echo "$RUNNER_TEMP/rojo" >> "$GITHUB_PATH"
+      - name: Gerar modelo e lugar
+        run: |
+          node tools/build-place.mjs
+          rojo build default.project.json -o build/prisao.rbxl
+          rojo build default.project.json -o build/prisao.rbxlx
+      - name: Verificar lugar
+        run: node tools/ci/verify-place.mjs build/prisao.rbxlx
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lugar
+          path: |
+            build/prisao.rbxl
+            build/prisao.rbxlx
+          retention-days: 14
+
+  render:
+    name: Capturas (Three.js)
+    needs: test
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Instalar Playwright + Chromium
+        run: |
+          npm install --no-save --no-package-lock "playwright@${PLAYWRIGHT_VERSION}"
+          npx playwright install --with-deps chromium
+      - name: Renderizar vistas
+        run: node tools/screenshots.mjs out/previews
+      - name: Gerar manual de montagem
+        run: node tools/manual.mjs out/previews
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capturas
+          path: out/previews
+          retention-days: 14
+      - name: Publicar imagens no branch ci-previews
+        id: previews
+        env:
+          TARGET: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref_name }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          SRC: out/previews
+        run: bash tools/ci/push-previews.sh
+      - name: Comentar capturas no PR
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_URL: ${{ steps.previews.outputs.base_url }}
+        run: node tools/ci/pr-comment.mjs previews out/previews/manifest.json
+
+  publish:
+    name: Publicar no Roblox
+    needs: [test, build]
+    if: >-
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: roblox-publish
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: lugar
+          path: build
+      - name: Publicar via Open Cloud
+        env:
+          ROBLOX_CLOUD_API: ${{ secrets.ROBLOX_CLOUD_API || vars.ROBLOX_CLOUD_API }}
+          ROBLOX_UNIVERSE_ID: ${{ vars.ROBLOX_UNIVERSE_ID || secrets.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_LOCAL_ID: ${{ vars.ROBLOX_LOCAL_ID || secrets.ROBLOX_LOCAL_ID }}
+          PUBLISH_REPORT: publish-report.md
+        run: node tools/publish.mjs build/prisao.rbxl
+      - name: Comentar publicação no PR
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: node tools/ci/pr-comment.mjs publish publish-report.md
+
+  pages:
+    name: Visualizador (GitHub Pages)
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    continue-on-error: true # requer Settings → Pages → Source: GitHub Actions
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4
