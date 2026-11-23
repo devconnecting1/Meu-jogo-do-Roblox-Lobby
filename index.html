@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lobby Prisão — Visualizador</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: rgba(18, 20, 26, 0.88);
+      --text: #e8e6e1;
+      --muted: #9a9890;
+      --accent: #f0c41e;
+      --line: rgba(255, 255, 255, 0.1);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; overflow: hidden; }
+    #app { position: fixed; inset: 0; }
+    #hud { position: fixed; top: 12px; left: 12px; width: min(320px, calc(100vw - 24px)); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; backdrop-filter: blur(6px); }
+    #hud h1 { font-size: 15px; margin: 0 0 2px; letter-spacing: 0.02em; }
+    #hud h1 span { color: var(--accent); }
+    #hud p { margin: 0 0 10px; color: var(--muted); font-size: 12px; }
+    .row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    button { background: #23262f; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font: inherit; font-size: 12px; cursor: pointer; }
+    button:hover { border-color: var(--accent); }
+    button.on { background: var(--accent); color: #111; border-color: var(--accent); }
+    #stats { font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+    #stats a { color: var(--accent); }
+    #walkhint { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 12px; display: none; }
+    #cross { position: fixed; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #fff; opacity: 0.7; display: none; pointer-events: none; }
+    #toggle { display: none; }
+    @media (max-width: 560px) {
+      #hud { top: 8px; left: 8px; padding: 10px; }
+      #hud.collapsed .body { display: none; }
+      #toggle { display: inline-block; float: right; }
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="cross"></div>
+  <div id="hud">
+    <button id="toggle" aria-label="Mostrar/ocultar painel">☰</button>
+    <h1>Lobby <span>Prisão</span></h1>
+    <p>Part clássico · SmoothPlastic · sem textura</p>
+    <div class="body">
+      <div class="row" id="views">
+        <button data-view="exterior">Vista externa</button>
+        <button data-view="plan">Planta (sem teto)</button>
+        <button data-view="ground">Corredor térreo</button>
+        <button data-view="upper">2º andar</button>
+        <button data-view="cell">Showcase da cela</button>
+      </div>
+      <div class="row">
+        <button id="roof" class="on">Teto</button>
+        <button id="walls" class="on">Paredes</button>
+        <button id="walk">Andar (WASD)</button>
+      </div>
+      <div id="stats"></div>
+    </div>
+  </div>
+  <div id="walkhint">WASD mover · Espaço pular · Shift correr · Esc sair</div>
+  <script type="module" src="viewer/main.js"></script>
+</body>
+</html>

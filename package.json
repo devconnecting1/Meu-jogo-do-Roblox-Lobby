@@ -1,0 +1,13 @@
+{
+  "name": "lobby-prisao-roblox",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build-place.mjs && rojo build -o build/lobby.rbxl",
+    "serve": "node tools/build-place.mjs && rojo serve",
+    "publish:roblox": "node tools/publish.mjs",
+    "publish:saved": "node tools/publish.mjs --saved",
+    "viewer": "npx --yes http-server -c-1 -p 8080 .",
+    "screenshots": "node tools/screenshots.mjs"
+  }
+}

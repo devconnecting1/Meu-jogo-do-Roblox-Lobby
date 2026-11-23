@@ -1,0 +1,46 @@
+name: Sincronizar com o Roblox
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'roblox/**'
+      - 'tools/build-place.mjs'
+      - 'default.project.json'
+      - 'tools/publish.mjs'
+      - 'roblox.config.json'
+      - '.github/workflows/roblox-sync.yml'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar Rojo 7.4.4
+        run: |
+          curl -sSL -o rojo.zip https://github.com/rojo-rbx/rojo/releases/download/v7.4.4/rojo-7.4.4-linux-x86_64.zip
+          unzip -q rojo.zip -d "$HOME/.rojo"
+          echo "$HOME/.rojo" >> "$GITHUB_PATH"
+      - name: Gerar lobby.rbxl
+        run: |
+          node tools/build-place.mjs
+          rojo build -o build/lobby.rbxl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lobby-rbxl
+          path: build/lobby.rbxl
+      # Só publica a partir da main (PRs apenas validam o build).
+      - name: Publicar no Roblox (Open Cloud)
+        if: github.event_name != 'pull_request'
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+        run: node tools/publish.mjs

@@ -1,0 +1,28 @@
+{
+  "name": "Lobby Prisao",
+  "tree": {
+    "$className": "DataModel",
+    "Workspace": {
+      "$className": "Workspace",
+      "Lobby Prisão": {
+        "$path": "build/Lobby.model.json"
+      }
+    },
+    "Lighting": {
+      "$className": "Lighting",
+      "$properties": {
+        "Ambient": [0.376, 0.376, 0.408],
+        "OutdoorAmbient": [0.549, 0.549, 0.588],
+        "Brightness": 2,
+        "ClockTime": 15.5,
+        "GlobalShadows": true
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "LobbyServer": {
+        "$path": "roblox/LobbyServer.server.lua"
+      }
+    }
+  }
+}
