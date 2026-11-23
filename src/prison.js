@@ -282,7 +282,8 @@ function cell(b, index, side, y0, number) {
   for (const bx of [6.3, 6.8, 7.3]) r('Porta Barra', bx - 0.1, bx + 0.1, 0.8, 9.7, -0.3, -0.05, C.steel, deco);
 
   // Interior
-  r('Piso', -7, 7, 0, 0.1, 0.6, D, C.cellFloor);
+  // o piso termina na face da parede do fundo (atrás das celas do térreo há um vão de serviço)
+  r('Piso', -7, 7, 0, 0.1, 0.6, D - 0.3, C.cellFloor);
   r('Revestimento E', -7, -6.8, 0, H, 0.6, D - 0.3, C.cellWall);
   r('Revestimento D', 6.8, 7, 0, H, 0.6, D - 0.3, C.cellWall);
   r('Parede Fundo', -7, 7, 0, H, D - 0.3, D, C.cellBack);
