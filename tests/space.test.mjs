@@ -47,3 +47,15 @@ test('corredores e galerias livres com pelo menos 7 studs de largura útil', () 
     assert.ok(w >= 7, `${z.name}: ${w}`);
   }
 });
+
+test('corte em terraços: corredor + átrio formam um vão aberto de pelo menos 60 studs', () => {
+  const openSpan = LEVELS.CELL_FRONT * 2;
+  assert.ok(openSpan >= 60, `vão aberto de ${openSpan}`);
+  assert.ok(LEVELS.UPPER_FRONT > LEVELS.CELL_FRONT, 'celas de cima precisam ser recuadas (galeria sobre as celas)');
+});
+
+test('nenhuma laje cobre o corredor do térreo (pé-direito duplo, como na referência)', () => {
+  const zones = clearanceZones().filter((z) => z.name.startsWith('Pé-direito duplo'));
+  assert.equal(zones.length, 4, 'zonas de pé-direito duplo nos dois lados da ponte, nas duas alas');
+  for (const z of zones) assert.ok(z.max[1] - z.min[1] >= 30, `${z.name}: só ${z.max[1] - z.min[1]} livres`);
+});

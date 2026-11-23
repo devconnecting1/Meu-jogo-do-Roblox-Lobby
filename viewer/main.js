@@ -171,7 +171,7 @@ for (const list of buckets.values()) {
 
 // Luzes reais só nas luminárias pendentes do átrio/hall (o resto é ambiente + emissivo).
 for (const p of parts) {
-  if (!p.light || p.light.type !== 'Point' || !/Iluminação\/(Átrio|Hall)/.test(p.model)) continue;
+  if (!p.light || p.light.type !== 'Point' || !/Iluminação\/(Átrio|Hall|Corredor)/.test(p.model)) continue;
   const l = new THREE.PointLight(srgb(p.light.color), 55, 42, 1.6);
   l.position.set(p.position[0], p.position[1] - 1, p.position[2]);
   scene.add(l);
@@ -190,18 +190,19 @@ orbit.enableDamping = true;
 orbit.maxDistance = 400;
 
 const c2 = cellCenterX(2);
-const OVERVIEW = { pos: [-45, 170, 150], target: [0, 0, 0], cut: true };
+const OVERVIEW = { pos: [-55, 200, 185], target: [0, 0, 0], cut: true };
 const VIEWS = [
   { id: 'overview', title: 'Visão geral (corte, sem teto)', ...OVERVIEW },
-  { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-86, 7, -22], target: [-55, 7, 10] },
-  { id: 'atrium', title: 'Átrio com refeitório', pos: [-84, 8.5, 0], target: [10, 11, 0] },
-  { id: 'corridor', title: 'Corredor das celas (térreo)', pos: [-64, 5.5, 29.5], target: [40, 4.5, 30.5] },
-  { id: 'upper', title: 'Galeria do 2º andar', pos: [-64, 22.5, 28.5], target: [40, 21, 29] },
-  { id: 'cells', title: 'Fachada das celas', pos: [c2 + 1.5, 6, -21], target: [c2 - 3, 5.5, -38] },
+  { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-86, 8, -26], target: [-50, 8, 12] },
+  { id: 'atrium', title: 'Átrio e vão de pé-direito duplo', pos: [-84, 9, 0], target: [10, 12, 0] },
+  { id: 'corridor', title: 'Corredor das celas (térreo, aberto até o teto)', pos: [-64, 6, 29.5], target: [40, 8, 30.5] },
+  { id: 'upper', title: 'Galeria do 2º andar (sobre as celas do térreo)', pos: [-64, 23, 39], target: [40, 21, 39.5] },
+  { id: 'gallery-view', title: 'Vista da galeria para o vão', pos: [-40, 23.5, 37], target: [0, 4, -10] },
+  { id: 'cells', title: 'Fachada das celas', pos: [c2 + 2, 7, -18], target: [c2 - 3, 8, -38] },
   { id: 'cell', title: 'Interior de uma cela', pos: [c2 + 3.8, 5.5, -35.8], target: [c2 - 3.5, 2.5, -48] },
   { id: 'stairs', title: 'Escada para o mezanino', pos: [22, 7, 3], target: [52, 10, 0] },
   { id: 'visits', title: 'Sala de visitas', pos: [68, 6.5, -22], target: [78, 3.5, 8] },
-  { id: 'storage', title: 'Estoque sob o mezanino', pos: [68, 7.5, 25], target: [80, 4, 44] },
+  { id: 'storage', title: 'Estoque sob o mezanino', pos: [68, 7.5, 25], target: [80, 4, 50] },
   { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
   { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },
   { id: 'build-75', title: 'Montagem — 75% das etapas', ...OVERVIEW, step: 0.75 },
