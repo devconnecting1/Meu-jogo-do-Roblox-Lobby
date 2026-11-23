@@ -1,0 +1,84 @@
+{
+  "views": [
+    {
+      "id": "overview",
+      "title": "Visão geral (corte, sem teto)"
+    },
+    {
+      "id": "hall",
+      "title": "Hall de entrada e posto de guarda"
+    },
+    {
+      "id": "atrium",
+      "title": "Átrio e vão de pé-direito duplo"
+    },
+    {
+      "id": "corridor",
+      "title": "Corredor das celas (térreo, aberto até o teto)"
+    },
+    {
+      "id": "upper",
+      "title": "Galeria do 2º andar (sobre as celas do térreo)"
+    },
+    {
+      "id": "gallery-view",
+      "title": "Vista da galeria para o vão"
+    },
+    {
+      "id": "cells",
+      "title": "Fachada das celas"
+    },
+    {
+      "id": "cell",
+      "title": "Interior de uma cela"
+    },
+    {
+      "id": "stairs",
+      "title": "Escada para o mezanino"
+    },
+    {
+      "id": "visits",
+      "title": "Sala de visitas"
+    },
+    {
+      "id": "storage",
+      "title": "Estoque sob o mezanino"
+    },
+    {
+      "id": "build-25",
+      "title": "Montagem — 25% das etapas"
+    },
+    {
+      "id": "build-50",
+      "title": "Montagem — 50% das etapas"
+    },
+    {
+      "id": "build-75",
+      "title": "Montagem — 75% das etapas"
+    }
+  ],
+  "stats": {
+    "total": 2381,
+    "lights": 73,
+    "groups": {
+      "Piso": 1,
+      "Paredes": 24,
+      "Teto": 8,
+      "Estrutura": 20,
+      "Pisos": 6,
+      "Celas": 1650,
+      "Galerias": 46,
+      "Iluminação": 170,
+      "Escada": 40,
+      "Hall": 6,
+      "Depósitos": 312,
+      "Átrio": 57,
+      "Sala de Visitas": 41
+    }
+  },
+  "manual": {
+    "parts": 2381,
+    "steps": 478,
+    "connections": 7645
+  }
+}
