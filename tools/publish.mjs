@@ -42,7 +42,9 @@ if (!/^\d+$/.test(universeId) || !/^\d+$/.test(placeId)) {
 
 const body = readFileSync(file);
 const url = `https://apis.roblox.com/universes/v1/${universeId}/places/${placeId}/versions?versionType=${versionType}`;
-console.log(`→ Enviando ${(body.length / 1024).toFixed(0)} KB para universo ${universeId}, lugar ${placeId} (${versionType})`);
+console.log(
+  `→ Enviando ${(body.length / 1024).toFixed(0)} KB para universo ${universeId}, lugar ${placeId} (${versionType})`,
+);
 
 let lastError = '';
 for (let attempt = 1; attempt <= 4; attempt++) {
@@ -55,7 +57,9 @@ for (let attempt = 1; attempt <= 4; attempt++) {
   if (res.ok) {
     const { versionNumber } = JSON.parse(text);
     console.log(`✔ Publicado! Versão ${versionNumber}`);
-    summary(`### Roblox\n✅ Publicado no lugar \`${placeId}\` — versão **${versionNumber}** (${versionType}).\nhttps://www.roblox.com/games/${placeId}`);
+    summary(
+      `### Roblox\n✅ Publicado no lugar \`${placeId}\` — versão **${versionNumber}** (${versionType}).\nhttps://www.roblox.com/games/${placeId}`,
+    );
     process.exit(0);
   }
   lastError = `HTTP ${res.status}: ${text}`;

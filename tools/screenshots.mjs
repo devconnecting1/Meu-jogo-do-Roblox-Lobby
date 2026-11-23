@@ -12,7 +12,12 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const outDir = resolve(process.argv[2] ?? 'out/previews');
 mkdirSync(outDir, { recursive: true });
 
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json' };
+const TYPES = {
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.mjs': 'text/javascript',
+  '.json': 'application/json',
+};
 const server = createServer((req, res) => {
   const path = resolve(join(root, decodeURIComponent(new URL(req.url, 'http://x').pathname)));
   const file = path === root ? join(root, 'index.html') : path;
@@ -22,7 +27,9 @@ const server = createServer((req, res) => {
 });
 await new Promise((r) => server.listen(0, r));
 
-const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const browser = await chromium.launch({
+  args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+});
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));

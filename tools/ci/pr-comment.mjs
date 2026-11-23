@@ -27,7 +27,10 @@ function testsBody() {
   const report = existsSync(file) ? strip(readFileSync(file, 'utf8')) : '(sem relatório)';
   const ok = env.OUTCOME === 'success';
   const lines = report.split('\n');
-  const totals = lines.filter((l) => /^ℹ (tests|pass|fail|duration_ms)/.test(l)).map((l) => l.replace('ℹ ', '')).join(' · ');
+  const totals = lines
+    .filter((l) => /^ℹ (tests|pass|fail|duration_ms)/.test(l))
+    .map((l) => l.replace('ℹ ', ''))
+    .join(' · ');
   let body = `${marker}\n## ${ok ? '✅' : '❌'} Testes da construção — \`${short}\`\n\n${totals || ''}\n\n[Execução no Actions](${runUrl})\n`;
   if (!ok) {
     const failStart = lines.findIndex((l) => /failing tests/i.test(l));
@@ -42,14 +45,17 @@ function previewsBody() {
   const manualFile = file.replace(/manifest\.json$/, 'manual.json');
   const manual = existsSync(manualFile) ? JSON.parse(readFileSync(manualFile, 'utf8')) : null;
   const base = env.BASE_URL;
-  const blob = base.replace('https://raw.githubusercontent.com/', 'https://github.com/').replace('/ci-previews/', '/blob/ci-previews/');
+  const blob = base
+    .replace('https://raw.githubusercontent.com/', 'https://github.com/')
+    .replace('/ci-previews/', '/blob/ci-previews/');
   const viewer = `https://raw.githack.com/${repo}/${env.HEAD_REF || 'main'}/index.html`;
   let body = `${marker}\n## 📸 Como ficou — \`${short}\`\n\n`;
   if (manual) {
     body += `**${manual.parts} peças · ${manual.steps} etapas · ${manual.connections} pontos de conexão verificados** · ${stats.lights} luzes · [manual de montagem](${blob}/MANUAL.md) · [visualizador 3D](${viewer})\n\n`;
   }
   const build = views.filter((v) => v.id.startsWith('build-'));
-  for (const v of views.filter((x) => !x.id.startsWith('build-'))) body += `**${v.title}**\n\n![${v.title}](${base}/${v.id}.png)\n\n`;
+  for (const v of views.filter((x) => !x.id.startsWith('build-')))
+    body += `**${v.title}**\n\n![${v.title}](${base}/${v.id}.png)\n\n`;
   if (build.length) {
     body += `### Montagem passo a passo\n\n| ${build.map((v) => v.title.replace('Montagem — ', '')).join(' | ')} |\n|${build.map(() => '---').join('|')}|\n`;
     body += `| ${build.map((v) => `![${v.title}](${base}/${v.id}.png)`).join(' | ')} |\n\n`;
@@ -59,7 +65,8 @@ function previewsBody() {
 }
 
 function lintBody() {
-  const tail = (f, n = 60) => (existsSync(f) ? strip(readFileSync(f, 'utf8')).trim().split('\n').slice(-n).join('\n') : '');
+  const tail = (f, n = 60) =>
+    existsSync(f) ? strip(readFileSync(f, 'utf8')).trim().split('\n').slice(-n).join('\n') : '';
   const ok = env.PRETTIER === 'success' && env.ESLINT === 'success';
   let body = `${marker}\n## ${ok ? '✅' : '❌'} ESLint + Prettier — \`${short}\`\n\nPrettier: **${env.PRETTIER}** · ESLint: **${env.ESLINT}**\n`;
   if (env.PRETTIER !== 'success') {

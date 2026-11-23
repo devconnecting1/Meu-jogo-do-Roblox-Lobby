@@ -53,26 +53,33 @@ export function makeBuilder() {
 export function rotationMatrix(rot) {
   if (!rot) return [1, 0, 0, 0, 1, 0, 0, 0, 1];
   const [ax, ay, az] = rot.map((d) => (d * Math.PI) / 180);
-  const cx = Math.cos(ax), sx = Math.sin(ax);
-  const cy = Math.cos(ay), sy = Math.sin(ay);
-  const cz = Math.cos(az), sz = Math.sin(az);
+  const cx = Math.cos(ax),
+    sx = Math.sin(ax);
+  const cy = Math.cos(ay),
+    sy = Math.sin(ay);
+  const cz = Math.cos(az),
+    sz = Math.sin(az);
   const r6 = (v) => {
     const r = Math.round(v * 1e6) / 1e6;
     return Object.is(r, -0) ? 0 : r;
   };
   return [
-    cy * cz, -cy * sz, sy,
-    cx * sz + sx * sy * cz, cx * cz - sx * sy * sz, -sx * cy,
-    sx * sz - cx * sy * cz, sx * cz + cx * sy * sz, cx * cy,
+    cy * cz,
+    -cy * sz,
+    sy,
+    cx * sz + sx * sy * cz,
+    cx * cz - sx * sy * sz,
+    -sx * cy,
+    sx * sz - cx * sy * cz,
+    sx * cz + cx * sy * sz,
+    cx * cy,
   ].map(r6);
 }
 
 /** Caixa alinhada aos eixos (AABB) de uma Part, considerando a rotação. */
 export function aabb(p) {
   const m = rotationMatrix(p.rotation);
-  const half = [0, 1, 2].map((i) =>
-    [0, 1, 2].reduce((acc, j) => acc + Math.abs(m[i * 3 + j]) * (p.size[j] / 2), 0),
-  );
+  const half = [0, 1, 2].map((i) => [0, 1, 2].reduce((acc, j) => acc + Math.abs(m[i * 3 + j]) * (p.size[j] / 2), 0));
   return {
     min: p.position.map((c, i) => c - half[i]),
     max: p.position.map((c, i) => c + half[i]),

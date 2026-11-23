@@ -95,8 +95,7 @@ export function findZFighting(parts) {
     return bx.some((b, i) => {
       if (ignore.has(i) || b.p.transparency !== 0 || b.p.rotation) return false;
       return (
-        b.min[f.a] < f.d - EPS && b.max[f.a] > f.d + EPS &&
-        contains([b.min[u], b.max[u], b.min[v], b.max[v]], rect)
+        b.min[f.a] < f.d - EPS && b.max[f.a] > f.d + EPS && contains([b.min[u], b.max[u], b.min[v], b.max[v]], rect)
       );
     });
   };
@@ -104,13 +103,16 @@ export function findZFighting(parts) {
   for (const list of buckets.values()) {
     for (let i = 0; i < list.length; i++) {
       for (let j = i + 1; j < list.length; j++) {
-        const f1 = list[i], f2 = list[j];
+        const f1 = list[i],
+          f2 = list[j];
         if (f1.idx === f2.idx || visualKey(f1.p) === visualKey(f2.p)) continue;
         const rect = overlapRect(f1.r, f2.r);
         if (!rect) continue;
         if (hidden(f1, rect, new Set([f1.idx, f2.idx]))) continue;
         const axis = 'XYZ'[f1.a];
-        problems.push(`Z-fighting em ${axis}=${f1.d} (${f1.s > 0 ? '+' : '-'}${axis}): ${label(f1.p)}  ×  ${label(f2.p)}`);
+        problems.push(
+          `Z-fighting em ${axis}=${f1.d} (${f1.s > 0 ? '+' : '-'}${axis}): ${label(f1.p)}  ×  ${label(f2.p)}`,
+        );
       }
     }
   }
@@ -136,15 +138,15 @@ export function findEdgeGaps(parts, edges, step = 0.25, height = 1.5) {
   for (const e of edges) {
     let gapStart = null;
     const flush = (t) => {
-      if (gapStart !== null) problems.push(`Sem guarda-corpo em "${e.name}" de ${gapStart.toFixed(2)} a ${t.toFixed(2)}`);
+      if (gapStart !== null)
+        problems.push(`Sem guarda-corpo em "${e.name}" de ${gapStart.toFixed(2)} a ${t.toFixed(2)}`);
       gapStart = null;
     };
     for (let t = e.from; t <= e.to + 1e-9; t += step) {
       const open = e.openings.some(([a, b]) => t >= a - EPS && t <= b + EPS);
       const pt = e.axis === 'x' ? [t, e.y + height, e.at] : [e.at, e.y + height, t];
       const covered =
-        open ||
-        solid.some((b) => [0, 1, 2].every((i) => pt[i] >= b.min[i] - EPS && pt[i] <= b.max[i] + EPS));
+        open || solid.some((b) => [0, 1, 2].every((i) => pt[i] >= b.min[i] - EPS && pt[i] <= b.max[i] + EPS));
       if (covered) flush(t);
       else if (gapStart === null) gapStart = t;
     }

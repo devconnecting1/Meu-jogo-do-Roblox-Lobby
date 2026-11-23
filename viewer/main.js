@@ -50,13 +50,20 @@ function studTexture() {
   const g = c.getContext('2d');
   g.fillStyle = '#e8e8e8';
   g.fillRect(0, 0, n, n);
-  const cx = n / 2, r = n * 0.3;
+  const cx = n / 2,
+    r = n * 0.3;
   g.fillStyle = '#b8b8b8';
-  g.beginPath(); g.arc(cx + 3, cx + 3, r, 0, Math.PI * 2); g.fill();
+  g.beginPath();
+  g.arc(cx + 3, cx + 3, r, 0, Math.PI * 2);
+  g.fill();
   g.fillStyle = '#ffffff';
-  g.beginPath(); g.arc(cx - 2, cx - 2, r, 0, Math.PI * 2); g.fill();
+  g.beginPath();
+  g.arc(cx - 2, cx - 2, r, 0, Math.PI * 2);
+  g.fill();
   g.fillStyle = '#dcdcdc';
-  g.beginPath(); g.arc(cx, cx, r * 0.92, 0, Math.PI * 2); g.fill();
+  g.beginPath();
+  g.arc(cx, cx, r * 0.92, 0, Math.PI * 2);
+  g.fill();
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.colorSpace = THREE.SRGBColorSpace;
@@ -277,7 +284,8 @@ let walking = false;
 
 function nearby(x, z) {
   const set = new Set();
-  const gx = Math.floor(x / GRID), gz = Math.floor(z / GRID);
+  const gx = Math.floor(x / GRID),
+    gz = Math.floor(z / GRID);
   for (let i = -1; i <= 1; i++)
     for (let j = -1; j <= 1; j++) (grid.get(gx + i + ',' + (gz + j)) || []).forEach((n) => set.add(n));
   return [...set].map((i) => colliders[i]);
@@ -285,7 +293,15 @@ function nearby(x, z) {
 function hits(pos, list) {
   const a0 = [pos.x - PLAYER.half, pos.y, pos.z - PLAYER.half];
   const a1 = [pos.x + PLAYER.half, pos.y + PLAYER.height, pos.z + PLAYER.half];
-  return list.filter((c) => a0[0] < c.max[0] && a1[0] > c.min[0] && a0[1] < c.max[1] && a1[1] > c.min[1] && a0[2] < c.max[2] && a1[2] > c.min[2]);
+  return list.filter(
+    (c) =>
+      a0[0] < c.max[0] &&
+      a1[0] > c.min[0] &&
+      a0[1] < c.max[1] &&
+      a1[1] > c.min[1] &&
+      a0[2] < c.max[2] &&
+      a1[2] > c.min[2],
+  );
 }
 function moveAxis(axis, delta, list) {
   if (!delta) return;

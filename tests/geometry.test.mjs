@@ -7,7 +7,9 @@ import { findFloating, findZFighting, findClearanceViolations, findEdgeGaps, fin
 
 const { parts } = buildPrison();
 const report = (problems, max = 40) =>
-  problems.length ? `\n${problems.slice(0, max).join('\n')}${problems.length > max ? `\n… +${problems.length - max}` : ''}` : '';
+  problems.length
+    ? `\n${problems.slice(0, max).join('\n')}${problems.length > max ? `\n… +${problems.length - max}` : ''}`
+    : '';
 
 test('nada flutua: toda Part está apoiada/encaixada na estrutura', () => {
   const p = findFloating(parts);
@@ -32,7 +34,10 @@ test('bordas do 2º andar têm guarda-corpo contínuo (sem buracos para cair)', 
 test('tudo fica dentro da envoltória; o interior não vaza para fora', () => {
   const outside = findOutside(parts, ENVELOPE);
   assert.equal(outside.length, 0, report(outside));
-  const inner = findOutside(parts.filter((p) => p.model !== 'Envoltória'), INTERIOR);
+  const inner = findOutside(
+    parts.filter((p) => p.model !== 'Envoltória'),
+    INTERIOR,
+  );
   assert.equal(inner.length, 0, report(inner));
 });
 

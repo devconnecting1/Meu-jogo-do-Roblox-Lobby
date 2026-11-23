@@ -101,7 +101,14 @@ export function buildManual(parts) {
       last.parts.push(x.i);
       last.names.push(x.p.name);
     } else {
-      steps.push({ n: steps.length + 1, phase: phase.id, phaseTitle: phase.title, model: x.p.model, parts: [x.i], names: [x.p.name] });
+      steps.push({
+        n: steps.length + 1,
+        phase: phase.id,
+        phaseTitle: phase.title,
+        model: x.p.model,
+        parts: [x.i],
+        names: [x.p.name],
+      });
     }
   }
 

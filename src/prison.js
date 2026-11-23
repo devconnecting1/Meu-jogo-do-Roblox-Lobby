@@ -315,8 +315,10 @@ export function buildPrison() {
   // --- Teto: vigas no ritmo das colunas ------------------------------------
   const T = 'Estrutura/Teto';
   const tg = { group: 'Teto' };
-  for (const x of COLUMN_X) b.span(T, 'Viga Transversal', [x - 0.7, ROOF - 1.8, -IN_Z], [x + 0.7, ROOF, IN_Z], C.beam, tg);
-  for (const z of [-E, E]) b.span(T, 'Viga Longitudinal', [-IN_X, ROOF - 1.8, z - 0.7], [IN_X, ROOF, z + 0.7], C.beam, tg);
+  for (const x of COLUMN_X)
+    b.span(T, 'Viga Transversal', [x - 0.7, ROOF - 1.8, -IN_Z], [x + 0.7, ROOF, IN_Z], C.beam, tg);
+  for (const z of [-E, E])
+    b.span(T, 'Viga Longitudinal', [-IN_X, ROOF - 1.8, z - 0.7], [IN_X, ROOF, z + 0.7], C.beam, tg);
 
   // --- Colunas ---------------------------------------------------------------
   for (const x of COLUMN_X) {
@@ -500,7 +502,8 @@ export function buildPrison() {
   b.span(V, 'Tampo', [75.8, 3, -18], [78.2, 3.3, 18], C.steelLight);
   b.span(V, 'Vidro Divisor', [76.9, 3.3, -18], [77.1, 9, 18], C.glass, { transparency: 0.6 });
   b.span(V, 'Travessa Vidro', [76.8, 9, -18], [77.2, 9.3, 18], C.steel);
-  for (let z = -18; z <= 18; z += 6) b.span(V, 'Divisória Cabine', [72, 0.1, z - 0.15], [82, 7.5, z + 0.15], C.wallTrim);
+  for (let z = -18; z <= 18; z += 6)
+    b.span(V, 'Divisória Cabine', [72, 0.1, z - 0.15], [82, 7.5, z + 0.15], C.wallTrim);
   for (let z = -15; z <= 15; z += 6) {
     for (const x of [74, 80]) {
       b.box(V, 'Banqueta Coluna', [x, 0.8, z], [0.4, 1.4, 0.4], C.steel);

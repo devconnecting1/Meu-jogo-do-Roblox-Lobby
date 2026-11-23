@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "description": "Prisão em Part clássico para Roblox. Tudo é testado, compilado, renderizado e publicado no GitHub Actions (.github/workflows/ci.yml).",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "node --test --test-reporter=spec \"tests/**/*.test.mjs\"",
     "build": "node tools/build-place.mjs && rojo build default.project.json -o build/prisao.rbxl",

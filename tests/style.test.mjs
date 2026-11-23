@@ -7,8 +7,20 @@ import { stats } from '../src/builder.js';
 
 const { parts } = buildPrison();
 const ALLOWED_KEYS = [
-  'model', 'name', 'position', 'size', 'color', 'transparency', 'canCollide', 'rotation',
-  'light', 'className', 'shape', 'material', 'studs', 'group',
+  'model',
+  'name',
+  'position',
+  'size',
+  'color',
+  'transparency',
+  'canCollide',
+  'rotation',
+  'light',
+  'className',
+  'shape',
+  'material',
+  'studs',
+  'group',
 ];
 
 test('somente Part clássico (Block; Cylinder só girado como tampo) e SpawnLocation', () => {

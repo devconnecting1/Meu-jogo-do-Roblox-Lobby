@@ -17,7 +17,20 @@ const lights = count(/<Item class="(PointLight|SurfaceLight)"/g);
 const expectedLights = parts.filter((p) => p.light).length;
 if (lights !== expectedLights) problems.push(`Luzes no lugar: ${lights}, esperado ${expectedLights}`);
 
-for (const banned of ['Decal', 'Texture', 'SurfaceGui', 'BillboardGui', 'ScreenGui', 'Script', 'LocalScript', 'ModuleScript', 'Humanoid', 'MeshPart', 'UnionOperation', 'Sky']) {
+for (const banned of [
+  'Decal',
+  'Texture',
+  'SurfaceGui',
+  'BillboardGui',
+  'ScreenGui',
+  'Script',
+  'LocalScript',
+  'ModuleScript',
+  'Humanoid',
+  'MeshPart',
+  'UnionOperation',
+  'Sky',
+]) {
   if (xml.includes(`<Item class="${banned}"`)) problems.push(`Instância proibida no lugar: ${banned}`);
 }
 if (!/<token name="Technology">4<\/token>/.test(xml)) problems.push('Lighting.Technology não está em Future (4)');
@@ -31,4 +44,6 @@ if (problems.length) {
   console.error('✖ Lugar inválido:\n' + problems.map((p) => '  - ' + p).join('\n'));
   process.exit(1);
 }
-console.log(`✔ Lugar ok: ${placeParts} Parts, ${lights} luzes, materiais ${[...materials].join('/')}, Lighting Future.`);
+console.log(
+  `✔ Lugar ok: ${placeParts} Parts, ${lights} luzes, materiais ${[...materials].join('/')}, Lighting Future.`,
+);
