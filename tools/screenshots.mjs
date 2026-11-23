@@ -39,7 +39,7 @@ await page.goto(`http://localhost:${port}/index.html`);
 await page.waitForFunction(() => window.__lobby?.ready, null, { timeout: 120000 });
 await page.addStyleTag({ content: '#hud{display:none !important}' });
 
-for (const view of ['exterior', 'plan', 'ground', 'upper', 'cell']) {
+for (const view of ['exterior', 'plan', 'atrium', 'corridor', 'upper', 'cell', 'stairs', 'play']) {
   await page.evaluate((v) => window.__lobby.setView(v), view);
   await page.waitForTimeout(1500);
   await page.screenshot({ path: join(outDir, `${view}.png`) });

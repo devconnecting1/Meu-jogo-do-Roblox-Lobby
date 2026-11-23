@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { buildLobby, stats as countStats } from '../src/lobby.js';
 
 const CONFIG = { universeId: '10548333977', placeId: '116364339053967' };
@@ -16,54 +20,79 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 0.85;
 app.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const sky = new THREE.Color(0x9cc7ea);
+const sky = new THREE.Color(0x8fbfe6);
 scene.background = sky;
-scene.fog = new THREE.Fog(sky, 260, 620);
+scene.fog = new THREE.Fog(sky, 300, 700);
 
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.3, 2000);
-camera.position.set(-190, 90, -150);
+const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.3, 2000);
 
-scene.add(new THREE.HemisphereLight(0xdfeeff, 0x6b6656, 0.9));
-scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-const sun = new THREE.DirectionalLight(0xfff2dc, 2.2);
+scene.add(new THREE.HemisphereLight(0xeef4ff, 0x8a8578, 0.75));
+scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+const sun = new THREE.DirectionalLight(0xfff2dc, 1.9);
 sun.position.set(-120, 200, -90);
 sun.castShadow = true;
 sun.shadow.mapSize.set(4096, 4096);
-const sc = sun.shadow.camera;
-sc.left = -170; sc.right = 170; sc.top = 170; sc.bottom = -170; sc.near = 10; sc.far = 600;
+Object.assign(sun.shadow.camera, { left: -130, right: 130, top: 130, bottom: -130, near: 10, far: 600 });
 sun.shadow.bias = -0.0004;
 sun.shadow.normalBias = 0.4;
 scene.add(sun);
+
+// ---------------------------------------------------------------------------
+// Textura de visualização (só no navegador: simula a superfície Studs do Roblox)
+// ---------------------------------------------------------------------------
+function studTexture() {
+  const n = 64;
+  const c = document.createElement('canvas');
+  c.width = c.height = n;
+  const g = c.getContext('2d');
+  g.fillStyle = '#e6e6e6';
+  g.fillRect(0, 0, n, n);
+  const cx = n / 2, r = n * 0.3;
+  g.fillStyle = '#b4b4b4';
+  g.beginPath(); g.arc(cx + 3, cx + 3, r, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#ffffff';
+  g.beginPath(); g.arc(cx - 2, cx - 2, r, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#d8d8d8';
+  g.beginPath(); g.arc(cx, cx, r * 0.92, 0, Math.PI * 2); g.fill();
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+const STUD_TEX = studTexture();
 
 // ---------------------------------------------------------------------------
 // Parts -> malhas
 // ---------------------------------------------------------------------------
 const { parts } = buildLobby();
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
-const groups = new Map(); // group -> THREE.Group
+// Cilindro do Roblox: eixo ao longo de X
+const unitCyl = new THREE.CylinderGeometry(0.5, 0.5, 1, 40).rotateZ(Math.PI / 2);
+const groups = new Map();
 const materialCache = new Map();
 
-function srgb([r, g, b]) {
-  return new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
-}
+const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
 
-function materialFor(p) {
-  const key = `${p.color.join(',')}|${p.transparency}|${p.light ? 1 : 0}`;
+function materialFor(p, studs = false) {
+  const key = `${p.color.join(',')}|${p.transparency}|${p.material}|${studs}`;
   if (materialCache.has(key)) return materialCache.get(key);
   const color = srgb(p.color);
+  const neon = p.material === 'Neon';
   const m = new THREE.MeshStandardMaterial({
     color,
-    roughness: 0.62,
-    metalness: 0.0,
+    map: studs ? STUD_TEX : null,
+    roughness: 0.75,
+    metalness: 0,
     transparent: p.transparency > 0,
     opacity: 1 - p.transparency,
     depthWrite: p.transparency === 0,
-    emissive: p.light ? color : new THREE.Color(0),
-    emissiveIntensity: p.light ? 0.9 : 0,
+    emissive: neon ? color : new THREE.Color(0),
+    emissiveIntensity: neon ? 1.5 : 0,
   });
   materialCache.set(key, m);
   return m;
@@ -83,7 +112,6 @@ function labelMaterials(p) {
   const base = materialFor(p);
   const faces = { Right: 0, Left: 1, Top: 2, Bottom: 3, Back: 4, Front: 5 };
   const idx = faces[p.label.face] ?? 5;
-  // largura/altura da face em studs
   const [sx, sy, sz] = p.size;
   const dims = idx < 2 ? [sz, sy] : idx < 4 ? [sx, sz] : [sx, sy];
   const ppu = 48;
@@ -93,40 +121,56 @@ function labelMaterials(p) {
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = `rgb(${p.color.join(',')})`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  const [r, g, b] = p.label.color ?? [255, 255, 255];
-  ctx.fillStyle = `rgb(${r},${g},${b})`;
+  ctx.fillStyle = `rgb(${(p.label.color ?? [255, 255, 255]).join(',')})`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   let size = canvas.height * 0.62;
-  ctx.font = `700 ${size}px system-ui, sans-serif`;
+  const font = (s) => `700 ${s}px "Source Sans 3", "Source Sans Pro", system-ui, sans-serif`;
+  ctx.font = font(size);
   while (ctx.measureText(p.label.text).width > canvas.width * 0.92 && size > 6) {
     size -= 2;
-    ctx.font = `700 ${size}px system-ui, sans-serif`;
+    ctx.font = font(size);
   }
   ctx.fillText(p.label.text, canvas.width / 2, canvas.height / 2 + size * 0.04);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
-  const faceMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.7, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.35 });
+  const faceMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.7 });
   const mats = Array(6).fill(base);
   mats[idx] = faceMat;
   return mats;
 }
 
+/** Caixa cuja face de cima repete o stud 1x por stud (como no Roblox). */
+function studGeometry([sx, , sz]) {
+  const g = unitBox.clone();
+  const uv = g.attributes.uv;
+  for (let i = 8; i < 12; i++) uv.setXY(i, uv.getX(i) * sx, uv.getY(i) * sz); // face +Y
+  return g;
+}
+
 const buckets = new Map();
 const tmp = new THREE.Object3D();
 for (const p of parts) {
-  if (p.rotation || p.label) {
-    const mesh = new THREE.Mesh(unitBox, p.label ? labelMaterials(p) : materialFor(p));
+  const special = p.rotation || p.label || p.studs || p.shape === 'Cylinder';
+  if (special) {
+    let geo = p.shape === 'Cylinder' ? unitCyl : unitBox;
+    let mat = p.label ? labelMaterials(p) : materialFor(p);
+    if (p.studs) {
+      geo = studGeometry(p.size);
+      const base = materialFor(p);
+      mat = [base, base, materialFor(p, true), base, base, base];
+    }
+    const mesh = new THREE.Mesh(geo, mat);
     mesh.position.fromArray(p.position);
     mesh.scale.fromArray(p.size);
     if (p.rotation) mesh.rotation.set(...p.rotation.map(THREE.MathUtils.degToRad), 'XYZ');
-    mesh.castShadow = p.transparency < 0.5;
+    mesh.castShadow = p.transparency < 0.5 && p.material !== 'Neon';
     mesh.receiveShadow = true;
     groupNode(p.group).add(mesh);
     continue;
   }
-  const key = `${p.group}|${p.color.join(',')}|${p.transparency}|${p.light ? 1 : 0}`;
+  const key = `${p.group}|${p.color.join(',')}|${p.transparency}|${p.material}`;
   if (!buckets.has(key)) buckets.set(key, []);
   buckets.get(key).push(p);
 }
@@ -136,38 +180,45 @@ for (const list of buckets.values()) {
   list.forEach((p, i) => {
     tmp.position.fromArray(p.position);
     tmp.scale.fromArray(p.size);
-    tmp.rotation.set(0, 0, 0);
     tmp.updateMatrix();
     mesh.setMatrixAt(i, tmp.matrix);
   });
-  mesh.castShadow = p0.transparency < 0.5 && p0.group !== 'Terreno';
+  mesh.castShadow = p0.transparency < 0.5 && p0.material !== 'Neon' && p0.group !== 'Terreno';
   mesh.receiveShadow = true;
   if (p0.transparency > 0) mesh.renderOrder = 2;
   groupNode(p0.group).add(mesh);
 }
 
-// Algumas luzes pontuais (as do átrio) para o interior não ficar escuro.
+// Algumas luzes pontuais reais (as do átrio) para dar volume ao interior.
 for (const p of parts) {
-  if (!p.light || p.name !== 'Luminária Átrio') continue;
-  const l = new THREE.PointLight(srgb(p.light.color), 260, 70, 1.6);
+  if (!p.light || !p.model.startsWith('Iluminação/Átrio')) continue;
+  const l = new THREE.PointLight(srgb(p.light.color), 60, 40, 1.6);
   l.position.set(p.position[0], p.position[1] - 1, p.position[2]);
   scene.add(l);
 }
+
+// Pós-processamento: bloom para o Neon (como o glow do Roblox)
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.32, 0.35, 0.96));
+composer.addPass(new OutputPass());
 
 // ---------------------------------------------------------------------------
 // Controles e vistas
 // ---------------------------------------------------------------------------
 const orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
-orbit.target.set(0, 10, 0);
 orbit.maxDistance = 600;
 
 const VIEWS = {
-  exterior: { pos: [-165, 62, -128], target: [-12, 6, 0], roof: true },
-  plan: { pos: [10, 210, 95], target: [0, 0, 0], roof: false },
-  ground: { pos: [-62, 6, -15], target: [20, 6, -27], roof: true },
-  upper: { pos: [-49, 20.5, 23], target: [30, 17, 20.5], roof: true },
-  cell: { pos: [22.5, 5, -15.5], target: [19.5, 4.2, -31.5], roof: true },
+  exterior: { pos: [-128, 44, -96], target: [-8, 8, 0], roof: true },
+  plan: { pos: [2, 150, 62], target: [0, 0, 0], roof: false },
+  atrium: { pos: [-66, 7.5, 0], target: [10, 9, 0], roof: true },
+  corridor: { pos: [-50, 5.5, 22], target: [30, 4.5, 23.5], roof: true },
+  upper: { pos: [-48, 21, 21], target: [30, 19.5, 22], roof: true },
+  cell: { pos: [-19.5, 5.2, -19], target: [-21.75, 4.2, -31], roof: true },
+  stairs: { pos: [18, 6, 2], target: [40, 9, 0], roof: true },
+  play: { pos: [57, 6.5, -16.5], target: [69, 5.5, 2], roof: true },
 };
 
 const roofBtn = document.getElementById('roof');
@@ -177,7 +228,11 @@ function setGroupVisible(name, on, btn) {
   if (g) g.visible = on;
   btn?.classList.toggle('on', on);
 }
-roofBtn.onclick = () => setGroupVisible('Teto', !groups.get('Teto').visible, roofBtn);
+roofBtn.onclick = () => {
+  const on = !groups.get('Teto').visible;
+  setGroupVisible('Teto', on, roofBtn);
+  setGroupVisible('Iluminação', on);
+};
 wallsBtn.onclick = () => setGroupVisible('Paredes', !groups.get('Paredes').visible, wallsBtn);
 
 function setView(name) {
@@ -188,6 +243,7 @@ function setView(name) {
   orbit.target.fromArray(v.target);
   orbit.update();
   setGroupVisible('Teto', v.roof, roofBtn);
+  setGroupVisible('Iluminação', v.roof);
   setGroupVisible('Paredes', true, wallsBtn);
   document.querySelectorAll('#views button').forEach((b) => b.classList.toggle('on', b.dataset.view === name));
 }
@@ -203,7 +259,7 @@ const colliders = parts
     min: p.position.map((c, i) => c - p.size[i] / 2),
     max: p.position.map((c, i) => c + p.size[i] / 2),
   }));
-colliders.push({ min: [-260, -10, -260], max: [260, -0.2, 260] }); // gramado
+colliders.push({ min: [-260, -10, -260], max: [260, -0.1, 260] }); // chão externo
 
 const GRID = 8;
 const grid = new Map();
@@ -218,8 +274,9 @@ colliders.forEach((c, i) => {
 });
 const ground = colliders.length - 1;
 
+const SPAWN = [-62, 1, 0];
 const PLAYER = { half: 0.9, height: 5, eye: 4.5 };
-const player = { pos: new THREE.Vector3(-40, 1, 0), vel: new THREE.Vector3(), onGround: false };
+const player = { pos: new THREE.Vector3(...SPAWN), vel: new THREE.Vector3(), onGround: false };
 const keys = {};
 const look = new PointerLockControls(camera, document.body);
 let walking = false;
@@ -244,7 +301,6 @@ function moveAxis(axis, delta, list) {
   const hit = hits(player.pos, list);
   if (!hit.length) return;
   if (axis !== 'y') {
-    // tenta subir degrau (até 1.2 stud)
     const top = Math.max(...hit.map((c) => c.max[1]));
     if (player.onGround && top - player.pos.y <= 1.2) {
       const y = player.pos.y;
@@ -255,7 +311,6 @@ function moveAxis(axis, delta, list) {
     player.pos[axis] -= delta;
     return;
   }
-  // eixo Y
   if (delta < 0) {
     player.pos.y = Math.max(...hit.map((c) => c.max[1])) + 0.001;
     player.onGround = true;
@@ -288,7 +343,7 @@ function stepWalk(dt) {
   moveAxis('z', wish.z * dt, list);
   player.onGround = false;
   moveAxis('y', player.vel.y * dt, list);
-  if (player.pos.y < -50) player.pos.set(-40, 1, 0);
+  if (player.pos.y < -50) player.pos.set(...SPAWN);
   camera.position.set(player.pos.x, player.pos.y + PLAYER.eye, player.pos.z);
 }
 
@@ -299,11 +354,12 @@ function enterWalk() {
   walkBtn.classList.add('on');
   document.getElementById('walkhint').style.display = 'block';
   document.getElementById('cross').style.display = 'block';
-  player.pos.set(-40, 1, 0);
+  player.pos.set(...SPAWN);
   player.vel.set(0, 0, 0);
-  camera.position.set(-40, 1 + PLAYER.eye, 0);
-  camera.lookAt(0, 1 + PLAYER.eye, 0);
+  camera.position.set(SPAWN[0], SPAWN[1] + PLAYER.eye, SPAWN[2]);
+  camera.lookAt(0, SPAWN[1] + PLAYER.eye, 0);
   setGroupVisible('Teto', true, roofBtn);
+  setGroupVisible('Iluminação', true);
   look.lock();
 }
 function exitWalk() {
@@ -331,10 +387,21 @@ addEventListener('keyup', (e) => (keys[e.code] = false));
 // ---------------------------------------------------------------------------
 const s = countStats(parts);
 const lights = parts.filter((p) => p.light).length;
-document.getElementById('stats').innerHTML = `
-  <div><b>${s.total}</b> Parts · <b>32</b> celas showcase · <b>${lights}</b> luzes</div>
-  <div>Universo ${CONFIG.universeId} · Lugar ${CONFIG.placeId}</div>
-  <div><a href="https://www.roblox.com/games/${CONFIG.placeId}" target="_blank" rel="noopener">Abrir no Roblox ↗</a></div>`;
+const statsEl = document.getElementById('stats');
+const line = (text) => {
+  const d = document.createElement('div');
+  d.textContent = text;
+  statsEl.appendChild(d);
+  return d;
+};
+line(`${s.total} Parts · 32 celas showcase · ${lights} luzes`);
+line(`Universo ${CONFIG.universeId} · Lugar ${CONFIG.placeId}`);
+const link = document.createElement('a');
+link.href = `https://www.roblox.com/games/${CONFIG.placeId}`;
+link.target = '_blank';
+link.rel = 'noopener';
+link.textContent = 'Abrir no Roblox ↗';
+line('').appendChild(link);
 
 // ---------------------------------------------------------------------------
 // Loop
@@ -343,6 +410,7 @@ addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
 });
 
 const clock = new THREE.Clock();
@@ -350,7 +418,7 @@ renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
   if (walking) stepWalk(dt);
   else orbit.update();
-  renderer.render(scene, camera);
+  composer.render();
 });
 
 const initial = new URLSearchParams(location.hash.slice(1)).get('view') || 'exterior';

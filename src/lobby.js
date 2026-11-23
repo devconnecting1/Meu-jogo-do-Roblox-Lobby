@@ -2,59 +2,53 @@
 //
 // Este módulo descreve TODAS as Parts do lobby como dados puros. Ele é usado:
 //   * pelo visualizador Three.js (index.html) para mostrar o mapa no navegador;
-//   * pelo gerador tools/build-rbxlx.mjs para criar o arquivo .rbxlx do Roblox.
+//   * pelo gerador tools/build-place.mjs para montar o lugar do Roblox (via Rojo).
 //
-// Regras do estilo: apenas Part clássico (shape Block), material SmoothPlastic,
-// todas as superfícies lisas (sem studs) e nenhuma textura/decal.
+// Estilo "clássico" (referência: prisão de builder de elite):
+//   * só Part clássico (Block, e Cylinder nas mesas redondas), material Plastic;
+//   * Neon apenas nas lâmpadas e telas;
+//   * paredes lisas, studs clássicos só nos pisos de destaque;
+//   * nenhuma textura, decal ou MeshPart;
+//   * paleta de 3 cores: branco + laranja queimado + azul-marinho.
 //
 // Unidades em studs. Eixos iguais aos do Roblox e do Three.js (Y para cima).
 
-export const STYLE = Object.freeze({
-  material: 'SmoothPlastic',
-  shape: 'Block',
-});
+export const STYLE = Object.freeze({ material: 'Plastic', accent: 'Neon' });
 
 const C = {
-  concrete: [124, 124, 128],
-  yard: [138, 138, 134],
-  path: [104, 104, 108],
-  grass: [96, 140, 80],
-  wall: [178, 174, 164],
-  wallDark: [96, 100, 110],
-  cellWall: [206, 201, 190],
-  cellFloor: [150, 150, 146],
-  steel: [62, 64, 70],
-  catwalk: [92, 96, 104],
-  rail: [214, 162, 32],
-  roof: [78, 80, 86],
-  glass: [168, 208, 232],
-  lamp: [255, 244, 206],
-  pedestal: [46, 48, 54],
-  pedestalTop: [238, 190, 60],
-  plaque: [28, 32, 40],
-  bed: [70, 76, 84],
-  mattress: [222, 222, 214],
-  toilet: [236, 236, 236],
-  stripe: [240, 196, 30],
-  table: [120, 124, 132],
-  booth: [52, 70, 104],
-  tower: [70, 74, 82],
-  padGreen: [60, 190, 90],
-  padYellow: [240, 200, 40],
-  padRed: [220, 70, 60],
-  spawn: [40, 120, 210],
+  white: [238, 238, 240],
+  offWhite: [218, 220, 224],
+  lightGray: [198, 200, 206],
+  gray: [160, 165, 175],
+  grayDark: [96, 100, 110],
+  charcoal: [46, 48, 56],
+  orange: [204, 94, 38],
+  orangeDark: [184, 84, 34],
+  navy: [26, 38, 86],
+  navyDark: [16, 24, 56],
+  blue: [22, 108, 200],
+  blueCafe: [40, 92, 130],
+  ceiling: [28, 32, 46],
+  neon: [244, 250, 255],
+  glass: [196, 224, 240],
+  mirror: [200, 208, 218],
+  red: [156, 42, 34],
+  crate: [92, 62, 44],
+  crateDark: [60, 40, 30],
+  grass: [88, 130, 74],
+  apron: [158, 158, 156],
 };
 
 // Roupas do showcase (uma por cela, repetindo nos 4 blocos).
 export const OUTFITS = [
-  { name: 'Detento Laranja', shirt: [255, 128, 0], pants: [255, 128, 0], skin: [245, 205, 160] },
-  { name: 'Listrado Clássico', shirt: [235, 235, 235], pants: [235, 235, 235], skin: [204, 142, 105], stripes: [25, 25, 25] },
-  { name: 'Guarda', shirt: [52, 88, 160], pants: [30, 32, 40], skin: [160, 105, 75] },
-  { name: 'Diretor', shirt: [40, 40, 46], pants: [40, 40, 46], skin: [245, 205, 160], tie: [180, 30, 40] },
-  { name: 'Fugitivo', shirt: [255, 128, 0], pants: [70, 90, 140], skin: [120, 80, 55] },
-  { name: 'Cozinheiro', shirt: [250, 250, 250], pants: [60, 60, 60], skin: [230, 185, 140] },
-  { name: 'Mecânico', shirt: [90, 110, 70], pants: [90, 110, 70], skin: [204, 142, 105] },
-  { name: 'VIP Dourado', shirt: [230, 180, 40], pants: [230, 180, 40], skin: [245, 205, 160], stripes: [120, 85, 10] },
+  { name: 'Detento Laranja', shirt: [214, 96, 30], pants: [214, 96, 30], skin: [245, 205, 160] },
+  { name: 'Listrado Clássico', shirt: [236, 236, 236], pants: [236, 236, 236], skin: [204, 142, 105], stripes: [30, 30, 34] },
+  { name: 'Guarda', shirt: [40, 64, 140], pants: [26, 30, 44], skin: [160, 105, 75], cap: [26, 30, 44] },
+  { name: 'Diretor', shirt: [44, 44, 52], pants: [44, 44, 52], skin: [245, 205, 160], tie: [170, 30, 40] },
+  { name: 'Fugitivo', shirt: [214, 96, 30], pants: [64, 84, 140], skin: [120, 80, 55] },
+  { name: 'Cozinheiro', shirt: [250, 250, 250], pants: [70, 70, 76], skin: [230, 185, 140], cap: [250, 250, 250] },
+  { name: 'Mecânico', shirt: [92, 112, 72], pants: [92, 112, 72], skin: [204, 142, 105] },
+  { name: 'VIP Dourado', shirt: [228, 178, 40], pants: [228, 178, 40], skin: [245, 205, 160], stripes: [130, 92, 14] },
 ];
 
 // ---------------------------------------------------------------------------
@@ -63,8 +57,6 @@ export const OUTFITS = [
 
 function makeBuilder() {
   const parts = [];
-  const models = new Map(); // path -> { name, path }
-
   const builder = {
     parts,
     /** Caixa pelo centro e tamanho. */
@@ -79,18 +71,20 @@ function makeBuilder() {
         canCollide: opts.canCollide ?? true,
         rotation: opts.rotation ?? null, // [rx, ry, rz] em graus (CFrame.Angles)
         light: opts.light ?? null, // { range, brightness, color }
-        label: opts.label ?? null, // { text, face, color, bg }
+        label: opts.label ?? null, // { text, face, color }
         className: opts.className ?? 'Part',
+        shape: opts.shape ?? 'Block',
+        material: opts.material ?? 'Plastic',
+        studs: opts.studs ?? false, // TopSurface = Studs (estilo clássico)
         group: opts.group ?? model.split('/')[0],
       };
       parts.push(part);
-      if (!models.has(model)) models.set(model, model);
       return part;
     },
-    /** Caixa pelos cantos mínimo/máximo. */
-    span(model, name, min, max, color, opts) {
-      const center = [0, 1, 2].map((i) => (min[i] + max[i]) / 2);
-      const size = [0, 1, 2].map((i) => Math.abs(max[i] - min[i]));
+    /** Caixa pelos cantos (em qualquer ordem). */
+    span(model, name, a, bb, color, opts) {
+      const center = [0, 1, 2].map((i) => (a[i] + bb[i]) / 2);
+      const size = [0, 1, 2].map((i) => Math.abs(bb[i] - a[i]));
       return builder.box(model, name, center, size, color, opts);
     },
   };
@@ -109,19 +103,23 @@ export const DIM = Object.freeze({
   inX: 70, // interior vai de -70 a 70
   inZ: 40, // interior vai de -40 a 40
   wall: 2,
-  floor1: 0,
-  floor2: 16, // piso do 2º andar (topo da laje)
+  floor2: 16, // topo da laje do 2º andar
   cellH: 15,
   cellW: 12,
   cellD: 14,
   cellsPerRow: 8,
   roofY: 34,
-  catwalkEdge: 20, // passarela vai de |z|=20 até |z|=26
+  catwalkEdge: 18, // vão do átrio: |z| < 18
+  stairX0: 38,
+  stairX1: 56, // mezanino leste começa em x = 56
+  stairHalf: 6,
 });
 
 const CELL_FRONT = DIM.inZ - DIM.cellD; // 26
 const PITCH = DIM.cellW + 1; // 13
 const ROW_START = -(DIM.cellsPerRow * PITCH + 1) / 2; // -52.5
+const COLUMN_X = [-65, ...Array.from({ length: 9 }, (_, i) => -52 + i * PITCH)]; // ritmo das colunas
+const NEON_LIGHT = { range: 22, brightness: 1.2, color: [255, 250, 240] };
 
 // ---------------------------------------------------------------------------
 // Peças compostas
@@ -139,172 +137,172 @@ function dummy(b, model, base, facing, outfit) {
   b.box(model, 'Mão Esquerda', [x - 1.5, y + 2.2, z], [1.04, 0.4, 1.04], outfit.skin);
   b.box(model, 'Mão Direita', [x + 1.5, y + 2.2, z], [1.04, 0.4, 1.04], outfit.skin);
   b.box(model, 'Cabeça', [x, y + 4.6, z], [1.2, 1.2, 1.2], outfit.skin);
-  // Rosto simples feito de blocos (sem decal): olhos e boca.
   const fz = z + f * 0.61;
-  b.box(model, 'Olho Esquerdo', [x - 0.25, y + 4.75, fz], [0.16, 0.22, 0.04], [20, 20, 20], { canCollide: false });
-  b.box(model, 'Olho Direito', [x + 0.25, y + 4.75, fz], [0.16, 0.22, 0.04], [20, 20, 20], { canCollide: false });
-  b.box(model, 'Boca', [x, y + 4.32, fz], [0.5, 0.08, 0.04], [20, 20, 20], { canCollide: false });
+  const face = { canCollide: false };
+  b.box(model, 'Olho Esquerdo', [x - 0.25, y + 4.75, fz], [0.16, 0.22, 0.04], [20, 20, 20], face);
+  b.box(model, 'Olho Direito', [x + 0.25, y + 4.75, fz], [0.16, 0.22, 0.04], [20, 20, 20], face);
+  b.box(model, 'Boca', [x, y + 4.32, fz], [0.5, 0.08, 0.04], [20, 20, 20], face);
   if (outfit.stripes) {
     for (let i = 0; i < 3; i++) {
-      const sy = y + 0.4 + i * 0.66;
-      b.box(model, `Listra Perna ${i + 1}`, [x, sy, z], [2.04, 0.22, 1.04], outfit.stripes, { canCollide: false });
-      b.box(model, `Listra Tronco ${i + 1}`, [x, y + 2.4 + i * 0.66, z], [4.04, 0.22, 1.04], outfit.stripes, { canCollide: false });
+      b.box(model, `Listra Perna ${i + 1}`, [x, y + 0.4 + i * 0.66, z], [2.04, 0.22, 1.04], outfit.stripes, face);
+      b.box(model, `Listra Tronco ${i + 1}`, [x, y + 2.4 + i * 0.66, z], [4.04, 0.22, 1.04], outfit.stripes, face);
     }
   }
-  if (outfit.tie) {
-    b.box(model, 'Gravata', [x, y + 3.1, z + f * 0.52], [0.3, 1.5, 0.04], outfit.tie, { canCollide: false });
+  if (outfit.tie) b.box(model, 'Gravata', [x, y + 3.1, z + f * 0.52], [0.3, 1.5, 0.04], outfit.tie, face);
+  if (outfit.cap) {
+    b.box(model, 'Boné', [x, y + 5.3, z], [1.3, 0.3, 1.3], outfit.cap, face);
+    b.box(model, 'Aba', [x, y + 5.2, z + f * 0.85], [1.1, 0.12, 0.5], outfit.cap, face);
   }
 }
 
-/** Uma cela showcase. side = -1 (bloco sul, abre para +Z) ou +1 (bloco norte, abre para -Z). */
+/** Caixa de madeira clássica: bloco + cantoneiras + cintas. */
+function crate(b, model, x, y, z, s = 4) {
+  b.box(model, 'Caixa', [x, y + s / 2, z], [s, s, s], C.crate);
+  const h = s / 2 - 0.15;
+  for (const dx of [-h, h]) for (const dz of [-h, h]) {
+    b.box(model, 'Cantoneira', [x + dx, y + s / 2, z + dz], [0.42, s + 0.04, 0.42], C.crateDark);
+  }
+  b.box(model, 'Cinta Inferior', [x, y + 0.3, z], [s + 0.06, 0.4, s + 0.06], C.crateDark);
+  b.box(model, 'Cinta Superior', [x, y + s - 0.3, z], [s + 0.06, 0.4, s + 0.06], C.crateDark);
+}
+
+/** Estante metálica de depósito (ao longo de X). */
+function rack(b, model, x, z, len = 9, depth = 3, h = 10) {
+  for (const dx of [-len / 2 + 0.3, 0, len / 2 - 0.3]) {
+    for (const dz of [-depth / 2 + 0.3, depth / 2 - 0.3]) {
+      b.box(model, 'Montante', [x + dx, h / 2, z + dz], [0.5, h, 0.5], C.grayDark);
+    }
+  }
+  [0.6, 4, 7.4].forEach((sy, i) => {
+    b.box(model, `Prateleira ${i + 1}`, [x, sy, z], [len, 0.3, depth], C.charcoal);
+  });
+  crate(b, model, x - 2.5, 0.75, z, 2.2);
+  crate(b, model, x + 2.2, 4.15, z, 2.2);
+  crate(b, model, x - 0.6, 7.55, z, 2.2);
+}
+
+/** Luminária fluorescente pendente (suporte escuro + 2 tubos Neon). */
+function hangingLight(b, model, x, y, z, stem = 3) {
+  b.box(model, 'Carcaça', [x, y, z], [7, 0.4, 1.6], C.charcoal, { canCollide: false });
+  for (const o of [-1.7, 1.7]) {
+    b.box(model, 'Tubo', [x + o, y - 0.3, z], [3.2, 0.25, 1], C.neon, {
+      canCollide: false,
+      material: 'Neon',
+      light: o < 0 ? NEON_LIGHT : null,
+    });
+    b.box(model, 'Haste', [x + o * 1.4, y + stem / 2 + 0.2, z], [0.3, stem, 0.3], C.charcoal, { canCollide: false });
+  }
+}
+
+/** Painel de luz embutido no teto (y = face inferior do teto). */
+function flushLight(b, model, x, y, z, w = 4, d = 1.2, light = true) {
+  b.box(model, 'Moldura', [x, y - 0.05, z], [w + 0.4, 0.1, d + 0.4], C.charcoal, { canCollide: false });
+  b.box(model, 'Painel', [x, y - 0.15, z], [w, 0.12, d], C.neon, {
+    canCollide: false,
+    material: 'Neon',
+    light: light ? { range: 18, brightness: 1, color: [255, 250, 240] } : null,
+  });
+}
+
+/** Guarda-corpo de vidro (rodapé escuro + vidro + corrimão), reto em X ou em Z. */
+function glassRail(b, model, a, bb, y) {
+  const alongX = a[1] === bb[1];
+  const x0 = Math.min(a[0], bb[0]), x1 = Math.max(a[0], bb[0]);
+  const z0 = Math.min(a[1], bb[1]), z1 = Math.max(a[1], bb[1]);
+  const seg = (name, w, ya, yb, color, opts) => {
+    const lo = alongX ? [x0, ya, z0 - w / 2] : [x0 - w / 2, ya, z0];
+    const hi = alongX ? [x1, yb, z0 + w / 2] : [x0 + w / 2, yb, z1];
+    b.span(model, name, lo, hi, color, opts);
+  };
+  seg('Rodapé', 0.7, y, y + 0.6, C.charcoal, { studs: true });
+  seg('Vidro', 0.2, y + 0.6, y + 3.6, C.glass, { transparency: 0.6 });
+  seg('Corrimão', 0.45, y + 3.6, y + 3.9, C.gray);
+}
+
+/** Uma cela showcase. side = -1 (ala sul, abre para +Z) ou +1 (ala norte, abre para -Z). */
 function cell(b, index, side, floorY, number) {
   const outfit = OUTFITS[index % OUTFITS.length];
-  const model = `Celas/Cela ${String(number).padStart(2, '0')}`;
-  const cx = ROW_START + 1 + DIM.cellW / 2 + index * PITCH; // centro X da cela
-  const front = side * CELL_FRONT; // plano da grade
-  const inward = side; // direção do fundo da cela
-  const facing = -side; // a cela "olha" para o átrio
+  const id = String(number).padStart(2, '0');
+  const model = `Celas/Cela ${id}`;
+  const cx = ROW_START + 1 + DIM.cellW / 2 + index * PITCH;
+  const front = side * CELL_FRONT;
+  const facing = -side; // a cela olha para o corredor
   const y0 = floorY;
-  const zAt = (depth) => front + inward * depth; // profundidade -> Z
+  const zAt = (d) => front + side * d; // profundidade (0 = fachada, 14 = fundo) -> Z
+  const r = (name, lx0, lx1, ya, yb, d0, d1, color, opts) =>
+    b.span(model, name, [cx + lx0, y0 + ya, zAt(d0)], [cx + lx1, y0 + yb, zAt(d1)], color, opts);
 
-  // Piso da cela levemente diferente
-  b.span(model, 'Piso', [cx - 6, y0, zAt(0.4)], [cx + 6, y0 + 0.1, zAt(DIM.cellD)], C.cellFloor);
-
-  // Verga sólida acima da grade (com placa)
-  const lintelZ0 = front + inward * 0;
-  const lintelZ1 = front + inward * 0.4;
-  b.span(model, 'Verga', [cx - 6, y0 + 13, lintelZ0], [cx + 6, y0 + DIM.cellH, lintelZ1], C.cellWall);
-  b.box(
-    model,
-    'Placa',
-    [cx, y0 + 14, front + facing * 0.1],
-    [7.5, 1.5, 0.2],
-    C.plaque,
-    {
-      label: {
-        text: `CELA ${String(number).padStart(2, '0')} · ${outfit.name.toUpperCase()}`,
-        face: facing > 0 ? 'Back' : 'Front',
-        color: [255, 210, 80],
-      },
-    },
-  );
-
-  // Grade: barras verticais + travessas
-  const barZ = front + inward * 0.2;
-  for (let i = 0; i < 8; i++) {
-    const bx = cx - 5.25 + i * 1.5;
-    b.box(model, `Barra ${i + 1}`, [bx, y0 + 6.5, barZ], [0.3, 13, 0.3], C.steel);
-  }
-  b.box(model, 'Travessa Inferior', [cx, y0 + 0.6, barZ], [12, 0.35, 0.4], C.steel);
-  b.box(model, 'Travessa Meio', [cx, y0 + 9.5, barZ], [12, 0.35, 0.4], C.steel);
-  b.box(model, 'Travessa Superior', [cx, y0 + 12.8, barZ], [12, 0.4, 0.4], C.steel);
-
-  // Vidro do showcase logo atrás da grade
-  b.box(model, 'Vidro Showcase', [cx, y0 + 6.5, front + inward * 0.6], [12, 13, 0.2], C.glass, { transparency: 0.78 });
-
-  // Pedestal + boneco
-  const pz = zAt(5.5);
-  b.box(model, 'Pedestal', [cx, y0 + 0.6, pz], [5, 1.2, 5], C.pedestal);
-  b.box(model, 'Pedestal Borda', [cx, y0 + 1.3, pz], [5.4, 0.2, 5.4], C.pedestalTop);
-  dummy(b, `${model}/Showcase`, [cx, y0 + 1.4, pz], facing, outfit);
-
-  // Holofote do showcase (teto)
-  b.box(model, 'Luminária', [cx, y0 + DIM.cellH - 0.2, zAt(5.5)], [3, 0.3, 1.6], C.lamp, {
+  // Fachada azul-marinho: pilar, janela, porta, pilar
+  r('Fachada Pilar E', -6, -5, 0, 12, 0, 0.6, C.navy);
+  r('Fachada Peitoril', -5, 0.5, 0, 2.5, 0, 0.6, C.navy);
+  r('Fachada Verga Janela', -5, 0.5, 10, 12, 0, 0.6, C.navy);
+  r('Fachada Pilar Meio', 0.5, 1.5, 0, 12, 0, 0.6, C.navy);
+  r('Fachada Verga Porta', 1.5, 4.5, 9, 12, 0, 0.6, C.navy);
+  r('Fachada Pilar D', 4.5, 6, 0, 12, 0, 0.6, C.navy);
+  // Faixa branca com listras laranja (assinatura visual)
+  r('Faixa Superior', -6, 6, 12, DIM.cellH, 0, 0.6, C.white);
+  r('Listra Laranja 1', -6, 6, 12.6, 13.2, -0.08, 0, C.orange, { canCollide: false });
+  r('Listra Laranja 2', -6, 6, 13.8, 14.4, -0.08, 0, C.orange, { canCollide: false });
+  // Placa
+  r('Placa', -4.6, -0.1, 10.3, 11.7, -0.12, 0, C.white, {
     canCollide: false,
-    light: { range: 16, brightness: 1.2, color: [255, 236, 200] },
+    label: { text: `${id} · ${outfit.name.toUpperCase()}`, face: facing > 0 ? 'Back' : 'Front', color: C.navy },
   });
 
-  // Beliche no fundo
-  const bz = zAt(12);
-  for (const lvl of [0, 1]) {
-    const by = y0 + 1.8 + lvl * 3.8;
-    b.box(model, `Cama ${lvl + 1} Estrado`, [cx - 1.5, by, bz], [7, 0.4, 3.2], C.bed);
-    b.box(model, `Cama ${lvl + 1} Colchão`, [cx - 1.5, by + 0.45, bz], [6.8, 0.5, 3], C.mattress);
-  }
-  for (const dx of [-4.9, 1.9]) {
-    for (const dz of [-1.4, 1.4]) {
-      b.box(model, 'Pé Beliche', [cx + dx, y0 + 4, bz + dz], [0.3, 8, 0.3], C.bed);
-    }
-  }
+  // Janela do showcase
+  r('Vidro Janela', -5, 0.5, 2.5, 10, 0.2, 0.4, C.glass, { transparency: 0.75 });
+  r('Caixilho E', -5, -4.75, 2.5, 10, -0.05, 0.65, C.charcoal);
+  r('Caixilho D', 0.25, 0.5, 2.5, 10, -0.05, 0.65, C.charcoal);
+  r('Caixilho Topo', -5, 0.5, 9.75, 10, -0.05, 0.65, C.charcoal);
+  r('Caixilho Base', -5, 0.5, 2.5, 2.75, -0.05, 0.65, C.charcoal);
+  r('Parapeito', -5.2, 0.7, 2.3, 2.6, -0.4, 0, C.gray);
 
-  // Vaso sanitário e pia no canto
-  const tz = zAt(12.2);
-  b.box(model, 'Vaso Base', [cx + 4.4, y0 + 0.9, tz], [1.6, 1.8, 2], C.toilet);
-  b.box(model, 'Vaso Caixa', [cx + 4.4, y0 + 2.4, tz + inward * 0.85], [1.6, 1.4, 0.4], C.toilet);
-  b.box(model, 'Pia', [cx + 4.9, y0 + 3.6, zAt(9)], [1.2, 0.5, 1.6], C.toilet);
-}
+  // Batente da porta + porta de grade deslizante (aberta)
+  r('Batente E', 1.5, 1.75, 0, 9, -0.05, 0.65, C.charcoal);
+  r('Batente D', 4.25, 4.5, 0, 9, -0.05, 0.65, C.charcoal);
+  r('Batente Topo', 1.5, 4.5, 8.75, 9, -0.05, 0.65, C.charcoal);
+  r('Trilho', 1.5, 7, 9, 9.3, -0.5, -0.1, C.charcoal);
+  const door = { canCollide: false };
+  r('Porta Quadro Topo', 4.6, 7, 8.5, 8.8, -0.45, -0.2, C.charcoal, door);
+  r('Porta Quadro Base', 4.6, 7, 0.2, 0.5, -0.45, -0.2, C.charcoal, door);
+  r('Porta Quadro E', 4.6, 4.85, 0.2, 8.8, -0.45, -0.2, C.charcoal, door);
+  r('Porta Quadro D', 6.75, 7, 0.2, 8.8, -0.45, -0.2, C.charcoal, door);
+  r('Porta Travessa', 4.6, 7, 4.3, 4.6, -0.45, -0.2, C.charcoal, door);
+  for (const bx of [5.3, 5.8, 6.3]) r('Porta Barra', bx - 0.1, bx + 0.1, 0.5, 8.5, -0.42, -0.23, C.charcoal, door);
 
-/** Corrimão reto com postes, entre x0 e x1, numa linha z, com aberturas. */
-function railingX(b, model, x0, x1, z, y, gaps = []) {
-  const inGap = (x) => gaps.some(([g0, g1]) => x > g0 && x < g1);
-  const segs = [];
-  let start = x0;
-  const cuts = [...gaps].sort((a, c) => a[0] - c[0]);
-  for (const [g0, g1] of cuts) {
-    if (g0 > start) segs.push([start, g0]);
-    start = Math.max(start, g1);
-  }
-  if (start < x1) segs.push([start, x1]);
-  segs.forEach(([s0, s1], i) => {
-    b.span(model, `Corrimão ${i + 1}`, [s0, y + 3.3, z - 0.2], [s1, y + 3.7, z + 0.2], C.rail);
-    b.span(model, `Corrimão Meio ${i + 1}`, [s0, y + 1.8, z - 0.15], [s1, y + 2.1, z + 0.15], C.rail);
-    b.span(model, `Rodapé ${i + 1}`, [s0, y, z - 0.15], [s1, y + 0.4, z + 0.15], C.rail);
-    for (let x = s0; x <= s1 + 0.01; x += Math.max(2, (s1 - s0) / Math.ceil((s1 - s0) / 4))) {
-      if (!inGap(x)) b.box(model, 'Poste', [x, y + 1.85, z], [0.4, 3.7, 0.4], C.rail);
-    }
-  });
-}
+  // Interior branco com fundo azul-marinho
+  r('Piso', -6, 6, 0, 0.1, 0.6, 14, C.lightGray);
+  r('Revestimento E', -6, -5.8, 0, DIM.cellH, 0.6, 13.7, C.white);
+  r('Revestimento D', 5.8, 6, 0, DIM.cellH, 0.6, 13.7, C.white);
+  r('Parede Fundo', -6, 6, 0, DIM.cellH, 13.7, 14, C.navy);
 
-function railingZ(b, model, z0, z1, x, y) {
-  b.span(model, 'Corrimão', [x - 0.2, y + 3.3, z0], [x + 0.2, y + 3.7, z1], C.rail);
-  b.span(model, 'Corrimão Meio', [x - 0.15, y + 1.8, z0], [x + 0.15, y + 2.1, z1], C.rail);
-  const n = Math.ceil((z1 - z0) / 4);
-  for (let i = 0; i <= n; i++) {
-    const z = z0 + ((z1 - z0) * i) / n;
-    b.box(model, 'Poste', [x, y + 1.85, z], [0.4, 3.7, 0.4], C.rail);
-  }
-}
+  // Pedestal + boneco (showcase, centralizado atrás da janela)
+  const px = cx - 2.25;
+  const pz = zAt(5);
+  b.box(model, 'Pedestal', [px, y0 + 0.4, pz], [4.4, 0.8, 4.4], C.navy);
+  b.box(model, 'Pedestal Friso', [px, y0 + 0.9, pz], [4.6, 0.2, 4.6], C.orange);
+  b.box(model, 'Pedestal Tampo', [px, y0 + 1.1, pz], [4.4, 0.2, 4.4], C.white);
+  dummy(b, `${model}/Showcase`, [px, y0 + 1.2, pz], facing, outfit);
+  flushLight(b, model, px, y0 + DIM.cellH, pz, 2.4, 2.4);
 
-/** Escada maciça que sobe ao longo de Z, de zBottom (y=0) até zTop (y=rise). */
-function stair(b, model, x0, x1, zBottom, zTop, rise, railX) {
-  const steps = rise;
-  const dir = Math.sign(zTop - zBottom);
-  const run = Math.abs(zTop - zBottom) / steps;
-  for (let k = 0; k < steps; k++) {
-    const za = zBottom + dir * run * k;
-    const zb = zBottom + dir * run * (k + 1);
-    b.span(model, `Degrau ${k + 1}`, [x0, 0, Math.min(za, zb)], [x1, k + 1, Math.max(za, zb)], k % 2 ? C.concrete : [116, 116, 120]);
-    b.span(model, `Faixa ${k + 1}`, [x0, k + 1, dir > 0 ? za : za - 0.3], [x1, k + 1.05, dir > 0 ? za + 0.3 : za], C.stripe, { canCollide: false });
-  }
-  // Corrimão inclinado
-  const len = Math.hypot(Math.abs(zTop - zBottom), rise);
-  const angle = (Math.atan2(rise, Math.abs(zTop - zBottom)) * 180) / Math.PI;
-  const midZ = (zBottom + zTop) / 2;
-  b.box(model, 'Corrimão Inclinado', [railX, rise / 2 + 3.5, midZ], [0.4, 0.4, len], C.rail, {
-    rotation: [dir > 0 ? -angle : angle, 0, 0],
-  });
-  const posts = 6;
-  for (let i = 0; i <= posts; i++) {
-    const t = i / posts;
-    const z = zBottom + (zTop - zBottom) * t;
-    const top = rise * t;
-    b.box(model, 'Poste', [railX, top + 1.75 + 0.5, z], [0.4, 3.5, 0.4], C.rail);
-  }
-}
+  // Cama (estrado escuro, gaveta branca, cobertor vermelho)
+  r('Cama Base', -5.6, 1.2, 0.1, 1.4, 10.4, 13.6, C.charcoal);
+  r('Cama Gaveta', -5.2, 0.8, 0.5, 0.9, 10.3, 10.4, C.white, { canCollide: false });
+  r('Colchão', -5.5, 1.1, 1.4, 1.9, 10.5, 13.5, C.white);
+  r('Cobertor', -3.5, 1.15, 1.9, 2.1, 10.45, 13.55, C.red);
+  r('Travesseiro', -5.3, -4, 1.9, 2.4, 10.8, 13.2, C.white);
+  r('Cabeceira', -5.8, -5.5, 0.1, 3, 10.4, 13.6, C.charcoal);
 
-function watchtower(b, name, x, z) {
-  const m = `Pátio/${name}`;
-  for (const dx of [-3, 3]) for (const dz of [-3, 3]) b.box(m, 'Pilar', [x + dx, 9, z + dz], [1, 18, 1], C.tower);
-  b.box(m, 'Piso', [x, 18.5, z], [9, 1, 9], C.tower);
-  b.box(m, 'Parede Baixa N', [x, 20.5, z + 4.3], [9, 3, 0.4], C.wallDark);
-  b.box(m, 'Parede Baixa S', [x, 20.5, z - 4.3], [9, 3, 0.4], C.wallDark);
-  b.box(m, 'Parede Baixa L', [x + 4.3, 20.5, z], [0.4, 3, 8.2], C.wallDark);
-  b.box(m, 'Parede Baixa O', [x - 4.3, 20.5, z], [0.4, 3, 8.2], C.wallDark);
-  b.box(m, 'Vidro', [x, 23.5, z], [8.4, 3, 8.4], C.glass, { transparency: 0.7 });
-  b.box(m, 'Telhado', [x, 25.5, z], [10.5, 1, 10.5], C.roof);
-  b.box(m, 'Holofote', [x, 24.6, z], [1.4, 0.6, 1.4], C.lamp, { canCollide: false, light: { range: 30, brightness: 1, color: [255, 244, 220] } });
-  // escada de marinheiro
-  for (let i = 0; i < 9; i++) b.box(m, 'Degrau', [x, 1 + i * 2, z - 3.7], [1.6, 0.25, 0.25], C.steel);
+  // Vaso sanitário
+  r('Vaso Base', 3.6, 4.9, 0.1, 1.3, 11.6, 13.3, C.white);
+  r('Vaso Assento', 3.5, 5, 1.3, 1.5, 11.5, 13.3, C.white);
+  r('Vaso Caixa', 3.6, 4.9, 1.3, 3, 13.2, 13.7, C.white);
+
+  // Pia com espelho na parede direita
+  r('Pia Coluna', 5.3, 5.6, 0.1, 3, 8.1, 8.4, C.charcoal);
+  r('Pia Cuba', 4.9, 5.8, 3, 3.6, 7.5, 9, C.charcoal);
+  r('Torneira', 5.5, 5.7, 3.6, 4.1, 8.2, 8.3, C.gray);
+  r('Espelho', 5.68, 5.8, 4.6, 7.4, 7.3, 9.2, C.mirror);
 }
 
 // ---------------------------------------------------------------------------
@@ -313,196 +311,278 @@ function watchtower(b, name, x, z) {
 
 export function buildLobby() {
   const b = makeBuilder();
-  const { inX, inZ, wall, roofY } = DIM;
+  const { inX, inZ, wall, roofY, floor2: F2, catwalkEdge: E, stairX0, stairX1, stairHalf } = DIM;
   const oX = inX + wall; // 72
   const oZ = inZ + wall; // 42
 
-  // --- Terreno e pátio ----------------------------------------------------
+  // --- Terreno ------------------------------------------------------------
   b.span('Terreno', 'Gramado', [-260, -2, -260], [260, -0.2, 260], C.grass);
-  b.span('Pátio', 'Piso do Pátio', [-118, -0.2, -76], [100, -0.1, 76], C.yard);
-  b.span('Pátio', 'Caminho Entrada', [-118, -0.1, -6], [-oX, -0.05, 6], C.path);
+  b.span('Terreno', 'Calçada', [-96, -0.2, -62], [92, -0.1, 62], C.apron);
+  b.span('Terreno', 'Caminho', [-96, -0.1, -5], [-oX, -0.05, 5], C.orange);
 
-  // Cerca perimetral com portão no oeste
-  const fx0 = -116, fx1 = 98, fz = 74, fh = 14;
-  const fence = (name, min, max) => {
-    b.span('Pátio/Cerca', name, min, max, [150, 152, 156], { transparency: 0.55 });
-  };
-  fence('Cerca Sul', [fx0, 0, -fz - 0.15], [fx1, fh, -fz + 0.15]);
-  fence('Cerca Norte', [fx0, 0, fz - 0.15], [fx1, fh, fz + 0.15]);
-  fence('Cerca Leste', [fx1 - 0.15, 0, -fz], [fx1 + 0.15, fh, fz]);
-  fence('Cerca Oeste A', [fx0 - 0.15, 0, -fz], [fx0 + 0.15, fh, -8]);
-  fence('Cerca Oeste B', [fx0 - 0.15, 0, 8], [fx0 + 0.15, fh, fz]);
-  for (let x = fx0; x <= fx1; x += 10.7) {
-    b.box('Pátio/Cerca', 'Poste', [x, fh / 2, -fz], [0.8, fh, 0.8], C.steel);
-    b.box('Pátio/Cerca', 'Poste', [x, fh / 2, fz], [0.8, fh, 0.8], C.steel);
-  }
-  for (let z = -fz; z <= fz; z += 10.57) {
-    b.box('Pátio/Cerca', 'Poste', [fx1, fh / 2, z], [0.8, fh, 0.8], C.steel);
-    if (Math.abs(z) > 8) b.box('Pátio/Cerca', 'Poste', [fx0, fh / 2, z], [0.8, fh, 0.8], C.steel);
-  }
-  b.span('Pátio/Cerca', 'Trilho Superior Sul', [fx0, fh, -fz - 0.3], [fx1, fh + 0.5, -fz + 0.3], C.steel);
-  b.span('Pátio/Cerca', 'Trilho Superior Norte', [fx0, fh, fz - 0.3], [fx1, fh + 0.5, fz + 0.3], C.steel);
-  b.span('Pátio/Cerca', 'Trilho Superior Leste', [fx1 - 0.3, fh, -fz], [fx1 + 0.3, fh + 0.5, fz], C.steel);
-  // Portão (aberto) do pátio
-  b.box('Pátio/Portão', 'Pilar Portão N', [fx0, 9, 9], [2, 18, 2], C.wallDark);
-  b.box('Pátio/Portão', 'Pilar Portão S', [fx0, 9, -9], [2, 18, 2], C.wallDark);
-  b.box('Pátio/Portão', 'Viga Portão', [fx0, 17.5, 0], [2, 1.5, 20], C.wallDark, {
-    label: { text: 'PENITENCIÁRIA ROBLOX', face: 'Left', color: [255, 210, 80] },
-  });
-
-  watchtower(b, 'Torre NO', fx0 + 6, fz - 6);
-  watchtower(b, 'Torre SO', fx0 + 6, -fz + 6);
-  watchtower(b, 'Torre NE', fx1 - 6, fz - 6);
-  watchtower(b, 'Torre SE', fx1 - 6, -fz + 6);
-
-  // --- Prédio: piso, paredes, teto -----------------------------------------
-  b.span('Prédio', 'Piso Térreo', [-oX, -1, -oZ], [oX, 0, oZ], C.concrete);
-  // Linhas amarelas de segurança no átrio
+  // --- Pisos do térreo ----------------------------------------------------
+  const P = 'Prédio/Pisos';
+  b.span(P, 'Laje Térreo', [-oX, -1, -oZ], [oX, 0, oZ], C.white);
+  b.span(P, 'Piso Átrio', [ROW_START, 0, -16.5], [stairX1, 0.1, 16.5], C.blue, { studs: true });
+  b.span(P, 'Piso Zona Jogar', [stairX1, 0, -E], [inX, 0.1, E], C.blueCafe, { studs: true });
   for (const s of [-1, 1]) {
-    b.span('Prédio/Faixas', 'Faixa Amarela', [-52.5, 0, s * 19.6 - 0.2], [52.5, 0.05, s * 19.6 + 0.2], C.stripe, { canCollide: false });
-  }
-
-  const wallOpts = { group: 'Paredes' };
-  // Paredes longas (sul/norte): sólida até 32, faixa de vidro 32..34
-  for (const s of [-1, 1]) {
-    const zA = s < 0 ? -oZ : inZ;
-    const zB = s < 0 ? -inZ : oZ;
     const tag = s < 0 ? 'Sul' : 'Norte';
-    b.span('Prédio/Paredes', `Parede ${tag}`, [-oX, 0, zA], [oX, 32, zB], C.wall, wallOpts);
-    b.span('Prédio/Paredes', `Janela Alta ${tag}`, [-oX, 32, zA], [oX, roofY, zB], C.glass, { ...wallOpts, transparency: 0.6 });
-    for (let x = -66; x <= 66; x += 12) {
-      b.span('Prédio/Paredes', 'Montante', [x - 0.5, 32, zA - 0.1], [x + 0.5, roofY, zB + 0.1], C.steel, wallOpts);
-    }
+    b.span(P, `Corredor ${tag}`, [-inX, 0, s * 20], [stairX1, 0.1, s * 25], C.orange);
+    b.span(P, `Meio-fio ${tag}`, [ROW_START, 0, s * 25], [-ROW_START, 0.5, s * CELL_FRONT], C.charcoal, { studs: true });
   }
-  // Parede leste (fechada, com janelas altas)
-  b.span('Prédio/Paredes', 'Parede Leste Baixa', [inX, 0, -inZ], [oX, 24, inZ], C.wall, wallOpts);
-  b.span('Prédio/Paredes', 'Janela Leste', [inX, 24, -inZ], [oX, 30, inZ], C.glass, { ...wallOpts, transparency: 0.6 });
-  b.span('Prédio/Paredes', 'Parede Leste Alta', [inX, 30, -inZ], [oX, roofY, inZ], C.wall, wallOpts);
-  // Parede oeste com portão principal (z -6..6, altura 12)
-  b.span('Prédio/Paredes', 'Parede Oeste S', [-oX, 0, -inZ], [-inX, roofY, -6], C.wall, wallOpts);
-  b.span('Prédio/Paredes', 'Parede Oeste N', [-oX, 0, 6], [-inX, roofY, inZ], C.wall, wallOpts);
-  b.span('Prédio/Paredes', 'Parede Oeste Verga', [-oX, 12, -6], [-inX, roofY, 6], C.wall, wallOpts);
-  b.box('Prédio/Entrada', 'Letreiro Entrada', [-oX - 0.3, 15, 0], [0.6, 4, 22], C.plaque, {
-    label: { text: 'BLOCO A · LOBBY', face: 'Left', color: [255, 210, 80] },
+  // Hall de entrada: faixas laranja que levam ao portão
+  for (const z of [-3.2, 0, 3.2]) {
+    b.span(P, 'Faixa Hall', [-inX, 0, z - 0.8], [ROW_START, 0.1, z + 0.8], C.orange, { canCollide: false });
+  }
+
+  // --- Paredes externas ---------------------------------------------------
+  const W = 'Prédio/Paredes';
+  const wo = { group: 'Paredes' };
+  b.span(W, 'Parede Sul', [-oX, 0, -oZ], [oX, roofY, -inZ], C.white, wo);
+  b.span(W, 'Parede Norte', [-oX, 0, inZ], [oX, roofY, oZ], C.white, wo);
+  b.span(W, 'Parede Leste', [inX, 0, -inZ], [oX, roofY, inZ], C.white, wo);
+  b.span(W, 'Parede Oeste S', [-oX, 0, -inZ], [-inX, roofY, -4], C.white, wo);
+  b.span(W, 'Parede Oeste N', [-oX, 0, 4], [-inX, roofY, inZ], C.white, wo);
+  b.span(W, 'Parede Oeste Verga', [-oX, 9, -4], [-inX, roofY, 4], C.white, wo);
+  // Faixas externas: rodapé marinho + listras laranja
+  const ext = { ...wo, canCollide: false };
+  for (const [n, a, c] of [
+    ['Sul', [-oX - 0.1, 0, -oZ - 0.1], [oX + 0.1, 0, -oZ]],
+    ['Norte', [-oX - 0.1, 0, oZ], [oX + 0.1, 0, oZ + 0.1]],
+    ['Leste', [oX, 0, -oZ - 0.1], [oX + 0.1, 0, oZ + 0.1]],
+    ['Oeste', [-oX - 0.1, 0, -oZ - 0.1], [-oX, 0, oZ + 0.1]],
+  ]) {
+    if (n !== 'Oeste') b.span(W, `Rodapé Externo ${n}`, a, [c[0], 2.5, c[2]], C.navy, ext);
+    b.span(W, `Listra Externa ${n}`, [a[0], 29, a[2]], [c[0], 30.5, c[2]], C.orange, ext);
+    b.span(W, `Listra Externa Fina ${n}`, [a[0], 31.3, a[2]], [c[0], 31.8, c[2]], C.orange, ext);
+  }
+  for (const [z0, z1] of [[-oZ - 0.1, -5.6], [5.6, oZ + 0.1]]) {
+    b.span(W, 'Rodapé Externo Oeste', [-oX - 0.1, 0, z0], [-oX, 2.5, z1], C.navy, ext);
+  }
+  b.box(W, 'Letreiro Fachada', [-oX - 0.25, 15, 0], [0.4, 4, 30], C.navy, {
+    ...wo,
+    label: { text: 'PENITENCIÁRIA · LOBBY', face: 'Left', color: C.white },
   });
-  // Grades do portão principal abertas para os lados
-  for (let i = 0; i < 6; i++) {
-    b.box('Prédio/Entrada', 'Grade Portão', [-oX - 0.6 - i * 1, 6, -6.4], [0.35, 12, 0.35], C.steel);
-    b.box('Prédio/Entrada', 'Grade Portão', [-oX - 0.6 - i * 1, 6, 6.4], [0.35, 12, 0.35], C.steel);
-  }
-  b.box('Prédio/Entrada', 'Travessa Portão S', [-oX - 3, 11.5, -6.4], [6, 0.4, 0.4], C.steel);
-  b.box('Prédio/Entrada', 'Travessa Portão N', [-oX - 3, 11.5, 6.4], [6, 0.4, 0.4], C.steel);
 
-  // Teto com claraboia central
-  b.span('Prédio/Teto', 'Teto Sul', [-oX, roofY, -oZ], [oX, roofY + 1, -6], C.roof, { group: 'Teto' });
-  b.span('Prédio/Teto', 'Teto Norte', [-oX, roofY, 6], [oX, roofY + 1, oZ], C.roof, { group: 'Teto' });
-  b.span('Prédio/Teto', 'Teto Leste', [52, roofY, -6], [oX, roofY + 1, 6], C.roof, { group: 'Teto' });
-  b.span('Prédio/Teto', 'Teto Oeste', [-oX, roofY, -6], [-52, roofY + 1, 6], C.roof, { group: 'Teto' });
-  b.span('Prédio/Teto', 'Claraboia', [-52, roofY + 0.3, -6], [52, roofY + 0.7, 6], C.glass, { group: 'Teto', transparency: 0.55 });
-  for (let x = -48; x <= 48; x += 8) {
-    b.span('Prédio/Teto', 'Viga Claraboia', [x - 0.4, roofY - 0.6, -6], [x + 0.4, roofY + 1, 6], C.steel, { group: 'Teto' });
+  // Faixas internas nas paredes de topo (leste/oeste) e acima das celas
+  const inner = { canCollide: false, group: 'Paredes' };
+  for (const [x, dir] of [[-inX, 1], [inX, -1]]) {
+    const xb = x + dir * 0.1;
+    for (const [ya, yb] of [[10.6, 11.4], [12.2, 13], [26.6, 27.4], [28.2, 29]]) {
+      b.span(W, 'Listra Interna', [x, ya, -inZ], [xb, yb, inZ], C.orange, inner);
+    }
+    b.span(W, 'Rodapé Interno', [x, 0, -inZ], [xb, 1, inZ], C.navy, inner);
   }
-  // Luminárias penduradas no átrio
-  for (let x = -44; x <= 44; x += 22) {
-    for (const z of [-11, 11]) {
-      b.box('Prédio/Iluminação', 'Cabo', [x, roofY - 2, z], [0.15, 4, 0.15], C.steel, { canCollide: false });
-      b.box('Prédio/Iluminação', 'Luminária Átrio', [x, roofY - 4.3, z], [6, 0.6, 1.4], C.lamp, {
-        canCollide: false,
-        light: { range: 40, brightness: 1.4, color: [255, 240, 210] },
-      });
+  for (const s of [-1, 1]) {
+    b.span(W, 'Listra Alta', [-inX, 32.4, s * inZ], [inX, 33.2, s * (inZ - 0.1)], C.orange, inner);
+  }
+
+  // Portão principal (folhas cinza com visores escuros e moldura laranja)
+  const G = 'Prédio/Entrada';
+  b.span(G, 'Moldura Portão S', [-oX - 0.3, 0, -5.6], [-inX + 0.8, 10.5, -4], C.orange);
+  b.span(G, 'Moldura Portão N', [-oX - 0.3, 0, 4], [-inX + 0.8, 10.5, 5.6], C.orange);
+  b.span(G, 'Moldura Portão Topo', [-oX - 0.3, 9, -5.6], [-inX + 0.8, 10.5, 5.6], C.orange, {
+    label: { text: 'BEM-VINDO À PRISÃO', face: 'Right', color: C.white },
+  });
+  for (const [z0, z1, n] of [[-4, 0, 'S'], [0, 4, 'N']]) {
+    b.span(G, `Folha ${n}`, [-inX - 0.6, 0, z0 + 0.05], [-inX - 0.1, 9, z1 - 0.05], C.gray);
+    b.span(G, `Visor ${n}`, [-inX - 0.12, 5, z0 + 0.7], [-inX - 0.02, 7.5, z1 - 0.7], C.navyDark, { canCollide: false });
+    b.span(G, `Faixa ${n}`, [-inX - 0.12, 3.2, z0 + 0.3], [-inX - 0.02, 3.6, z1 - 0.3], C.charcoal, { canCollide: false });
+  }
+
+  // --- Teto, vigas e claraboia -------------------------------------------
+  const T = 'Prédio/Teto';
+  const to = { group: 'Teto' };
+  b.span(T, 'Laje Teto Sul', [-oX, roofY, -oZ], [oX, roofY + 1, -12], C.ceiling, to);
+  b.span(T, 'Laje Teto Norte', [-oX, roofY, 12], [oX, roofY + 1, oZ], C.ceiling, to);
+  b.span(T, 'Laje Teto Oeste', [-oX, roofY, -12], [-50, roofY + 1, 12], C.ceiling, to);
+  b.span(T, 'Laje Teto Leste', [36, roofY, -12], [oX, roofY + 1, 12], C.ceiling, to);
+  b.span(T, 'Claraboia', [-50, roofY + 0.3, -12], [36, roofY + 0.7, 12], C.glass, { ...to, transparency: 0.5 });
+  for (const x of COLUMN_X) {
+    b.span(T, 'Viga Transversal', [x - 0.6, 32.4, -inZ], [x + 0.6, roofY, inZ], C.grayDark, to);
+  }
+  for (const z of [-E, E]) b.span(T, 'Viga Longitudinal', [-inX, 32.4, z - 0.6], [inX, roofY, z + 0.6], C.grayDark, to);
+
+  // Luminárias pendentes no átrio
+  for (let x = -45.5; x <= 32.5; x += PITCH) {
+    for (const z of [-8, 8]) hangingLight(b, 'Iluminação/Átrio', x, 29, z, 4.8);
+  }
+
+  // --- Colunas ------------------------------------------------------------
+  for (const x of COLUMN_X) {
+    for (const s of [-1, 1]) {
+      b.box('Prédio/Colunas', 'Coluna', [x, roofY / 2, s * E], [2.6, roofY, 2.6], C.gray);
+      b.box('Prédio/Colunas', 'Base Coluna', [x, 0.4, s * E], [3.2, 0.8, 3.2], C.grayDark);
     }
   }
 
-  // --- Blocos de celas (2 lados x 2 andares x 8) --------------------------
+  // --- Celas (2 alas x 2 andares x 8) -------------------------------------
   let number = 1;
   for (const side of [-1, 1]) {
     const tag = side < 0 ? 'Sul' : 'Norte';
-    const zFront = side * CELL_FRONT;
-    const zBack = side * inZ;
-    const z0 = Math.min(zFront, zBack);
-    const z1 = Math.max(zFront, zBack);
-    for (const floorY of [0, DIM.floor2]) {
-      // paredes divisórias
+    const z0 = Math.min(side * CELL_FRONT, side * inZ);
+    const z1 = Math.max(side * CELL_FRONT, side * inZ);
+    for (const floorY of [0, F2]) {
       for (let i = 0; i <= DIM.cellsPerRow; i++) {
         const wx = ROW_START + i * PITCH;
-        b.span(`Celas/Bloco ${tag}`, 'Divisória', [wx, floorY, z0], [wx + 1, floorY + DIM.cellH, z1], C.cellWall);
+        b.span(`Celas/Ala ${tag}`, 'Divisória', [wx, floorY, z0], [wx + 1, floorY + DIM.cellH, z1], C.navy);
+        b.span(`Celas/Ala ${tag}`, 'Divisória Faixa', [wx - 0.02, floorY + 12, side * (CELL_FRONT - 0.02)], [wx + 1.02, floorY + DIM.cellH, side * (CELL_FRONT + 0.6)], C.white, { canCollide: false });
       }
-      // parede do fundo (acabamento interno)
-      b.span(`Celas/Bloco ${tag}`, 'Fundo', [ROW_START, floorY, side < 0 ? z0 : z1 - 0.3], [-ROW_START, floorY + DIM.cellH, side < 0 ? z0 + 0.3 : z1], C.cellWall);
       for (let i = 0; i < DIM.cellsPerRow; i++) cell(b, i, side, floorY, number++);
     }
-    // Laje do 2º andar (celas + passarela) e laje superior das celas
-    const cz0 = side < 0 ? -inZ : DIM.catwalkEdge;
-    const cz1 = side < 0 ? -DIM.catwalkEdge : inZ;
-    b.span(`Passarela ${tag}`, 'Laje 2º Andar', [-inX, DIM.floor2 - 1, cz0], [inX, DIM.floor2, cz1], C.catwalk);
-    b.span(`Celas/Bloco ${tag}`, 'Laje Superior', [ROW_START, 31, z0], [-ROW_START, 32, z1], C.cellWall);
-    // Vigas sob a passarela
-    for (let x = -60; x <= 60; x += 15) {
-      b.box(`Passarela ${tag}`, 'Pilar', [x, (DIM.floor2 - 1) / 2, side * (DIM.catwalkEdge + 0.6)], [1, DIM.floor2 - 1, 1], C.steel);
+    b.span(`Celas/Ala ${tag}`, 'Laje Superior', [ROW_START, 31, z0], [-ROW_START, 32, z1], C.offWhite);
+
+    // Laje do 2º andar (passarela + celas) e acabamentos
+    const cz0 = side < 0 ? -inZ : E;
+    const cz1 = side < 0 ? -E : inZ;
+    const pw = `Passarelas/Passarela ${tag}`;
+    b.span(pw, 'Laje', [-inX, F2 - 1, cz0], [stairX1, F2, cz1], C.offWhite);
+    b.span(pw, 'Piso Passarela', [-inX, F2, side * E], [stairX1, F2 + 0.1, side * 25], C.lightGray);
+    b.span(pw, 'Faixa Laranja', [-inX, F2, side * 20.4], [stairX1, F2 + 0.12, side * 21.4], C.orange, { canCollide: false });
+    b.span(pw, 'Meio-fio', [ROW_START, F2, side * 25], [-ROW_START, F2 + 0.5, side * CELL_FRONT], C.charcoal, { studs: true });
+    b.span(pw, 'Testeira', [-inX, F2 - 1.6, side * E - 0.3], [stairX1, F2, side * E + 0.3], C.orange);
+
+    // Guarda-corpo de vidro entre as colunas (abertura para a ponte em x -23..-16)
+    const stops = [-inX, ...COLUMN_X.flatMap((x) => [x - 1.3, x + 1.3]), stairX1];
+    for (let i = 0; i < stops.length; i += 2) {
+      const a = stops[i], c = stops[i + 1];
+      if (c <= a) continue;
+      if (a < -16 && c > -23) {
+        if (a < -23) glassRail(b, pw, [a, side * E], [-23, side * E], F2);
+        if (c > -16) glassRail(b, pw, [-16, side * E], [c, side * E], F2);
+        continue;
+      }
+      glassRail(b, pw, [a, side * E], [c, side * E], F2);
+    }
+
+    // Iluminação dos corredores (térreo embutida, 2º andar pendente)
+    for (let i = 0; i < DIM.cellsPerRow; i++) {
+      const lx = ROW_START + 1 + DIM.cellW / 2 + i * PITCH;
+      flushLight(b, `Iluminação/Corredor ${tag}`, lx, F2 - 1, side * 22.5, 5, 1.2, i % 2 === 0);
+      hangingLight(b, `Iluminação/Galeria ${tag}`, lx, 30.4, side * 22.5, 3.4);
     }
   }
 
-  // Corrimãos das passarelas (com aberturas para ponte e escadas)
-  railingX(b, 'Passarela Sul', -inX, inX, -DIM.catwalkEdge, DIM.floor2, [[-4, 4], [62, 70]]);
-  railingX(b, 'Passarela Norte', -inX, inX, DIM.catwalkEdge, DIM.floor2, [[-4, 4], [54, 62]]);
+  // --- Ponte central (2º andar) ------------------------------------------
+  const B = 'Passarelas/Ponte';
+  b.span(B, 'Laje Ponte', [-23, F2 - 1, -E], [-16, F2, E], C.offWhite);
+  b.span(B, 'Piso Ponte', [-23, F2, -E], [-16, F2 + 0.1, E], C.lightGray);
+  b.span(B, 'Testeira E', [-23.3, F2 - 1.6, -E], [-22.7, F2, E], C.orange);
+  b.span(B, 'Testeira D', [-16.3, F2 - 1.6, -E], [-15.7, F2, E], C.orange);
+  glassRail(b, B, [-23, -E + 1.3], [-23, E - 1.3], F2);
+  glassRail(b, B, [-16, -E + 1.3], [-16, E - 1.3], F2);
 
-  // Ponte central no 2º andar
-  b.span('Ponte', 'Ponte', [-4, DIM.floor2 - 1, -DIM.catwalkEdge], [4, DIM.floor2, DIM.catwalkEdge], C.catwalk);
-  railingZ(b, 'Ponte', -DIM.catwalkEdge, DIM.catwalkEdge, -3.8, DIM.floor2);
-  railingZ(b, 'Ponte', -DIM.catwalkEdge, DIM.catwalkEdge, 3.8, DIM.floor2);
+  // --- Mezanino leste + escada laranja ------------------------------------
+  const M = 'Passarelas/Mezanino';
+  b.span(M, 'Laje Mezanino', [stairX1, F2 - 1, -inZ], [inX, F2, inZ], C.offWhite);
+  b.span(M, 'Patamar', [stairX1, F2, -E], [inX, F2 + 0.1, E], C.orange, { studs: true });
+  b.span(M, 'Piso Mezanino S', [stairX1, F2, -inZ], [inX, F2 + 0.1, -E], C.lightGray);
+  b.span(M, 'Piso Mezanino N', [stairX1, F2, E], [inX, F2 + 0.1, inZ], C.lightGray);
+  b.span(M, 'Testeira', [stairX1 - 0.3, F2 - 1.6, -E], [stairX1 + 0.3, F2, E], C.orange);
+  glassRail(b, M, [stairX1, -E + 1.3], [stairX1, -stairHalf - 0.8], F2);
+  glassRail(b, M, [stairX1, stairHalf + 0.8], [stairX1, E - 1.3], F2);
 
-  // Escadas em tesoura no leste
-  stair(b, 'Escadas/Escada Sul', 62, 70, 14, -DIM.catwalkEdge, DIM.floor2, 62.2);
-  stair(b, 'Escadas/Escada Norte', 54, 62, -14, DIM.catwalkEdge, DIM.floor2, 54.2);
-
-  // --- Átrio: spawn, guarita, mesas, zona de jogar ------------------------
-  b.box('Átrio', 'SpawnLocation', [-40, 0.5, 0], [10, 1, 10], C.spawn, { className: 'SpawnLocation' });
-  b.box('Átrio', 'Borda Spawn', [-40, 0.05, 0], [12, 0.1, 12], C.stripe, { canCollide: false });
-
-  // Guarita central (sob a ponte)
-  const g = 'Átrio/Guarita';
-  b.span(g, 'Base', [-6, 0, -5], [6, 4, 5], C.booth);
-  b.span(g, 'Balcão', [-6.4, 4, -5.4], [6.4, 4.4, 5.4], C.table);
-  for (const [px, pz] of [[-6, -5], [6, -5], [-6, 5], [6, 5]]) b.box(g, 'Coluna', [px, 6.5, pz], [0.6, 5, 0.6], C.booth);
-  b.span(g, 'Vidro N', [-6, 4.4, 4.8], [6, 9, 5], C.glass, { transparency: 0.7 });
-  b.span(g, 'Vidro S', [-6, 4.4, -5], [6, 9, -4.8], C.glass, { transparency: 0.7 });
-  b.span(g, 'Vidro L', [5.8, 4.4, -5], [6, 9, 5], C.glass, { transparency: 0.7 });
-  b.span(g, 'Vidro O', [-6, 4.4, -5], [-5.8, 9, 5], C.glass, { transparency: 0.7 });
-  b.span(g, 'Teto Guarita', [-6.6, 9, -5.6], [6.6, 9.8, 5.6], C.booth, {
-    label: { text: 'GUARITA', face: 'Left', color: [255, 255, 255] },
+  const S = 'Escada';
+  const run = (stairX1 - stairX0) / F2;
+  for (let k = 0; k < F2; k++) {
+    const xa = stairX0 + k * run;
+    b.span(S, `Degrau ${k + 1}`, [xa, 0, -stairHalf], [stairX1, k + 1, stairHalf], k % 2 ? C.orange : C.orangeDark);
+  }
+  for (const s of [-1, 1]) {
+    b.span(S, 'Parede Escada', [stairX0, 0, s * stairHalf], [stairX1, F2 + 3.5, s * (stairHalf + 0.8)], C.white);
+    b.span(S, 'Listra Parede', [stairX0, 1, s * (stairHalf + 0.8)], [stairX1, 1.8, s * (stairHalf + 0.9)], C.orange, { canCollide: false });
+    b.span(S, 'Pórtico Pilar', [stairX0 - 1.6, 0, s * stairHalf], [stairX0, 14, s * (stairHalf + 2.4)], C.orange);
+  }
+  b.span(S, 'Pórtico Viga', [stairX0 - 1.6, 11, -stairHalf - 2.4], [stairX0, 14, stairHalf + 2.4], C.orange, {
+    label: { text: '▲ 2º ANDAR', face: 'Left', color: C.white },
   });
-  b.box(g, 'Sirene', [0, 10.3, 0], [1.2, 0.8, 1.2], C.padRed, { light: { range: 18, brightness: 1, color: [255, 60, 40] } });
+  for (let i = 0; i < 6; i++) {
+    b.span(S, 'Grelha', [stairX0 + 0.2 + i * 2.6, 13.6, -stairHalf], [stairX0 + 1.0 + i * 2.6, 14, stairHalf], C.orangeDark, { canCollide: false });
+  }
+  b.span(S, 'Forro Pórtico', [stairX0, 14, -stairHalf], [stairX0 + 16, 14.2, stairHalf], C.orange, { canCollide: false });
 
-  // Refeitório: mesas e bancos de aço
-  for (const tx of [-24, -12]) {
-    for (const tz of [-10, 10]) {
-      const m = 'Átrio/Refeitório';
-      b.box(m, 'Mesa', [tx, 2.6, tz], [8, 0.4, 3.5], C.table);
-      b.box(m, 'Pé Mesa', [tx, 1.2, tz], [1, 2.4, 1], C.steel);
-      b.box(m, 'Banco', [tx, 1.4, tz - 2.8], [8, 0.4, 1.2], C.table);
-      b.box(m, 'Banco', [tx, 1.4, tz + 2.8], [8, 0.4, 1.2], C.table);
-      b.box(m, 'Pé Banco', [tx, 0.6, tz - 2.8], [0.8, 1.2, 0.8], C.steel);
-      b.box(m, 'Pé Banco', [tx, 0.6, tz + 2.8], [0.8, 1.2, 0.8], C.steel);
+  // --- Hall de entrada ----------------------------------------------------
+  const H = 'Átrio/Hall';
+  b.box(H, 'SpawnLocation', [-62, 0.5, 0], [8, 1, 8], C.orange, { className: 'SpawnLocation', studs: true });
+  b.box(H, 'Borda Spawn', [-62, 0.15, 0], [9.2, 0.3, 9.2], C.charcoal, { studs: true });
+  b.span(H, 'Balcão Recepção', [-60, 0, 9], [-56.5, 3.5, 16], C.navy);
+  b.span(H, 'Tampo Recepção', [-60.3, 3.5, 8.7], [-56.2, 3.8, 16.3], C.white);
+  b.span(H, 'Faixa Recepção', [-56.5, 1.2, 9], [-56.4, 1.8, 16], C.orange, { canCollide: false });
+  b.box(H, 'Placa Recepção', [-63, 9.5, 12.5], [0.3, 1.6, 7], C.navy, {
+    canCollide: false,
+    label: { text: 'RECEPÇÃO', face: 'Right', color: C.white },
+  });
+
+  // Depósitos fechados (cantos oeste do térreo) com janela
+  for (const s of [-1, 1]) {
+    const D = `Átrio/Depósito ${s < 0 ? 'Sul' : 'Norte'}`;
+    const za = s * CELL_FRONT, zb = s * (CELL_FRONT + 0.6);
+    b.span(D, 'Parede Baixa', [-inX, 0, za], [ROW_START, 3, zb], C.white);
+    b.span(D, 'Parede Alta', [-inX, 10, za], [ROW_START, F2 - 1, zb], C.white);
+    b.span(D, 'Parede E', [-inX, 3, za], [-66, 10, zb], C.white);
+    b.span(D, 'Parede D', [-56, 3, za], [ROW_START, 10, zb], C.white);
+    b.span(D, 'Vidro', [-66, 3, s * (CELL_FRONT + 0.2)], [-56, 10, s * (CELL_FRONT + 0.4)], C.glass, { transparency: 0.55 });
+    for (const [a, c] of [[[-66.3, 2.8], [-65.9, 10.2]], [[-56.1, 2.8], [-55.7, 10.2]], [[-66.3, 9.8], [-55.7, 10.2]], [[-66.3, 2.8], [-55.7, 3.2]]]) {
+      b.span(D, 'Caixilho', [a[0], a[1], za - s * 0.05], [c[0], c[1], zb + s * 0.05], C.charcoal);
     }
+    b.span(D, 'Listra', [-inX, 12, za - s * 0.08], [ROW_START, 12.8, za], C.orange, { canCollide: false });
+    b.box(D, 'Placa', [-61, 11.4, za - s * 0.1], [6, 1.2, 0.2], C.navy, {
+      canCollide: false,
+      label: { text: 'DEPÓSITO', face: s < 0 ? 'Back' : 'Front', color: C.white },
+    });
+    crate(b, D, -66, 0, s * 31);
+    crate(b, D, -66, 4, s * 31);
+    crate(b, D, -61.5, 0, s * 30);
+    rack(b, D, -61, s * 37, 12, 3, 10);
+    flushLight(b, D, -61, F2 - 1, s * 33, 5, 1.2);
   }
 
-  // Zona JOGAR: portal de grades + 3 plataformas de fila
-  const p = 'Átrio/Zona Jogar';
-  b.span(p, 'Pilar Portal S', [38, 0, -13], [40, 14, -11], C.wallDark);
-  b.span(p, 'Pilar Portal N', [38, 0, 11], [40, 14, 13], C.wallDark);
-  b.span(p, 'Viga Portal', [38, 14, -13], [40, 17, 13], C.wallDark, {
-    label: { text: 'FUGA ▶ JOGAR', face: 'Left', color: [120, 255, 140] },
-  });
-  [[-7, C.padGreen, 'Fila 1'], [0, C.padYellow, 'Fila 2'], [7, C.padRed, 'Fila 3']].forEach(([z, color, name]) => {
-    b.box(p, `${name} Moldura`, [46, 0.15, z], [6.4, 0.3, 6.4], C.steel);
-    b.box(p, name, [46, 0.4, z], [5.6, 0.3, 5.6], color, {
-      light: { range: 10, brightness: 0.8, color },
+  // --- Átrio: refeitório e caixas ----------------------------------------
+  const R = 'Átrio/Refeitório';
+  for (const [tx, tz] of [[-42, -8], [-42, 8], [-31, -8], [-31, 8]]) {
+    b.box(R, 'Mesa Tampo', [tx, 3.2, tz], [0.4, 7, 7], C.white, { shape: 'Cylinder', rotation: [0, 0, 90] });
+    b.box(R, 'Mesa Pé', [tx, 1.6, tz], [1, 3, 1], C.charcoal);
+    b.box(R, 'Mesa Base', [tx, 0.25, tz], [3, 0.3, 3], C.charcoal);
+    for (const s of [-1, 1]) {
+      b.box(R, 'Banco', [tx, 1.8, tz + s * 4.8], [6, 0.5, 1.6], C.gray);
+      b.box(R, 'Banco Encosto', [tx, 2.9, tz + s * 5.6], [6, 1.7, 0.35], C.charcoal);
+      b.box(R, 'Banco Pé', [tx - 2.2, 0.8, tz + s * 4.8], [0.6, 1.6, 1.2], C.charcoal);
+      b.box(R, 'Banco Pé', [tx + 2.2, 0.8, tz + s * 4.8], [0.6, 1.6, 1.2], C.charcoal);
+    }
+  }
+  const K = 'Átrio/Caixas';
+  crate(b, K, 4, 0.1, -10);
+  crate(b, K, 8.2, 0.1, -10);
+  crate(b, K, 6.1, 4.1, -10);
+  crate(b, K, 18, 0.1, 11);
+  crate(b, K, 18, 0.1, 6.8, 3);
+
+  // --- Zona Jogar (sob o mezanino) ---------------------------------------
+  const Z = 'Átrio/Zona Jogar';
+  const screens = [
+    ['Fila 1', -10, [120, 220, 255]],
+    ['Fila 2', 0, [240, 240, 255]],
+    ['Fila 3', 10, [255, 50, 220]],
+  ];
+  for (const [name, z, color] of screens) {
+    b.box(Z, `${name} Tela`, [inX - 0.25, 7.5, z], [0.3, 4.5, 6.5], color, { material: 'Neon', canCollide: false, light: { range: 14, brightness: 1, color } });
+    b.box(Z, `${name} Moldura`, [inX - 0.1, 7.5, z], [0.2, 5.3, 7.3], C.charcoal, { canCollide: false });
+    b.box(Z, `${name} Placa`, [inX - 0.25, 11.2, z], [0.3, 1.4, 6.5], C.navy, {
+      canCollide: false,
+      label: { text: name.toUpperCase(), face: 'Left', color: C.white },
     });
-    b.box(p, `${name} Placa`, [50, 4, z], [0.4, 2, 5], C.plaque, {
-      label: { text: name.toUpperCase(), face: 'Left', color: [255, 255, 255] },
-    });
-    b.box(p, `${name} Suporte`, [50, 1.5, z], [0.4, 3, 0.4], C.steel);
-  });
+    b.box(Z, `${name} Aro`, [63, 0.2, z], [6.6, 0.4, 6.6], C.charcoal, { studs: true });
+    b.box(Z, name, [63, 0.45, z], [5.6, 0.3, 5.6], color, { studs: true });
+  }
+  for (const z of [-12, 0, 12]) flushLight(b, Z, 63, F2 - 1, z, 5, 1.2);
+
+  // Estoque aberto sob o mezanino (estantes)
+  for (const s of [-1, 1]) {
+    const D = `Átrio/Estoque ${s < 0 ? 'Sul' : 'Norte'}`;
+    for (const z of [23, 29.5, 36]) rack(b, D, 63, s * z, 9, 3, 10);
+    flushLight(b, D, 63, F2 - 1, s * 26.2, 5, 1.2);
+    flushLight(b, D, 63, F2 - 1, s * 32.8, 5, 1.2, false);
+  }
 
   return { parts: b.parts };
 }
@@ -518,7 +598,6 @@ export function rotationMatrix(rot) {
   const cx = Math.cos(ax), sx = Math.sin(ax);
   const cy = Math.cos(ay), sy = Math.sin(ay);
   const cz = Math.cos(az), sz = Math.sin(az);
-  // Rx * Ry * Rz
   return [
     cy * cz, -cy * sz, sy,
     cx * sz + sx * sy * cz, cx * cz - sx * sy * sz, -sx * cy,

@@ -10,7 +10,7 @@
       --panel: rgba(18, 20, 26, 0.88);
       --text: #e8e6e1;
       --muted: #9a9890;
-      --accent: #f0c41e;
+      --accent: #e0662a;
       --line: rgba(255, 255, 255, 0.1);
     }
     * { box-sizing: border-box; }
@@ -50,14 +50,17 @@
   <div id="hud">
     <button id="toggle" aria-label="Mostrar/ocultar painel">☰</button>
     <h1>Lobby <span>Prisão</span></h1>
-    <p>Part clássico · SmoothPlastic · sem textura</p>
+    <p>Part clássico · Plastic + Neon · studs no piso · sem textura</p>
     <div class="body">
       <div class="row" id="views">
-        <button data-view="exterior">Vista externa</button>
-        <button data-view="plan">Planta (sem teto)</button>
-        <button data-view="ground">Corredor térreo</button>
+        <button data-view="exterior">Externa</button>
+        <button data-view="plan">Planta</button>
+        <button data-view="atrium">Átrio</button>
+        <button data-view="corridor">Corredor</button>
         <button data-view="upper">2º andar</button>
-        <button data-view="cell">Showcase da cela</button>
+        <button data-view="cell">Cela showcase</button>
+        <button data-view="stairs">Escada</button>
+        <button data-view="play">Zona Jogar</button>
       </div>
       <div class="row">
         <button id="roof" class="on">Teto</button>

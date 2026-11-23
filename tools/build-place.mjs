@@ -13,9 +13,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = resolve(root, 'build/Lobby.model.json');
 
 const ENUM = {
-  SmoothPlastic: 272,
-  Block: 1,
+  Material: { Plastic: 256, SmoothPlastic: 272, Neon: 288 },
+  PartType: { Ball: 0, Block: 1, Cylinder: 2 },
   Smooth: 0,
+  Studs: 3,
   PixelsPerStud: 1,
   NormalId: { Right: 0, Top: 1, Back: 2, Left: 3, Bottom: 4, Front: 5 },
 };
@@ -27,7 +28,7 @@ function partJson(p) {
   const properties = {
     Anchored: true,
     CanCollide: p.canCollide,
-    CastShadow: p.transparency < 0.5,
+    CastShadow: p.transparency < 0.5 && p.material !== 'Neon',
     Size: p.size,
     CFrame: {
       CFrame: {
@@ -36,10 +37,10 @@ function partJson(p) {
       },
     },
     Color: c3(p.color),
-    Material: { Enum: ENUM.SmoothPlastic },
-    Shape: { Enum: ENUM.Block },
+    Material: { Enum: ENUM.Material[p.material] ?? ENUM.Material.Plastic },
+    Shape: { Enum: ENUM.PartType[p.shape] ?? ENUM.PartType.Block },
     Transparency: p.transparency,
-    TopSurface: { Enum: ENUM.Smooth },
+    TopSurface: { Enum: p.studs ? ENUM.Studs : ENUM.Smooth },
     BottomSurface: { Enum: ENUM.Smooth },
     FrontSurface: { Enum: ENUM.Smooth },
     BackSurface: { Enum: ENUM.Smooth },
@@ -116,4 +117,4 @@ const { parts } = buildLobby();
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, JSON.stringify(buildTree(parts)));
 const s = stats(parts);
-console.log(`✔ build/Lobby.model.json — ${s.total} Parts (SmoothPlastic, Block, superfícies lisas)`);
+console.log(`✔ build/Lobby.model.json — ${s.total} Parts (Plastic + Neon, studs só nos pisos, sem texturas)`);
