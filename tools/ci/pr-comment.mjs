@@ -4,6 +4,7 @@
 //   node tools/ci/pr-comment.mjs tests    <relatorio.txt>   (env: OUTCOME)
 //   node tools/ci/pr-comment.mjs previews <manifest.json>   (env: BASE_URL)
 //   node tools/ci/pr-comment.mjs publish  <resumo.md>
+//   node tools/ci/pr-comment.mjs lint                       (env: PRETTIER, ESLINT, AUTOFIX_BRANCH)
 // Env comuns: GH_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, SHA, GITHUB_SERVER_URL, GITHUB_RUN_ID
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -19,7 +20,8 @@ if (!pr) {
 const runUrl = `${env.GITHUB_SERVER_URL}/${repo}/actions/runs/${env.GITHUB_RUN_ID}`;
 const short = (env.SHA || '').slice(0, 7);
 const marker = `<!-- prisao-ci:${mode} -->`;
-const strip = (s) => s.replace(/\x1b\[[0-9;]*m/g, '');
+const ANSI = new RegExp(String.fromCharCode(27) + '\\[[0-9;]*m', 'g');
+const strip = (s) => s.replace(ANSI, '');
 
 function testsBody() {
   const report = existsSync(file) ? strip(readFileSync(file, 'utf8')) : '(sem relatório)';
@@ -37,11 +39,39 @@ function testsBody() {
 
 function previewsBody() {
   const { views, stats } = JSON.parse(readFileSync(file, 'utf8'));
+  const manualFile = file.replace(/manifest\.json$/, 'manual.json');
+  const manual = existsSync(manualFile) ? JSON.parse(readFileSync(manualFile, 'utf8')) : null;
   const base = env.BASE_URL;
-  let body = `${marker}\n## 📸 Como ficou — \`${short}\`\n\n**${stats.total} Parts · ${stats.lights} luzes · 32 celas** · [visualizador 3D desta branch](https://raw.githack.com/${repo}/${env.HEAD_REF || 'main'}/index.html)\n\n`;
-  for (const v of views) body += `**${v.title}**\n\n![${v.title}](${base}/${v.id}.png)\n\n`;
+  const blob = base.replace('https://raw.githubusercontent.com/', 'https://github.com/').replace('/ci-previews/', '/blob/ci-previews/');
+  const viewer = `https://raw.githack.com/${repo}/${env.HEAD_REF || 'main'}/index.html`;
+  let body = `${marker}\n## 📸 Como ficou — \`${short}\`\n\n`;
+  if (manual) {
+    body += `**${manual.parts} peças · ${manual.steps} etapas · ${manual.connections} pontos de conexão verificados** · ${stats.lights} luzes · [manual de montagem](${blob}/MANUAL.md) · [visualizador 3D](${viewer})\n\n`;
+  }
+  const build = views.filter((v) => v.id.startsWith('build-'));
+  for (const v of views.filter((x) => !x.id.startsWith('build-'))) body += `**${v.title}**\n\n![${v.title}](${base}/${v.id}.png)\n\n`;
+  if (build.length) {
+    body += `### Montagem passo a passo\n\n| ${build.map((v) => v.title.replace('Montagem — ', '')).join(' | ')} |\n|${build.map(() => '---').join('|')}|\n`;
+    body += `| ${build.map((v) => `![${v.title}](${base}/${v.id}.png)`).join(' | ')} |\n\n`;
+  }
   body += `[Execução no Actions](${runUrl})\n`;
   return body;
+}
+
+function lintBody() {
+  const tail = (f, n = 60) => (existsSync(f) ? strip(readFileSync(f, 'utf8')).trim().split('\n').slice(-n).join('\n') : '');
+  const ok = env.PRETTIER === 'success' && env.ESLINT === 'success';
+  let body = `${marker}\n## ${ok ? '✅' : '❌'} ESLint + Prettier — \`${short}\`\n\nPrettier: **${env.PRETTIER}** · ESLint: **${env.ESLINT}**\n`;
+  if (env.PRETTIER !== 'success') {
+    body += `\n<details><summary>Prettier</summary>\n\n\`\`\`\n${tail('prettier-report.txt')}\n\`\`\`\n</details>\n`;
+  }
+  if (env.ESLINT !== 'success') {
+    body += `\n<details open><summary>ESLint</summary>\n\n\`\`\`\n${tail('eslint-report.txt', 120)}\n\`\`\`\n</details>\n`;
+  }
+  if (env.AUTOFIX_BRANCH) {
+    body += `\nCorreção automática publicada em \`${env.AUTOFIX_BRANCH}\` (prettier --write + eslint --fix). Incorpore com \`git merge origin/${env.AUTOFIX_BRANCH}\`.\n`;
+  }
+  return body + `\n[Execução no Actions](${runUrl})\n`;
 }
 
 function publishBody() {
@@ -49,7 +79,7 @@ function publishBody() {
   return `${marker}\n## 🎮 Publicação no Roblox — \`${short}\`\n\n${md}\n\n[Execução no Actions](${runUrl})\n`;
 }
 
-const body = { tests: testsBody, previews: previewsBody, publish: publishBody }[mode]?.();
+const body = { tests: testsBody, previews: previewsBody, publish: publishBody, lint: lintBody }[mode]?.();
 if (!body) throw new Error(`modo desconhecido: ${mode}`);
 
 const api = async (path, init = {}) => {

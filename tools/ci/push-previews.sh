@@ -24,9 +24,9 @@ else
 fi
 
 mkdir -p "$WT/$DIR" "$WT/$TARGET/latest"
-cp "$SRC"/*.png "$SRC"/manifest.json "$WT/$DIR/"
+cp "$SRC"/* "$WT/$DIR/"
 rm -f "$WT/$TARGET/latest/"*
-cp "$SRC"/*.png "$SRC"/manifest.json "$WT/$TARGET/latest/"
+cp "$SRC"/* "$WT/$TARGET/latest/"
 
 git -C "$WT" add -A
 git -C "$WT" commit -qm "capturas: ${TARGET} ${SHORT}" || echo "sem mudanças"

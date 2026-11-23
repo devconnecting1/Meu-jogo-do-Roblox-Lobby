@@ -2,7 +2,7 @@
 // guarda-corpo contínuo, escada confortável e ambiente fechado.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPrison, clearanceZones, fallEdges, ENVELOPE, INTERIOR, DIM } from '../src/prison.js';
+import { buildPrison, clearanceZones, fallEdges, ENVELOPE, INTERIOR, LEVELS } from '../src/prison.js';
 import { findFloating, findZFighting, findClearanceViolations, findEdgeGaps, findOutside } from '../src/checks.js';
 
 const { parts } = buildPrison();
@@ -50,7 +50,7 @@ test('ambiente fechado: piso, teto e 4 paredes opacos cobrindo tudo', () => {
     assert.deepEqual(span(byName[n], 2), [ENVELOPE.min[2], ENVELOPE.max[2]], `${n} cobre Z`);
   }
   for (const n of ['Parede Sul', 'Parede Norte', 'Parede Leste', 'Parede Oeste']) {
-    assert.deepEqual(span(byName[n], 1), [0, DIM.roofY], `${n} vai do piso ao teto`);
+    assert.deepEqual(span(byName[n], 1), [0, LEVELS.ROOF], `${n} vai do piso ao teto`);
   }
 });
 
@@ -65,7 +65,7 @@ test('escada: degraus de até 1 stud, chegando exatamente ao 2º andar', () => {
     assert.ok(top - prev <= 1 + 1e-9, `${s.name} sobe ${top - prev} studs`);
     prev = top;
   }
-  assert.equal(prev, DIM.floor2);
+  assert.equal(prev, LEVELS.F2);
 });
 
 test('exatamente um SpawnLocation, sobre o piso', () => {

@@ -9,6 +9,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { buildPrison, cellCenterX } from '../src/prison.js';
 import { stats as countStats } from '../src/builder.js';
+import { buildManual } from '../src/manual.js';
 
 // ---------------------------------------------------------------------------
 // Cena (ambiente interno: não existe exterior)
@@ -32,14 +33,14 @@ const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerH
 scene.add(new THREE.HemisphereLight(0xf4f1ea, 0x4a4845, 0.65));
 scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 // "Luz de teto" difusa vinda de cima (o teto não projeta sombra no visualizador).
-const top = new THREE.DirectionalLight(0xfff6e8, 1.15);
-top.position.set(25, 160, 55);
-top.castShadow = true;
-top.shadow.mapSize.set(4096, 4096);
-Object.assign(top.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 10, far: 400 });
-top.shadow.bias = -0.0004;
-top.shadow.normalBias = 0.35;
-scene.add(top);
+const ceilingLight = new THREE.DirectionalLight(0xfff6e8, 1.15);
+ceilingLight.position.set(30, 200, 70);
+ceilingLight.castShadow = true;
+ceilingLight.shadow.mapSize.set(4096, 4096);
+Object.assign(ceilingLight.shadow.camera, { left: -110, right: 110, top: 110, bottom: -110, near: 10, far: 500 });
+ceilingLight.shadow.bias = -0.0004;
+ceilingLight.shadow.normalBias = 0.4;
+scene.add(ceilingLight);
 
 // Simula a superfície Studs do Roblox (só no navegador).
 function studTexture() {
@@ -112,10 +113,16 @@ function studGeometry([sx, , sz]) {
   return g;
 }
 
+const manual = buildManual(parts);
+const stepOf = new Array(parts.length);
+for (const st of manual.steps) for (const i of st.parts) stepOf[i] = st.n;
+const singles = []; // { mesh, i }
+const instanced = []; // { mesh, items: [{ i, matrix }] }
+
 const castsShadow = (p) => p.transparency < 0.5 && p.material !== 'Neon' && !NO_SHADOW_GROUPS.has(p.group);
 const buckets = new Map();
 const tmp = new THREE.Object3D();
-for (const p of parts) {
+parts.forEach((p, pi) => {
   if (p.rotation || p.studs || p.shape === 'Cylinder') {
     let geo = p.shape === 'Cylinder' ? unitCyl : unitBox;
     let mat = material(p);
@@ -130,21 +137,25 @@ for (const p of parts) {
     mesh.castShadow = castsShadow(p);
     mesh.receiveShadow = true;
     groupNode(p.group).add(mesh);
-    continue;
+    singles.push({ mesh, i: pi });
+    return;
   }
   const k = `${p.group}|${p.color}|${p.transparency}|${p.material}`;
   if (!buckets.has(k)) buckets.set(k, []);
-  buckets.get(k).push(p);
-}
+  buckets.get(k).push({ p, i: pi });
+});
 for (const list of buckets.values()) {
-  const p0 = list[0];
+  const p0 = list[0].p;
   const mesh = new THREE.InstancedMesh(unitBox, material(p0), list.length);
-  list.forEach((p, i) => {
+  const entry = { mesh, items: [] };
+  list.forEach(({ p, i }, k) => {
     tmp.position.fromArray(p.position);
     tmp.scale.fromArray(p.size);
     tmp.updateMatrix();
-    mesh.setMatrixAt(i, tmp.matrix);
+    mesh.setMatrixAt(k, tmp.matrix);
+    entry.items.push({ i, matrix: tmp.matrix.clone() });
   });
+  instanced.push(entry);
   mesh.castShadow = castsShadow(p0);
   mesh.receiveShadow = true;
   if (p0.transparency > 0) mesh.renderOrder = 2;
@@ -172,18 +183,39 @@ orbit.enableDamping = true;
 orbit.maxDistance = 400;
 
 const c2 = cellCenterX(2);
+const OVERVIEW = { pos: [-45, 170, 150], target: [0, 0, 0], cut: true };
 const VIEWS = [
-  { id: 'overview', title: 'Visão geral (corte, sem teto)', pos: [-30, 125, 105], target: [2, 0, 0], cut: true },
-  { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-68, 6.5, -15], target: [-45, 6, 6] },
-  { id: 'atrium', title: 'Átrio com refeitório', pos: [-66, 7.5, 0], target: [10, 9, 0] },
-  { id: 'corridor', title: 'Corredor das celas (térreo)', pos: [-50, 5.5, 22], target: [30, 4.5, 23.5] },
-  { id: 'upper', title: 'Galeria do 2º andar', pos: [-48, 21, 21.5], target: [30, 19.5, 22] },
-  { id: 'cells', title: 'Fachada das celas', pos: [c2 + 1, 5.5, -18.5], target: [c2 - 3, 4.5, -30] },
-  { id: 'cell', title: 'Interior de uma cela', pos: [c2 + 3, 5, -27.6], target: [c2 - 3, 2.5, -38] },
-  { id: 'stairs', title: 'Escada para o mezanino', pos: [18, 6, 2], target: [40, 9, 0] },
-  { id: 'visits', title: 'Sala de visitas', pos: [57.5, 6, -17], target: [64, 3.5, 6] },
-  { id: 'storage', title: 'Estoque sob o mezanino', pos: [57, 6.5, 19], target: [66, 4, 36] },
+  { id: 'overview', title: 'Visão geral (corte, sem teto)', ...OVERVIEW },
+  { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-86, 7, -22], target: [-55, 7, 10] },
+  { id: 'atrium', title: 'Átrio com refeitório', pos: [-84, 8.5, 0], target: [10, 11, 0] },
+  { id: 'corridor', title: 'Corredor das celas (térreo)', pos: [-64, 5.5, 29.5], target: [40, 4.5, 30.5] },
+  { id: 'upper', title: 'Galeria do 2º andar', pos: [-64, 22.5, 28.5], target: [40, 21, 29] },
+  { id: 'cells', title: 'Fachada das celas', pos: [c2 + 1.5, 6, -21], target: [c2 - 3, 5.5, -38] },
+  { id: 'cell', title: 'Interior de uma cela', pos: [c2 + 3.8, 5.5, -35.8], target: [c2 - 3.5, 2.5, -48] },
+  { id: 'stairs', title: 'Escada para o mezanino', pos: [22, 7, 3], target: [52, 10, 0] },
+  { id: 'visits', title: 'Sala de visitas', pos: [68, 6.5, -22], target: [78, 3.5, 8] },
+  { id: 'storage', title: 'Estoque sob o mezanino', pos: [68, 7.5, 25], target: [80, 4, 44] },
+  { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
+  { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },
+  { id: 'build-75', title: 'Montagem — 75% das etapas', ...OVERVIEW, step: 0.75 },
 ];
+
+const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
+const stepInput = document.getElementById('step');
+const stepLabel = document.getElementById('step-label');
+stepInput.max = String(manual.steps.length);
+function setStep(n) {
+  const k = Math.max(1, Math.min(manual.steps.length, Math.round(n)));
+  for (const { mesh, i } of singles) mesh.visible = stepOf[i] <= k;
+  for (const { mesh, items } of instanced) {
+    items.forEach(({ i, matrix }, idx) => mesh.setMatrixAt(idx, stepOf[i] <= k ? matrix : ZERO));
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+  stepInput.value = String(k);
+  const st = manual.steps[k - 1];
+  stepLabel.textContent = `Etapa ${k}/${manual.steps.length} · ${st.phaseTitle}`;
+}
+stepInput.oninput = () => setStep(Number(stepInput.value));
 
 function setGroupVisible(name, on) {
   const g = groups.get(name);
@@ -205,11 +237,12 @@ function setView(id) {
   orbit.target.fromArray(v.target);
   orbit.update();
   setCut(Boolean(v.cut));
+  setStep(v.step ? v.step * manual.steps.length : manual.steps.length);
   document.querySelectorAll('#views button').forEach((b) => b.classList.toggle('on', b.dataset.view === id));
 }
 
 const viewsEl = document.getElementById('views');
-for (const v of VIEWS) {
+for (const v of VIEWS.filter((x) => !x.step)) {
   const b = document.createElement('button');
   b.dataset.view = v.id;
   b.textContent = v.title.split(' (')[0];
@@ -235,7 +268,7 @@ colliders.forEach((c, i) => {
       grid.get(k).push(i);
     }
 });
-const SPAWN = [-62, 1, 0];
+const SPAWN = [-76, 1, 0];
 const PLAYER = { half: 0.9, height: 5, eye: 4.5 };
 const player = { pos: new THREE.Vector3(...SPAWN), vel: new THREE.Vector3(), onGround: false };
 const keys = {};
@@ -316,6 +349,7 @@ function enterWalk() {
   camera.position.set(SPAWN[0], SPAWN[1] + PLAYER.eye, SPAWN[2]);
   camera.lookAt(0, SPAWN[1] + PLAYER.eye, 0);
   setCut(false);
+  setStep(manual.steps.length);
   look.lock();
 }
 function exitWalk() {
@@ -342,7 +376,8 @@ addEventListener('keyup', (e) => (keys[e.code] = false));
 // Painel e loop
 // ---------------------------------------------------------------------------
 const s = countStats(parts);
-document.getElementById('stats').textContent = `${s.total} Parts · 32 celas · ${s.lights} luzes`;
+document.getElementById('stats').textContent =
+  `${s.total} peças · ${manual.steps.length} etapas · ${manual.connections} conexões verificadas · ${s.lights} luzes`;
 
 addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -364,4 +399,5 @@ window.__prison = {
   views: VIEWS.map(({ id, title }) => ({ id, title })),
   setView,
   stats: s,
+  manual: { parts: manual.parts, steps: manual.steps.length, connections: manual.connections },
 };

@@ -1,6 +1,6 @@
 # Prisão — Roblox
 
-Prisão **fechada** de 2 andares, feita só com **Part clássico** em cores neutras. Não tem UI, NPC nem script: é apenas a construção. O GitHub Actions testa, compila, renderiza e publica tudo automaticamente.
+Prisão **fechada e espaçosa** de 2 andares, feita só com **Part clássico** em cores neutras. Não tem UI, NPC nem script: é apenas a construção. O GitHub Actions testa, compila, renderiza e publica tudo automaticamente.
 
 ![Átrio](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/atrium.png)
 
@@ -18,6 +18,8 @@ Prisão **fechada** de 2 andares, feita só com **Part clássico** em cores neut
 - **Átrio de pé-direito duplo** com refeitório (mesas redondas), caixas, colunas no ritmo das celas e luminárias fluorescentes.
 - **2º andar** com galerias de guarda-corpo de vidro, ponte central e mezanino, com acesso por uma escada de degraus de 1 stud.
 - **Hall** com SpawnLocation e posto de guarda, **depósitos**, **sala de visitas** e **estoque** com estantes.
+- **Escala ampla** (como na referência): celas de 14×16, corredores de 10, vão central de 48 e 27 studs do 2º andar ao teto.
+- **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado. O resumo é "N peças · N etapas · N pontos de conexão verificados", com imagens da montagem em estágios.
 - **Lighting:** tecnologia Future, sem sol (ambiente fechado), ambiente neutro, correção de cor sutil e bloom leve nas lâmpadas.
 
 ## Como funciona
@@ -28,7 +30,7 @@ src/prison.js ─┬─► src/rojo.js ─► Rojo ─► prisao.rbxl ─► Ope
                └─► tests/ (apoio, z-fighting, passagens, guarda-corpo, estilo)
 ```
 
-Tudo roda em `.github/workflows/ci.yml` (`ubuntu-latest`). Os jobs são **test → build → render → publish** (e **pages** na `main`). Veja as regras completas em [AGENTS.md](AGENTS.md).
+Tudo roda em `.github/workflows/ci.yml` (`ubuntu-latest`). Os jobs são **lint (ESLint + Prettier) → test → build → render → publish** (e **pages** na `main`). Veja as regras completas em [AGENTS.md](AGENTS.md).
 
 ### Publicação no Roblox
 

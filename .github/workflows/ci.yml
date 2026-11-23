@@ -1,7 +1,8 @@
 # Pipeline único do projeto. TUDO roda aqui (nada localmente):
-#   test     -> regras de construção (node:test, sem dependências)
+#   lint     -> ESLint + Prettier (correção automática num branch autoformat/pr-N)
+#   test     -> regras de construção + manual de montagem (node:test, sem dependências)
 #   build    -> Rojo gera o .rbxl e o lugar é verificado
-#   render   -> Three.js + Chromium geram as capturas e comentam no PR
+#   render   -> Three.js + Chromium geram as capturas e o manual, e comentam no PR
 #   publish  -> Open Cloud publica no Roblox (PR do próprio repo, main ou manual)
 #   pages    -> visualizador no GitHub Pages (main)
 name: CI
@@ -28,10 +29,70 @@ env:
   NODE_VERSION: '22'
   ROJO_VERSION: 7.4.4
   PLAYWRIGHT_VERSION: 1.49.1
+  LINT_PACKAGES: eslint@9.15.0 @eslint/js@9.15.0 globals@15.12.0 prettier@3.3.3 eslint-config-prettier@9.1.0
   # PR de fork não recebe segredos nem permissão de escrita.
   SAME_REPO: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
 
 jobs:
+  lint:
+    name: ESLint + Prettier
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Instalar ESLint e Prettier
+        run: npm install --no-save --no-package-lock $LINT_PACKAGES
+      - name: Prettier
+        id: prettier
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx prettier --check . 2>&1 | tee prettier-report.txt
+      - name: ESLint
+        id: eslint
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx eslint . 2>&1 | tee eslint-report.txt
+      - name: Publicar correção automática (branch autoformat/pr-N)
+        id: autofix
+        if: (steps.prettier.outcome == 'failure' || steps.eslint.outcome == 'failure') && github.event_name == 'pull_request' && env.SAME_REPO == 'true'
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          npx prettier --write . > /dev/null
+          npx eslint --fix . || true
+          if git diff --quiet; then echo "nada a corrigir automaticamente"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "autoformat/pr-$PR"
+          git commit -qam "style: Prettier + ESLint --fix"
+          git push -qf origin "autoformat/pr-$PR"
+          echo "branch=autoformat/pr-$PR" >> "$GITHUB_OUTPUT"
+      - name: Comentar no PR
+        if: always() && github.event_name == 'pull_request' && env.SAME_REPO == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          PRETTIER: ${{ steps.prettier.outcome }}
+          ESLINT: ${{ steps.eslint.outcome }}
+          AUTOFIX_BRANCH: ${{ steps.autofix.outputs.branch }}
+        run: node tools/ci/pr-comment.mjs lint
+      - name: Resultado
+        if: steps.prettier.outcome == 'failure' || steps.eslint.outcome == 'failure'
+        run: |
+          echo "::error::ESLint/Prettier encontraram problemas (veja o comentário no PR)."
+          exit 1
+
   test:
     name: Testes da construção
     runs-on: ubuntu-latest
@@ -112,6 +173,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Renderizar vistas
         run: node tools/screenshots.mjs out/previews
+      - name: Gerar manual de montagem
+        run: node tools/manual.mjs out/previews
       - uses: actions/upload-artifact@v4
         with:
           name: capturas

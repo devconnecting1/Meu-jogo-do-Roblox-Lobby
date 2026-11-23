@@ -31,14 +31,18 @@ await page.goto(`http://localhost:${server.address().port}/index.html`);
 await page.waitForFunction(() => window.__prison?.ready, null, { timeout: 180000 });
 await page.addStyleTag({ content: '#hud{display:none !important}' });
 
-const { views, stats } = await page.evaluate(() => ({ views: window.__prison.views, stats: window.__prison.stats }));
+const { views, stats, manual } = await page.evaluate(() => ({
+  views: window.__prison.views,
+  stats: window.__prison.stats,
+  manual: window.__prison.manual,
+}));
 for (const v of views) {
   await page.evaluate((id) => window.__prison.setView(id), v.id);
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1200);
   await page.screenshot({ path: join(outDir, `${v.id}.png`) });
   console.log(`✔ ${v.id}.png — ${v.title}`);
 }
-writeFileSync(join(outDir, 'manifest.json'), JSON.stringify({ views, stats }, null, 2));
+writeFileSync(join(outDir, 'manifest.json'), JSON.stringify({ views, stats, manual }, null, 2));
 
 await browser.close();
 server.close();
