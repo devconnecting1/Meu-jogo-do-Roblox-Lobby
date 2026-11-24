@@ -2,147 +2,67 @@
   "views": [
     {
       "id": "overview",
-      "title": "Visão geral (corte, sem teto)"
+      "title": "Visão geral do reino"
     },
     {
-      "id": "hall",
-      "title": "Hall de entrada e posto de guarda"
+      "id": "top",
+      "title": "Mapa visto de cima (30 lotes, estradas, rio e lago)"
     },
     {
-      "id": "atrium",
-      "title": "Átrio e vão de pé-direito duplo"
+      "id": "lobby",
+      "title": "Lobby: estátua do rei, mercado e colunas antigas"
     },
     {
-      "id": "corridor",
-      "title": "Corredor das celas (térreo, aberto até o teto)"
+      "id": "market",
+      "title": "Mercado do Lobby (altura do jogador)"
     },
     {
-      "id": "upper",
-      "title": "Galeria do 2º andar (sobre as celas do térreo)"
+      "id": "lobby-stairs",
+      "title": "Escadaria de madeira do Lobby"
     },
     {
-      "id": "gallery-view",
-      "title": "Vista da galeria para o vão"
+      "id": "plot",
+      "title": "Lote 05: fundação do castelo"
     },
     {
-      "id": "cells",
-      "title": "Fachada das celas"
+      "id": "plots",
+      "title": "Lotes espalhados pelo mapa"
     },
     {
-      "id": "cell",
-      "title": "Interior de uma cela"
+      "id": "bridge",
+      "title": "Ponte de madeira sobre o rio"
     },
     {
-      "id": "service",
-      "title": "Ala oeste: corredor de serviço"
+      "id": "bridge-walk",
+      "title": "Atravessando a ponte (altura do jogador)"
     },
     {
-      "id": "cafeteria",
-      "title": "Ala oeste: refeitório"
+      "id": "lake",
+      "title": "Lago e rio"
     },
     {
-      "id": "storeroom",
-      "title": "Ala oeste: almoxarifado"
+      "id": "forest",
+      "title": "Floresta"
     },
     {
-      "id": "infirmary",
-      "title": "Ala oeste: enfermaria"
+      "id": "autumn",
+      "title": "Bosque de outono"
     },
     {
-      "id": "guards",
-      "title": "Sala dos guardas"
+      "id": "mesa",
+      "title": "Planalto de rocha com escadaria"
     },
     {
-      "id": "stairs",
-      "title": "Escada para o mezanino"
+      "id": "farm",
+      "title": "Campo de trigo"
     },
     {
-      "id": "visits",
-      "title": "Sala de visitas"
+      "id": "mine",
+      "title": "Jazida de ouro"
     },
     {
-      "id": "gate",
-      "title": "Portal do túnel e portão de emergência (aberto)"
-    },
-    {
-      "id": "tunnel",
-      "title": "Túnel de acesso até o portão fechado"
-    },
-    {
-      "id": "breach",
-      "title": "Rombo na parede do bloco e coluna rachada"
-    },
-    {
-      "id": "column",
-      "title": "Coluna rachada no átrio"
-    },
-    {
-      "id": "roof",
-      "title": "Telhado desabado: céu de noite, trepadeiras e a corda de lençóis da fuga"
-    },
-    {
-      "id": "roof-floor",
-      "title": "Destroços do telhado no átrio (lajes, viga, poça e musgo)"
-    },
-    {
-      "id": "barricade",
-      "title": "Barricada da rebelião no hall"
-    },
-    {
-      "id": "fire",
-      "title": "Sala dos guardas incendiada"
-    },
-    {
-      "id": "crack",
-      "title": "Rachadura do terremoto no piso do átrio"
-    },
-    {
-      "id": "collapse",
-      "title": "Coluna desabada: toco, topo partido e fuste caído"
-    },
-    {
-      "id": "wrecked-cell",
-      "title": "Cela destruída (porta arrancada, vidro estilhaçado, parede furada)"
-    },
-    {
-      "id": "locked-cell",
-      "title": "Cela trancada com cadeado"
-    },
-    {
-      "id": "intake",
-      "title": "Triagem (sala lateral da eclusa de entrada)"
-    },
-    {
-      "id": "machines",
-      "title": "Casa de máquinas (fundo do túnel)"
-    },
-    {
-      "id": "solitary",
-      "title": "Solitária"
-    },
-    {
-      "id": "mezzanine",
-      "title": "2º andar: salas do mezanino"
-    },
-    {
-      "id": "control",
-      "title": "Sala de controle (vidraça para o vão)"
-    },
-    {
-      "id": "office",
-      "title": "Diretoria"
-    },
-    {
-      "id": "rest",
-      "title": "Sala de descanso dos guardas"
-    },
-    {
-      "id": "library",
-      "title": "Biblioteca (2º andar)"
-    },
-    {
-      "id": "classroom",
-      "title": "Sala de aula (2º andar)"
+      "id": "dock",
+      "title": "Cais e barco na praia"
     },
     {
       "id": "build-25",
@@ -158,29 +78,24 @@
     }
   ],
   "stats": {
-    "total": 3714,
-    "lights": 77,
+    "total": 4617,
+    "lights": 0,
     "groups": {
-      "Piso": 2,
-      "Paredes": 60,
-      "Teto": 29,
-      "Ruínas": 469,
-      "Estrutura": 65,
-      "Pisos": 49,
-      "Celas": 1692,
-      "Galerias": 46,
-      "Iluminação": 178,
-      "Escada": 40,
-      "Hall": 6,
-      "Salas": 390,
-      "Sala de Visitas": 57,
-      "Ala Oeste": 401,
-      "Túnel": 230
+      "Mar": 1,
+      "Terreno": 498,
+      "Lobby": 297,
+      "Estradas": 65,
+      "Pontes": 70,
+      "Lotes": 330,
+      "Relevo": 443,
+      "Recursos": 128,
+      "Costa": 45,
+      "Vegetação": 2740
     }
   },
   "manual": {
-    "parts": 3714,
-    "steps": 699,
-    "connections": 11070
+    "parts": 4617,
+    "steps": 748,
+    "connections": 11057
   }
 }

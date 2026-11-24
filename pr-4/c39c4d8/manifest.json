@@ -1,0 +1,101 @@
+{
+  "views": [
+    {
+      "id": "overview",
+      "title": "Visão geral do reino"
+    },
+    {
+      "id": "top",
+      "title": "Mapa visto de cima (30 lotes, estradas, rio e lago)"
+    },
+    {
+      "id": "lobby",
+      "title": "Lobby: estátua do rei, mercado e colunas antigas"
+    },
+    {
+      "id": "market",
+      "title": "Mercado do Lobby (altura do jogador)"
+    },
+    {
+      "id": "lobby-stairs",
+      "title": "Escadaria de madeira do Lobby"
+    },
+    {
+      "id": "plot",
+      "title": "Lote 05: fundação do castelo"
+    },
+    {
+      "id": "plots",
+      "title": "Lotes espalhados pelo mapa"
+    },
+    {
+      "id": "bridge",
+      "title": "Ponte de madeira sobre o rio"
+    },
+    {
+      "id": "bridge-walk",
+      "title": "Atravessando a ponte (altura do jogador)"
+    },
+    {
+      "id": "lake",
+      "title": "Lago e rio"
+    },
+    {
+      "id": "forest",
+      "title": "Floresta"
+    },
+    {
+      "id": "autumn",
+      "title": "Bosque de outono"
+    },
+    {
+      "id": "mesa",
+      "title": "Planalto de rocha com escadaria"
+    },
+    {
+      "id": "farm",
+      "title": "Campo de trigo"
+    },
+    {
+      "id": "mine",
+      "title": "Jazida de ouro"
+    },
+    {
+      "id": "dock",
+      "title": "Cais e barco na praia"
+    },
+    {
+      "id": "build-25",
+      "title": "Montagem — 25% das etapas"
+    },
+    {
+      "id": "build-50",
+      "title": "Montagem — 50% das etapas"
+    },
+    {
+      "id": "build-75",
+      "title": "Montagem — 75% das etapas"
+    }
+  ],
+  "stats": {
+    "total": 4617,
+    "lights": 0,
+    "groups": {
+      "Mar": 1,
+      "Terreno": 498,
+      "Lobby": 297,
+      "Estradas": 65,
+      "Pontes": 70,
+      "Lotes": 330,
+      "Relevo": 443,
+      "Recursos": 128,
+      "Costa": 45,
+      "Vegetação": 2740
+    }
+  },
+  "manual": {
+    "parts": 4617,
+    "steps": 748,
+    "connections": 11057
+  }
+}
