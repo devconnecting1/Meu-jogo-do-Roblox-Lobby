@@ -981,7 +981,7 @@ export function createWorld(seed = SEED) {
           const Q = `${V}/Quintal ${n}`;
           for (const tt of [t - half, t, t + half]) {
             const post = rectTW(tt - 0.2, tt + 0.2, fence - 0.2, fence + 0.2);
-            b.span(Q, 'Estaca da Cerca', [post.x0, land - 0.1, post.z0], [post.x1, land + 2, post.z1], C.woodDark, deco);
+            b.span(Q, 'Estaca da Cerca', [post.x0, land - 0.1, post.z0], [post.x1, land + 2, post.z1], C.wood, deco);
           }
           const rail = rectTW(t - half, t + half, fence - 0.1, fence + 0.1);
           b.span(Q, 'Cerca', [rail.x0, land + 1.2, rail.z0], [rail.x1, land + 1.5, rail.z1], C.wood, deco);

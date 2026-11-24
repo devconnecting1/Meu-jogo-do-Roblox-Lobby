@@ -172,6 +172,8 @@ test('trilhas ligam cada lugar à malha de estradas (nada solto no meio do mato)
     (p) =>
       p.model === 'Estradas' ||
       p.model === 'Trilhas' ||
+      // a rua da vila faz parte da malha (liga na estrada pela trilha da vila)
+      (p.model.startsWith('Vila/') && ['Rua da Vila', 'Praça da Vila', 'Largo da Vila'].includes(p.name)) ||
       (p.model.startsWith('Pontes/') && p.name === 'Tabuleiro') ||
       ['Base do Lobby', 'Piso do Lobby', 'Degrau do Lobby'].includes(p.name),
   );

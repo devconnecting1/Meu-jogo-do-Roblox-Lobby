@@ -123,6 +123,8 @@ Cada item já derrubou o CI uma vez (a maioria no projeto da prisão; continuam 
 | capturas canceladas | push novo enquanto o job `render` ainda roda (o CI cancela o anterior) | espere "📸 Como ficou" antes do próximo push, a não ser que haja teste vermelho para corrigir |
 | "só 0 planaltos com escada" | o retângulo do próprio planalto entrou em `blocked` antes de testar a escada, então `free(escada)` sempre falhava | registre em `blocked` só **depois** de montar tudo que encosta na peça (escada, rampa, cais) |
 | z-fighting em X=39: Trilha × Terra Arada (variante 2027) | a borda da trilha (meia-largura 2, coordenadas inteiras) caiu no mesmo plano da borda do campo, com alturas que se cruzam | trilha com meia-largura 2,05: bordas nunca em inteiro ou meio; peça deitada que entra em outra não pode ter borda em coordenada "redonda" |
+| z-fighting Estaca da Cerca × Cerca (quintais) | poste e trilho da cerca em cores diferentes com faces no mesmo plano | cerca do quintal toda na mesma madeira (`C.wood`); detalhe de outra cor sempre afastado 0,1 |
+| "trilhas soltas" perto das vilas | trilhas dos campos ligam na rua da vila, e o teste não contava a rua como parte da malha | a rua, a praça e o largo da vila fazem parte da malha (ligam na estrada pela trilha da vila) |
 | captura com a vista anterior | o SwiftShader demora a desenhar muitas malhas | tudo instanciado no visualizador; o CI espera 2 quadros antes de capturar |
 
 - **Z-fighting:** duas peças com faces coplanares e cores diferentes. Desloque a decorativa (0,05 a 0,1), deixe uma por dentro da outra, ou use a mesma cor.
