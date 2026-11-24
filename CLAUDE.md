@@ -15,6 +15,8 @@
 - Falha de teste se corrige na geometria. Nunca afrouxe um teste para ficar verde.
 - Ao receber falha: leia **a lista inteira** do comentário (todas as peças e coordenadas), entenda a causa real e corrija tudo num commit só. Depois registre a lição nova na tabela 6.1 do AGENTS.md.
 - Antes de cada push, confira as peças novas contra a tabela 6.1 do AGENTS.md (nomes com "gui", espessura < 0,04, bases deitadas no mesmo plano, fase do manual, decoração com colisão perto de passagens, Neon sem luz, cor fora da paleta neutra).
+- **Imagens sempre:** a cada commit com capturas, baixe **todas** as imagens do comentário "📸 Como ficou" (branch `ci-previews/pr-N/<sha>/`) e envie no chat como anexo para o usuário baixar, inclusive catálogo e variantes. Diga o que melhorou e o que ainda está fraco.
+- **Memória do projeto:** toda regra, lição, teste ou decisão nova vai para o AGENTS.md (regras, tabela de testes, 6.1) no mesmo commit; o README resume o que existe. Nada fica só na conversa.
 - Não faça push enquanto o job de capturas roda (cancela as imagens), a não ser para corrigir teste vermelho. O usuário sempre quer **ver as imagens** no chat: baixe do branch `ci-previews/pr-N/<sha>/` e envie.
 - Decoração nova precisa fazer sentido no reino (regra 10 do AGENTS.md): nada no caminho de lotes, estradas ou da praça.
 - A prisão antiga fica só no branch `arquivo/prisao`; não traga nada dela de volta para o mapa.

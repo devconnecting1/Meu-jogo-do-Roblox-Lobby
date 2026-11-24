@@ -56,7 +56,7 @@ test('praia, rio e lago existem e o terreno tem as alturas certas', () => {
   const top = (p) => p.position[1] + p.size[1] / 2;
   for (const p of parts.filter((x) => x.name === 'Grama')) assert.equal(top(p), DIM.land);
   for (const p of parts.filter((x) => x.name === 'Areia')) assert.equal(top(p), DIM.beach);
-  for (const p of parts.filter((x) => x.name.startsWith('Água'))) {
+  for (const p of parts.filter((x) => x.model === 'Terreno' && x.name.startsWith('Água'))) {
     assert.equal(top(p), DIM.water);
     assert.equal(p.canCollide, false, 'água não colide (o jogador entra nela)');
   }

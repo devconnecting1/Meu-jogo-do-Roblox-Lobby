@@ -2,7 +2,7 @@
 // Usado no navegador (GitHub Pages / prévia do PR) e pelo CI para gerar as capturas.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { buildMap, PLOTS, LAKE, DIM } from '../src/map.js';
+import { createWorld, SEED, DIM } from '../src/map.js';
 import { stats as countStats } from '../src/builder.js';
 import { buildManual } from '../src/manual.js';
 
@@ -104,7 +104,12 @@ function addStuds(m) {
 // ---------------------------------------------------------------------------
 // Parts -> malhas instanciadas (uma por grupo + cor + aparência)
 // ---------------------------------------------------------------------------
-const { parts, landmarks } = buildMap();
+// #seed=123 mostra outra variante do mapa (cada servidor do jogo usa uma semente)
+const params = new URLSearchParams(location.hash.slice(1));
+const seed = Number(params.get('seed')) || SEED;
+const world = createWorld(seed);
+const { PLOTS, LAKE } = world;
+const { parts, landmarks } = world.buildMap();
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
 const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
 const cache = new Map();
@@ -309,9 +314,10 @@ renderer.setAnimationLoop(() => {
   renderer.render(scene, camera);
 });
 
-setView(new URLSearchParams(location.hash.slice(1)).get('view') || 'overview');
+setView(params.get('view') || 'overview');
 window.__reino = {
   ready: true,
+  seed,
   views: VIEWS.map(({ id, title }) => ({ id, title })),
   setView,
   stats: s,

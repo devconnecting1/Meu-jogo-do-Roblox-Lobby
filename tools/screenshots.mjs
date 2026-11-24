@@ -7,6 +7,7 @@ import { mkdirSync, readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { VARIANT_SEEDS } from '../src/variants.js';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const outDir = resolve(process.argv[2] ?? 'out/previews');
@@ -50,6 +51,26 @@ for (const v of views) {
   await page.waitForTimeout(800);
   await page.screenshot({ path: join(outDir, `${v.id}.png`) });
   console.log(`✔ ${v.id}.png — ${v.title}`);
+}
+// variantes sorteadas por servidor: uma vista de cima e uma geral de cada semente
+const base = `http://localhost:${server.address().port}/index.html`;
+for (const seed of VARIANT_SEEDS) {
+  await page.goto('about:blank');
+  await page.goto(`${base}#seed=${seed}`);
+  await page.waitForFunction((s) => window.__reino?.ready && window.__reino.seed === s, seed, { timeout: 180000 });
+  await page.addStyleTag({ content: '#hud{display:none !important}' });
+  for (const [view, suffix, title] of [
+    ['top', '', 'vista de cima'],
+    ['overview', '-geral', 'visão geral'],
+  ]) {
+    await page.evaluate((id) => window.__reino.setView(id), view);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    await page.waitForTimeout(800);
+    const id = `variante-${seed}${suffix}`;
+    await page.screenshot({ path: join(outDir, `${id}.png`) });
+    views.push({ id, title: `Variante do servidor (semente ${seed}): ${title}` });
+    console.log(`✔ ${id}.png`);
+  }
 }
 writeFileSync(join(outDir, 'manifest.json'), JSON.stringify({ views, stats, manual }, null, 2));
 

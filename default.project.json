@@ -90,6 +90,30 @@
           "Spread": 0.55
         }
       }
+    },
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "Mapas": {
+        "$className": "Folder",
+        "Semente 101": {
+          "$path": "build/Mapas/Semente 101.model.json"
+        },
+        "Semente 2027": {
+          "$path": "build/Mapas/Semente 2027.model.json"
+        },
+        "Semente 4242": {
+          "$path": "build/Mapas/Semente 4242.model.json"
+        },
+        "Semente 77777": {
+          "$path": "build/Mapas/Semente 77777.model.json"
+        }
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "EscolherMapa": {
+        "$path": "src/game/escolher-mapa.server.luau"
+      }
     }
   }
 }
