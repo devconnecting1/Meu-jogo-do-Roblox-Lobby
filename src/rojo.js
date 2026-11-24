@@ -5,7 +5,7 @@ import { rotationMatrix } from './builder.js';
 
 export const ENUM = Object.freeze({
   Material: { Plastic: 256, Neon: 288 },
-  PartType: { Block: 1, Cylinder: 2 },
+  PartType: { Ball: 0, Block: 1, Cylinder: 2 },
   SurfaceType: { Smooth: 0, Weld: 2, Studs: 3, Inlet: 4, Universal: 5 },
   NormalId: { Bottom: 4 },
 });
@@ -53,8 +53,9 @@ export function partJson(p) {
     Transparency: p.transparency,
     TopSurface: { Enum: p.studs ? ENUM.SurfaceType.Studs : surfaceEnum(p) },
   };
-  // a face de baixo fica sempre lisa (encosta no apoio); as laterais recebem o relevo clássico
-  for (const s of SIDES) properties[s] = { Enum: s === 'BottomSurface' ? ENUM.SurfaceType.Smooth : surfaceEnum(p) };
+  // estilo clássico: studs em cima e inlet embaixo; as laterais recebem o relevo (ou ficam lisas)
+  const bottom = p.studs ? ENUM.SurfaceType.Inlet : ENUM.SurfaceType.Smooth;
+  for (const s of SIDES) properties[s] = { Enum: s === 'BottomSurface' ? bottom : surfaceEnum(p) };
   if (p.className === 'SpawnLocation') {
     properties.Neutral = true;
     properties.Duration = 0;

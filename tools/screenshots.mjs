@@ -35,17 +35,19 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 await page.goto(`http://localhost:${server.address().port}/index.html`);
-await page.waitForFunction(() => window.__prison?.ready, null, { timeout: 180000 });
+await page.waitForFunction(() => window.__reino?.ready, null, { timeout: 180000 });
 await page.addStyleTag({ content: '#hud{display:none !important}' });
 
 const { views, stats, manual } = await page.evaluate(() => ({
-  views: window.__prison.views,
-  stats: window.__prison.stats,
-  manual: window.__prison.manual,
+  views: window.__reino.views,
+  stats: window.__reino.stats,
+  manual: window.__reino.manual,
 }));
 for (const v of views) {
-  await page.evaluate((id) => window.__prison.setView(id), v.id);
-  await page.waitForTimeout(1200);
+  await page.evaluate((id) => window.__reino.setView(id), v.id);
+  // espera dois quadros completos (o SwiftShader é lento) antes de capturar
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  await page.waitForTimeout(800);
   await page.screenshot({ path: join(outDir, `${v.id}.png`) });
   console.log(`✔ ${v.id}.png — ${v.title}`);
 }

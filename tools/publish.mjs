@@ -7,7 +7,7 @@
 //   ROBLOX_UNIVERSE_ID    opcional (padrão: roblox.config.json)
 //   ROBLOX_LOCAL_ID       opcional (padrão: roblox.config.json)
 //
-// Uso: node tools/publish.mjs build/prisao.rbxl [--saved]
+// Uso: node tools/publish.mjs build/reino.rbxl [--saved]
 
 import { appendFileSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const config = JSON.parse(readFileSync(resolve(root, 'roblox.config.json'), 'utf8'));
 const args = process.argv.slice(2);
-const file = resolve(root, args.find((a) => !a.startsWith('--')) ?? 'build/prisao.rbxl');
+const file = resolve(root, args.find((a) => !a.startsWith('--')) ?? 'build/reino.rbxl');
 const versionType = args.includes('--saved') ? 'Saved' : 'Published';
 
 const apiKey = (process.env.ROBLOX_CLOUD_API || '').trim();

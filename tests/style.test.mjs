@@ -1,11 +1,11 @@
-// Regras de estilo: Part clássico, sem textura/UI/NPC, cores neutras, orçamento de Parts e luzes.
+// Regras de estilo: Part clássico, sem textura/UI/NPC/script, cores da paleta e orçamento.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPrison } from '../src/prison.js';
-import { saturation } from '../src/palette.js';
+import { buildMap } from '../src/map.js';
+import { C, saturation } from '../src/palette.js';
 import { stats } from '../src/builder.js';
 
-const { parts } = buildPrison();
+const { parts } = buildMap();
 const ALLOWED_KEYS = [
   'model',
   'name',
@@ -23,27 +23,23 @@ const ALLOWED_KEYS = [
   'surface',
   'group',
 ];
+const PALETTE = new Set(Object.values(C).map((c) => c.join(',')));
 
-test('somente Part clássico (Block; Cylinder só girado como tampo) e SpawnLocation', () => {
+test('somente Part clássico (Block, Cylinder ou Ball) e SpawnLocation', () => {
   for (const p of parts) {
     assert.ok(['Part', 'SpawnLocation'].includes(p.className), `${p.name}: classe ${p.className}`);
-    assert.ok(['Block', 'Cylinder'].includes(p.shape), `${p.name}: shape ${p.shape}`);
-    if (p.rotation && p.shape !== 'Cylinder') {
-      // ruínas (entulho, lajes tombadas, vigas caídas) podem girar em qualquer eixo, mas nunca colidem:
-      // o apoio é checado pela caixa envolvente e o jogador não tropeça em geometria inclinada
-      assert.ok(p.model.includes('Ruínas'), `${p.model}/${p.name}: só cilindros e ruínas podem ser girados`);
-      assert.equal(p.canCollide, false, `${p.name}: ruína girada não pode colidir`);
-    }
+    assert.ok(['Block', 'Cylinder', 'Ball'].includes(p.shape), `${p.name}: shape ${p.shape}`);
   }
 });
 
-test('materiais: Plastic em tudo, Neon apenas em lâmpadas sem colisão', () => {
+test('materiais: Plastic em tudo; Neon só em lâmpada sem colisão e com luz', () => {
   for (const p of parts) {
     assert.ok(['Plastic', 'Neon'].includes(p.material), `${p.name}: material ${p.material}`);
-    if (p.material === 'Neon') assert.equal(p.canCollide, false, `${p.name}: Neon não deve colidir`);
+    if (p.material === 'Neon') {
+      assert.equal(p.canCollide, false, `${p.name}: Neon não deve colidir`);
+      assert.ok(p.light, `${p.model}/${p.name}: Neon sem luz é lâmpada falsa`);
+    }
     if (p.light) assert.equal(p.material, 'Neon', `${p.name}: luz precisa estar numa peça Neon`);
-    // e o contrário: só brilha o que emite luz (nada de lâmpada "acesa" de enfeite numa sala escura)
-    if (p.material === 'Neon') assert.ok(p.light, `${p.model}/${p.name}: Neon sem luz é lâmpada falsa`);
   }
 });
 
@@ -54,11 +50,9 @@ test('sem textura, decal, UI, NPC ou script: só os campos conhecidos de Part', 
   }
 });
 
-test('cores neutras (saturação HSV <= 0.3)', () => {
-  for (const p of parts) {
-    assert.ok(saturation(p.color) <= 0.3, `${p.model}/${p.name}: cor saturada ${p.color}`);
-    if (p.light) assert.ok(saturation(p.light.color) <= 0.3, `${p.name}: luz saturada`);
-  }
+test('cores neutras: toda cor vem da paleta e nenhuma é berrante (saturação HSV <= 0,55)', () => {
+  for (const c of Object.values(C)) assert.ok(saturation(c) <= 0.55, `cor saturada demais na paleta: ${c}`);
+  for (const p of parts) assert.ok(PALETTE.has(p.color.join(',')), `${p.model}/${p.name}: cor fora da paleta ${p.color}`);
 });
 
 test('relevo clássico (Inlet/Weld/Universal) só em peças opacas de Plastic', () => {
@@ -69,34 +63,28 @@ test('relevo clássico (Inlet/Weld/Universal) só em peças opacas de Plastic', 
   }
 });
 
-test('superfícies grandes não estouram: paredes, pisos e colunas em tons médios', async () => {
-  const { C } = await import('../src/palette.js');
-  for (const k of ['wall', 'cellWall', 'column', 'floor', 'floorAtrium', 'floorCorridor', 'cellFloor', 'tunnel']) {
-    assert.ok(Math.max(...C[k]) <= 215, `C.${k} = ${C[k]} (claro demais: estoura com gráficos baixos)`);
-  }
-});
-
-test('studs só em superfícies pisáveis baixas', () => {
-  for (const p of parts.filter((x) => x.studs)) {
-    assert.ok(p.size[1] <= 1, `${p.name}: studs numa peça alta (${p.size[1]})`);
+test('estilo clássico: studs no topo de tudo, menos no mar e na água', () => {
+  for (const p of parts) {
+    const wet = p.name === 'Mar' || p.name.startsWith('Água');
+    assert.equal(p.studs, !wet, `${p.model}/${p.name}: studs = ${p.studs}`);
   }
 });
 
 test('valores numéricos válidos e transparência controlada', () => {
   for (const p of parts) {
     for (const v of [...p.position, ...p.size]) assert.ok(Number.isFinite(v), `${p.name}: número inválido`);
-    for (const v of p.size) assert.ok(v >= 0.04 && v <= 2048, `${p.name}: tamanho ${v}`);
+    for (const v of p.size) assert.ok(v >= 0.04 && v <= 2048, `${p.model}/${p.name}: tamanho ${v}`);
     assert.ok(p.transparency >= 0 && p.transparency <= 0.8, `${p.name}: transparência ${p.transparency}`);
     for (const c of p.color) assert.ok(Number.isInteger(c) && c >= 0 && c <= 255, `${p.name}: cor ${p.color}`);
   }
 });
 
-test('orçamento: até 5000 Parts e 120 luzes', () => {
+test('orçamento: até 8000 Parts e 60 luzes', () => {
   const s = stats(parts);
-  assert.ok(s.total <= 5000, `${s.total} Parts`);
-  assert.ok(s.lights <= 120, `${s.lights} luzes`);
+  assert.ok(s.total <= 8000, `${s.total} Parts`);
+  assert.ok(s.lights <= 60, `${s.lights} luzes`);
 });
 
 test('determinístico: duas montagens geram exatamente o mesmo mapa', () => {
-  assert.deepEqual(buildPrison(), buildPrison());
+  assert.deepEqual(buildMap(), buildMap());
 });

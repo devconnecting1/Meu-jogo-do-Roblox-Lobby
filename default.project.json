@@ -1,11 +1,11 @@
 {
-  "name": "Prisao",
+  "name": "Reino",
   "tree": {
     "$className": "DataModel",
     "Workspace": {
       "$className": "Workspace",
-      "Prisão": {
-        "$path": "build/Prisao.model.json"
+      "Reino": {
+        "$path": "build/Reino.model.json"
       }
     },
     "Lighting": {
@@ -14,59 +14,44 @@
         "Technology": {
           "Enum": 4
         },
-        "ClockTime": 0,
-        "Brightness": 0.5,
-        "Ambient": [0.1, 0.105, 0.11],
-        "OutdoorAmbient": [0.05, 0.055, 0.06],
-        "EnvironmentDiffuseScale": 0.1,
-        "EnvironmentSpecularScale": 0.15,
-        "ExposureCompensation": -0.1,
-        "ShadowSoftness": 0.2,
+        "ClockTime": 14.5,
+        "GeographicLatitude": 35,
+        "Brightness": 2,
+        "Ambient": [0.38, 0.38, 0.4],
+        "OutdoorAmbient": [0.5, 0.5, 0.52],
+        "EnvironmentDiffuseScale": 0.6,
+        "EnvironmentSpecularScale": 0.2,
+        "ExposureCompensation": 0,
+        "ShadowSoftness": 0.3,
         "GlobalShadows": true
       },
       "Correcao de Cor": {
         "$className": "ColorCorrectionEffect",
         "$properties": {
-          "Brightness": -0.02,
-          "Contrast": 0.22,
-          "Saturation": -0.3,
-          "TintColor": [0.9, 0.97, 0.96]
+          "Brightness": 0,
+          "Contrast": 0.06,
+          "Saturation": -0.08,
+          "TintColor": [1, 0.99, 0.97]
         }
       },
-      "Brilho das Lampadas": {
+      "Brilho": {
         "$className": "BloomEffect",
         "$properties": {
-          "Intensity": 0.2,
-          "Size": 20,
-          "Threshold": 2
+          "Intensity": 0.15,
+          "Size": 24,
+          "Threshold": 2.2
         }
       },
-      "Poeira no Ar": {
+      "Neblina Leve": {
         "$className": "Atmosphere",
         "$properties": {
-          "Density": 0.32,
-          "Offset": 0.18,
-          "Color": [0.34, 0.38, 0.38],
-          "Decay": [0.08, 0.09, 0.1],
+          "Density": 0.28,
+          "Offset": 0.2,
+          "Color": [0.78, 0.84, 0.9],
+          "Decay": [0.62, 0.68, 0.76],
           "Glare": 0,
-          "Haze": 1.4
+          "Haze": 0.8
         }
-      }
-    },
-    "StarterPlayer": {
-      "$className": "StarterPlayer",
-      "StarterPlayerScripts": {
-        "$className": "StarterPlayerScripts",
-        "Cintilacao": {
-          "$path": "src/game/cintilacao.client.luau"
-        }
-      },
-      "$properties": {
-        "CameraMode": {
-          "Enum": 1
-        },
-        "CameraMaxZoomDistance": 0.5,
-        "CameraMinZoomDistance": 0.5
       }
     }
   }

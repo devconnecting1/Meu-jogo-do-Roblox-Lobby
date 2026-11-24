@@ -19,6 +19,7 @@ if (!pr) {
 }
 const runUrl = `${env.GITHUB_SERVER_URL}/${repo}/actions/runs/${env.GITHUB_RUN_ID}`;
 const short = (env.SHA || '').slice(0, 7);
+// marcador antigo mantido de propósito: assim os comentários já existentes no PR são atualizados
 const marker = `<!-- prisao-ci:${mode} -->`;
 const ANSI = new RegExp(String.fromCharCode(27) + '\\[[0-9;]*m', 'g');
 const strip = (s) => s.replace(ANSI, '');

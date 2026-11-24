@@ -1,5 +1,5 @@
 // Ferramentas genéricas para descrever Parts como dados puros.
-// Nada aqui sabe sobre a prisão: é reaproveitável e testado em tests/.
+// Nada aqui sabe sobre o mapa: é reaproveitável e testado em tests/.
 
 /** Arredonda para 3 casas (evita lixo de ponto flutuante nos arquivos gerados). */
 export const round = (v) => {

@@ -1,39 +1,36 @@
-# Prisão — Roblox
+# Reino — Roblox
 
-Prisão **fechada e espaçosa** de 2 andares, feita só com **Part clássico** em cores neutras. Não tem UI, NPC nem script: é apenas a construção. O GitHub Actions testa, compila, renderiza e publica tudo automaticamente.
+Mapa base de um jogo de estratégia no estilo **Lords Mobile**, feito só com **Part clássico** (studs em cima, inlet embaixo) e cores neutras. Ainda não tem UI, NPC, script nem castelos de jogador: é o terreno onde os castelos vão ficar. O GitHub Actions testa, compila, renderiza e publica tudo automaticamente.
 
-![Átrio](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/atrium.png)
+![Visão geral](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/overview.png)
 
 | | |
 |---|---|
-| ![Visão geral](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/overview.png) | ![Corredor](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/corridor.png) |
-| ![Galeria](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/upper.png) | ![Cela](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/cell.png) |
+| ![Praça](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/plaza.png) | ![Mercado](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/market.png) |
+| ![Ponte](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/bridge.png) | ![Planalto](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/mesa.png) |
 
 *As imagens são geradas pelo CI a cada push na `main`. Em PRs, elas aparecem no comentário "📸 Como ficou".*
 
 ## O que tem
 
-- **Envoltória fechada:** piso, teto e 4 paredes opacos. Não há janelas para fora nem exterior. O único vão é o portal do **túnel de acesso**, que também é fechado.
-- **Túnel de acesso:** do fim do corredor de serviço, uma eclusa com **portão de emergência bipartido aberto** (duas folhas que se encontram no meio), um túnel de 40 studs com costelas de aço, e no fundo o **mesmo portão, fechado** (reservado para uma atualização futura).
-- **32 celas** em 2 alas × 2 andares. Cada uma tem fachada com janela de observação, porta de grade deslizante, cama, vaso, pia com espelho, mesa, banqueta, prateleira e luz embutida.
-- **Bloco de celas** com átrio de pé-direito duplo, piso em xadrez clássico com studs, colunas com base e capitel, e luminárias de galpão presas ao teto.
-- **Salas próprias:** hall com spawn e posto de guarda, sala dos guardas, rouparia, sala de visitas e estoque de uniformes sob o mezanino; no 2º andar, sala de controle, diretoria, arquivo, descanso, vestiário, biblioteca e sala de aula; na ala oeste, refeitório, almoxarifado e enfermaria.
-- **Acabamento clássico:** relevo das superfícies do Roblox (Inlet, Weld, Universal) em rodapés, colunas, pisos de corredor, túnel e portões, sempre em Parts.
-- **Escala ampla** (como na referência): celas de 14×16, corredores de 10, vão central de 48 e 27 studs do 2º andar ao teto.
-- **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado. O resumo é "N peças · N etapas · N pontos de conexão verificados", com imagens da montagem em estágios.
-- **Luz equilibrada:** tecnologia Future, sem sol, ambiente e exposição baixos, bloom leve e todas as luminárias no mesmo patamar de brilho (testado), para nenhuma sala estourar com gráficos baixos.
+- **Ilha de 1200×1200 studs** cercada de mar, com praia, lago e um rio que corta o oeste até o mar.
+- **30 lotes de castelo** (20 para jogadores e 10 para bots), espalhados pelo mapa com folga entre eles. Cada lote tem fundação de 32×32 com studs, meio-fio, marcos nos cantos e bandeira. O jogo vai sortear depois quem fica em cada lote.
+- **Praça do Reino** no centro, estilo lobby: piso octogonal de studs, estátua do rei com coroa, espada e escudo, mercado com 4 barracas de toldo listrado, caixotes, canteiros de flores, colunas antigas (algumas partidas) e o spawn.
+- **Estradas de pedra** ligando todos os lotes à praça e **pontes de madeira** com guarda-corpo sobre o rio.
+- **Natureza:** florestas verdes e bosques de outono com árvores de copa em camadas, arbustos, pedras e **planaltos de rocha** com topo de grama e escadaria de pedra para subir.
+- **Recursos** (futuros pontos de coleta): campos de trigo cercados, jazidas de ouro e pedreiras.
+- **Costa:** cais de madeira com barco amarrado.
+- **Dia claro** (Lighting Future), sombra suave e neblina leve no horizonte.
+- **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado.
 
-- **Abandono e terror:** fluorescentes frias, parte queimada e algumas piscando suave (único script do lugar, só visual), poeira no ar, colunas rachadas com vergalhão aparente, rombo numa parede interna, forro furado, entulho, manchas de mofo, poças e móveis tombados. Nada abre para o lado de fora.
-- **Destruição com história:** rebelião (barricada, sala dos guardas incendiada, sala de controle invadida), telhado do átrio desabado com céu de noite e luar, viga e lajes no chão, rachadura de terremoto, fuga por uma corda de lençóis pendurada no rombo, túnel cavado numa cela, trepadeiras, musgo e poças de chuva.
-- **Câmera em primeira pessoa** e neblina de poeira no ar.
-- **Salas do túnel:** triagem e revista na eclusa de entrada; casa de máquinas e solitária na eclusa do fundo.
+A prisão do projeto anterior está guardada no branch [`arquivo/prisao`](https://github.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/tree/arquivo/prisao).
 
 ## Como funciona
 
 ```
-src/prison.js ─┬─► src/rojo.js ─► Rojo ─► prisao.rbxl ─► Open Cloud ─► Roblox
-               ├─► viewer/main.js (Three.js) ─► capturas do CI / GitHub Pages
-               └─► tests/ (apoio, z-fighting, passagens, guarda-corpo, estilo)
+src/map.js ─┬─► src/rojo.js ─► Rojo ─► reino.rbxl ─► Open Cloud ─► Roblox
+            ├─► viewer/main.js (Three.js) ─► capturas do CI / GitHub Pages
+            └─► tests/ (apoio, z-fighting, passagens, lotes, estradas, estilo)
 ```
 
 Tudo roda em `.github/workflows/ci.yml` (`ubuntu-latest`). Os jobs são **lint (ESLint + Prettier) → test → build → render → publish** (e **pages** na `main`). Veja as regras completas em [AGENTS.md](AGENTS.md).
@@ -50,13 +47,11 @@ Configure em *Settings → Secrets and variables → Actions*:
 - `ROBLOX_CLOUD_API`: chave Open Cloud com o escopo `universe-places:write`. **Use a aba Secrets.** O CI também aceita Variables e mascara a chave nos logs.
 - `ROBLOX_UNIVERSE_ID` e `ROBLOX_LOCAL_ID`: opcionais.
 
-A publicação acontece em PRs do próprio repositório, em todo push na `main` e manualmente (*Actions → CI → Run workflow*). Ela sempre roda depois dos testes e do build passarem.
+A publicação acontece em PRs do próprio repositório, em todo push na `main` e manualmente (*Actions → CI → Run workflow*), sempre depois dos testes e do build passarem.
 
-> A publicação substitui o lugar inteiro, então não edite a prisão no Studio. As versões anteriores ficam no histórico do Creator Hub.
+> A publicação substitui o lugar inteiro, então não edite o mapa no Studio. As versões anteriores ficam no histórico do Creator Hub.
 
 ### Visualizador 3D
 
 - Prévia de qualquer branch: `https://raw.githack.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/<branch>/index.html`
 - GitHub Pages (depois do merge na `main`): ative em *Settings → Pages → Source: GitHub Actions*.
-
-Tem 10 vistas, corte sem teto e modo **Andar (WASD)** com física parecida com a do Roblox.

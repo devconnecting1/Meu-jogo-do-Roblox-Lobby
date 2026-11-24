@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // Confere o lugar gerado pelo Rojo (versão XML) antes de publicar — roda no GitHub Actions.
-// Uso: node tools/ci/verify-place.mjs build/prisao.rbxlx
+// Uso: node tools/ci/verify-place.mjs build/reino.rbxlx
 
 import { readFileSync } from 'node:fs';
-import { buildPrison } from '../../src/prison.js';
+import { buildMap } from '../../src/map.js';
 
 const xml = readFileSync(process.argv[2], 'utf8');
-const { parts } = buildPrison();
+const { parts } = buildMap();
 const count = (re) => (xml.match(re) || []).length;
 const problems = [];
 
@@ -24,6 +24,7 @@ for (const banned of [
   'BillboardGui',
   'ScreenGui',
   'Script',
+  'LocalScript',
   'ModuleScript',
   'Humanoid',
   'MeshPart',
@@ -32,10 +33,9 @@ for (const banned of [
 ]) {
   if (xml.includes(`<Item class="${banned}"`)) problems.push(`Instância proibida no lugar: ${banned}`);
 }
-// única exceção de script: a cintilação das lâmpadas (LocalScript, só visual)
-const localScripts = count(/<Item class="LocalScript"/g);
-if (localScripts !== 1) problems.push(`LocalScripts no lugar: ${localScripts}, esperado 1 (Cintilacao)`);
-if (!/<Item class="Atmosphere"/.test(xml)) problems.push('Faltando Atmosphere (poeira no ar) no Lighting');
+if (!/<Item class="Atmosphere"/.test(xml)) problems.push('Faltando Atmosphere (neblina leve) no Lighting');
+const spawns = count(/<Item class="SpawnLocation"/g);
+if (spawns !== 1) problems.push(`SpawnLocations no lugar: ${spawns}, esperado 1 (praça)`);
 if (!/<token name="Technology">4<\/token>/.test(xml)) problems.push('Lighting.Technology não está em Future (4)');
 for (const c of ['ColorCorrectionEffect', 'BloomEffect']) {
   if (!xml.includes(`<Item class="${c}"`)) problems.push(`Faltando ${c} no Lighting`);

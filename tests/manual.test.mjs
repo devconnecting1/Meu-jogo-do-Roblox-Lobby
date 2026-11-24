@@ -1,10 +1,10 @@
 // Manual de montagem: toda peça entra numa etapa e se apoia no que já foi montado.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPrison } from '../src/prison.js';
+import { buildMap } from '../src/map.js';
 import { buildManual, manualMarkdown } from '../src/manual.js';
 
-const { parts } = buildPrison();
+const { parts } = buildMap();
 const manual = buildManual(parts);
 
 test('montagem possível: cada peça encosta no que já foi montado antes dela', () => {
@@ -26,9 +26,9 @@ test('etapas com até 8 peças, numeradas em sequência', () => {
   });
 });
 
-test('fases na ordem de obra: laje primeiro, iluminação por último', () => {
+test('fases na ordem de obra: o mar primeiro, a natureza por último', () => {
   assert.equal(manual.steps[0].phase, 'base');
-  assert.equal(manual.steps.at(-1).phase, 'luz');
+  assert.equal(manual.steps.at(-1).phase, 'natureza');
   const order = manual.phases.map((p) => p.id);
   let last = -1;
   for (const s of manual.steps) {
@@ -39,7 +39,9 @@ test('fases na ordem de obra: laje primeiro, iluminação por último', () => {
 });
 
 test('conexões contadas e manual em texto', () => {
-  assert.ok(manual.connections > parts.length, `${manual.connections} conexões para ${parts.length} peças`);
+  // tudo ligado ao mar: pelo menos n-1 contatos
+  assert.ok(manual.connections >= parts.length - 1, `${manual.connections} conexões para ${parts.length} peças`);
   const md = manualMarkdown(manual);
+  assert.match(md, /^# Manual de montagem do Reino/);
   assert.match(md, /peças · \d+ etapas · \d+ pontos de conexão verificados/);
 });

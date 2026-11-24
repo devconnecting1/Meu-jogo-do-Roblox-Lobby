@@ -141,16 +141,16 @@ jobs:
       - name: Gerar modelo e lugar
         run: |
           node tools/build-place.mjs
-          rojo build default.project.json -o build/prisao.rbxl
-          rojo build default.project.json -o build/prisao.rbxlx
+          rojo build default.project.json -o build/reino.rbxl
+          rojo build default.project.json -o build/reino.rbxlx
       - name: Verificar lugar
-        run: node tools/ci/verify-place.mjs build/prisao.rbxlx
+        run: node tools/ci/verify-place.mjs build/reino.rbxlx
       - uses: actions/upload-artifact@v4
         with:
           name: lugar
           path: |
-            build/prisao.rbxl
-            build/prisao.rbxlx
+            build/reino.rbxl
+            build/reino.rbxlx
           retention-days: 14
 
   render:
@@ -227,7 +227,7 @@ jobs:
           ROBLOX_UNIVERSE_ID: ${{ vars.ROBLOX_UNIVERSE_ID || secrets.ROBLOX_UNIVERSE_ID }}
           ROBLOX_LOCAL_ID: ${{ vars.ROBLOX_LOCAL_ID || secrets.ROBLOX_LOCAL_ID }}
           PUBLISH_REPORT: publish-report.md
-        run: node tools/publish.mjs build/prisao.rbxl
+        run: node tools/publish.mjs build/reino.rbxl
       - name: Comentar publicação no PR
         if: always() && github.event_name == 'pull_request'
         env:
