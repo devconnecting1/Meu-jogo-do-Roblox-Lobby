@@ -8,7 +8,7 @@
 //
 // O mapa é uma ilha cercada de mar, com lago e rio, praça central com a estátua do rei,
 // 30 lotes de castelo (20 jogadores + 10 bots: quem fica em qual lote é sorteado pelo jogo
-// depois), estradas de pedra ligando tudo, pontes de madeira, planaltos de rocha, florestas
+// depois), estradas de pedra ligando tudo, pontes de madeira, montanhas e colinas, florestas
 // verdes e de outono, pedras, campos de trigo, jazidas, pedreiras e cais na praia.
 //
 // Tudo sai de uma semente fixa: a mesma semente gera sempre o mesmo mapa.
@@ -16,6 +16,9 @@
 
 import { makeBuilder } from './builder.js';
 import { C } from './palette.js';
+import { fountainStatue, FOUNTAIN_HALF } from './props/statue.js';
+import { plantTree, bush, flowerPatch } from './props/trees.js';
+import { building, footprint } from './props/buildings.js';
 
 export const DIM = Object.freeze({
   half: 600, // a ilha cabe em x,z ∈ [-600, 600]
@@ -223,7 +226,9 @@ function pickPlots(banned) {
 }
 
 // ---------------------------------------------------------------------------
-// Estradas: árvore geradora mínima (praça + lotes) com trechos retos em "L" ou "Z"
+// Estradas: a malha cresce a partir do Lobby. Cada lote (do mais perto ao mais longe)
+// liga no ponto mais próximo da malha que já existe (forma cruzamentos em "T"), com
+// trechos retos. Estrada nunca passa por cima de outro lote nem corre colada em outra.
 // ---------------------------------------------------------------------------
 const ROAD_HALF = DIM.road / 2;
 
@@ -236,34 +241,37 @@ function samples(a, b, step) {
 }
 
 /** Pontos de uma seção transversal da estrada (centro e as duas bordas). */
-const section = (x, z, horiz) =>
+const section = (x, z, horiz, half = ROAD_HALF) =>
   horiz
     ? [
         [x, z],
-        [x, z - ROAD_HALF],
-        [x, z + ROAD_HALF],
+        [x, z - half],
+        [x, z + half],
       ]
     : [
         [x, z],
-        [x - ROAD_HALF, z],
-        [x + ROAD_HALF, z],
+        [x - half, z],
+        [x + half, z],
       ];
 
 /**
  * Um trecho reto é válido se passa só por grama ou por rio (ponte de até DIM.maxBridge),
- * longe da praça. Devolve null (inválido) ou quantos studs passam sobre a água.
+ * fora do Lobby e fora dos lotes (menos o próprio). Devolve null ou os studs sobre a água.
  */
-function legWater(a, b) {
+function legWater(a, b, ctx) {
   const horiz = a[1] === b[1];
   let run = 0;
   let total = 0;
   for (const [x, z] of samples(a, b, 2)) {
     let wet = false;
-    for (const [px, pz] of section(x, z, horiz)) {
+    for (const [px, pz] of section(x, z, horiz, ctx.half)) {
       const t = terrainAt(px, pz);
-      if (t === T.RIVER) wet = true;
+      if (t === T.RIVER && ctx.bridges) wet = true;
       else if (t !== T.GRASS) return null;
       if (Math.abs(px) < LOBBY_GUARD && Math.abs(pz) < LOBBY_GUARD) return null; // nunca por dentro do Lobby
+      for (const r of ctx.avoid) {
+        if (r !== ctx.own && px > r.x0 && px < r.x1 && pz > r.z0 && pz < r.z1) return null;
+      }
     }
     run = wet ? run + 2 : 0;
     total += wet ? 2 : 0;
@@ -272,98 +280,117 @@ function legWater(a, b) {
   return total;
 }
 
-/** Esquina de estrada: precisa ficar na grama (nada de curva em cima de ponte). */
-const cornerOk = ([x, z]) => allGrass(x - ROAD_HALF, x + ROAD_HALF, z - ROAD_HALF, z + ROAD_HALF, 4);
+/** Esquina ou cruzamento: precisa ficar na grama (nada de curva em cima de ponte). */
+const cornerOk = ([x, z], half = ROAD_HALF) => allGrass(x - half, x + half, z - half, z + half, 2);
 
-/** Caminhos candidatos de A até B, só com trechos alinhados aos eixos. */
-function routeOptions(A, B, gate) {
-  const [ax, az] = A;
-  const [bx, bz] = B;
-  if (gate) {
-    // saída da praça: o primeiro trecho sai reto, para fora
-    const alongX = az === 0;
-    const s = alongX ? Math.sign(ax) : Math.sign(az);
-    const opts = [alongX ? [A, [bx, az], B] : [A, [ax, bz], B]];
-    for (const k of [30, 60, 100]) {
-      const o = (alongX ? ax : az) + s * k;
-      opts.push(alongX ? [A, [o, az], [o, bz], B] : [A, [ax, o], [bx, o], B]);
-    }
-    return opts;
-  }
-  const mx = Math.round((ax + bx) / 2);
-  const mz = Math.round((az + bz) / 2);
-  return [
-    [A, [bx, az], B],
-    [A, [ax, bz], B],
-    [A, [mx, az], [mx, bz], B],
-    [A, [ax, mz], [bx, mz], B],
-    [A, [mx - 40, az], [mx - 40, bz], B],
-    [A, [mx + 40, az], [mx + 40, bz], B],
-    [A, [ax, mz - 40], [bx, mz - 40], B],
-    [A, [ax, mz + 40], [bx, mz + 40], B],
-  ];
+const legAxis = ([a, b]) => (a[1] === b[1] ? 'x' : 'z');
+const legAt = (l) => (legAxis(l) === 'x' ? l[0][1] : l[0][0]);
+const legSpan = (l) => {
+  const i = legAxis(l) === 'x' ? 0 : 1;
+  return [Math.min(l[0][i], l[1][i]), Math.max(l[0][i], l[1][i])];
+};
+
+/** Trecho novo correndo colado (ou por cima) de um trecho existente paralelo? */
+function hugs(leg, legs, gap) {
+  const ax = legAxis(leg);
+  const [s0, s1] = legSpan(leg);
+  return legs.some((o) => {
+    if (legAxis(o) !== ax || Math.abs(legAt(o) - legAt(leg)) >= gap) return false;
+    const [o0, o1] = legSpan(o);
+    return Math.min(s1, o1) - Math.max(s0, o0) > 2;
+  });
 }
 
-/** Valida um caminho: devolve {legs, water} ou null. */
-function checkRoute(points) {
+/** Valida um caminho (lista de pontos): devolve {legs, water} ou null. */
+function checkRoute(points, ctx, network) {
   const pts = points.filter((p, k) => k === 0 || p[0] !== points[k - 1][0] || p[1] !== points[k - 1][1]);
+  if (pts.length < 2) return null;
   const legs = [];
   let water = 0;
   for (let k = 0; k < pts.length - 1; k++) {
-    const w = legWater(pts[k], pts[k + 1]);
-    if (w === null) return null;
+    const leg = [pts[k], pts[k + 1]];
+    if (leg[0][0] !== leg[1][0] && leg[0][1] !== leg[1][1]) return null; // só trechos retos
+    const w = legWater(leg[0], leg[1], ctx);
+    if (w === null || hugs(leg, network, ctx.gap)) return null;
     water += w;
-    legs.push([pts[k], pts[k + 1]]);
+    legs.push(leg);
   }
-  for (let k = 1; k < pts.length - 1; k++) if (!cornerOk(pts[k])) return null;
+  for (let k = 1; k < pts.length; k++) if (!cornerOk(pts[k], ctx.half)) return null;
   return { legs, water };
 }
 
-function planRoads(plots) {
-  const gates = PLAZA.gates.length;
-  const nodes = [...PLAZA.gates.map(([x, z]) => ({ x, z, gate: true })), ...plots];
-  const parent = nodes.map((_, i) => i);
-  const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
-  for (let g = 1; g < gates; g++) parent[find(g)] = find(0); // a praça liga as 4 saídas
-  const edges = [];
-  for (let a = 0; a < nodes.length; a++) {
-    for (let b = Math.max(a + 1, gates); b < nodes.length; b++) {
-      const d = Math.hypot(nodes[a].x - nodes[b].x, nodes[a].z - nodes[b].z);
-      if (d <= 360 || nodes[a].gate) edges.push({ a, b, d });
-    }
+/** Pontos da malha onde dá para ligar: saídas do Lobby, pontas e o ponto mais próximo de cada trecho. */
+function attachPoints(A, network, gates) {
+  const pts = gates.map((g) => [...g]);
+  for (const l of network) {
+    const [s0, s1] = legSpan(l);
+    if (legAxis(l) === 'x') pts.push([Math.round(Math.min(Math.max(A[0], s0), s1)), legAt(l)]);
+    else pts.push([legAt(l), Math.round(Math.min(Math.max(A[1], s0), s1))]);
+    pts.push([...l[0]], [...l[1]]);
   }
-  edges.sort((p, q) => p.d - q.d || p.a - q.a || p.b - q.b);
-  const route = ({ a, b }) => {
-    const A = [nodes[a].x, nodes[a].z];
-    const B = [nodes[b].x, nodes[b].z];
-    for (const opt of routeOptions(A, B, nodes[a].gate)) {
-      const r = checkRoute(opt);
+  const d = (p) => Math.abs(p[0] - A[0]) + Math.abs(p[1] - A[1]);
+  return pts.sort((p, q) => d(p) - d(q) || p[0] - q[0] || p[1] - q[1]).slice(0, 24);
+}
+
+/** Liga o ponto A à malha (caminho mais curto que passa nas regras). */
+export function connect(A, network, gates, ctx) {
+  for (const T of attachPoints(A, network, gates)) {
+    const mx = Math.round((A[0] + T[0]) / 2);
+    const mz = Math.round((A[1] + T[1]) / 2);
+    for (const opt of [
+      [A, [T[0], A[1]], T],
+      [A, [A[0], T[1]], T],
+      [A, [mx, A[1]], [mx, T[1]], T],
+      [A, [A[0], mz], [T[0], mz], T],
+    ]) {
+      const r = checkRoute(opt, ctx, network);
       if (r) return r;
     }
-    return null;
-  };
+  }
+  return null;
+}
+
+const plotRect = (p, pad = 0) => {
+  const h = DIM.plotSize / 2 + pad;
+  return { x0: p.x - h, x1: p.x + h, z0: p.z - h, z1: p.z + h };
+};
+
+function planRoads(plots) {
+  const gates = PLAZA.gates;
+  const rects = plots.map((p) => plotRect(p, 3));
+  const order = plots.map((_, k) => k).sort((a, b) => Math.hypot(plots[a].x, plots[a].z) - Math.hypot(plots[b].x, plots[b].z));
   const legs = [];
-  const used = new Set();
+  const connected = plots.map(() => false);
   let crossings = 0;
-  for (const e of edges) {
-    if (find(e.a) === find(e.b)) continue;
-    const r = route(e);
-    if (!r) continue;
-    legs.push(...r.legs);
-    used.add(e);
-    if (r.water > 0) crossings++;
-    parent[find(e.a)] = find(e.b);
+  for (let pass = 0; pass < 2; pass++) {
+    for (const k of order) {
+      if (connected[k]) continue;
+      const ctx = { half: ROAD_HALF, bridges: true, avoid: rects, own: rects[k], gap: 16 };
+      const r = connect([plots[k].x, plots[k].z], legs, gates, ctx);
+      if (!r) continue;
+      legs.push(...r.legs);
+      connected[k] = true;
+      if (r.water > 0) crossings++;
+    }
   }
-  // pontes dão vida ao mapa: garante até 2 travessias do rio (atalhos entre lotes vizinhos)
-  for (const e of edges) {
-    if (crossings >= 2) break;
-    if (used.has(e) || nodes[e.a].gate || e.d > 260) continue;
-    const r = route(e);
-    if (!r || r.water === 0) continue;
-    legs.push(...r.legs);
-    crossings++;
+  // pontes dão vida ao mapa: se nenhum lote precisou cruzar o rio, liga um vizinho do outro lado
+  for (let a = 0; a < plots.length && crossings === 0; a++) {
+    for (let b = 0; b < plots.length && crossings === 0; b++) {
+      if (a === b || Math.hypot(plots[a].x - plots[b].x, plots[a].z - plots[b].z) > 260) continue;
+      const ctx = { half: ROAD_HALF, bridges: true, avoid: rects, own: rects[a], gap: 16 };
+      const A = [plots[a].x, plots[a].z];
+      const B = [plots[b].x, plots[b].z];
+      const r = [
+        [A, [B[0], A[1]], B],
+        [A, [A[0], B[1]], B],
+      ]
+        .map((o) => checkRoute(o, { ...ctx, avoid: rects.filter((_, i) => i !== b) }, legs))
+        .find((x) => x && x.water > 0);
+      if (!r) continue;
+      legs.push(...r.legs);
+      crossings++;
+    }
   }
-  const connected = plots.map((_, k) => find(gates + k) === find(0));
   return { legs, connected };
 }
 
@@ -413,6 +440,8 @@ function splitLeg([a, b]) {
   return pieces.filter((p) => p.t1 - p.t0 > 0.5);
 }
 
+/** Trechos da malha de estradas (para ligar trilhas e para o visualizador). */
+export const ROAD_LEGS = Object.freeze(KINGDOM.legs.map((l) => Object.freeze(l.map((p) => Object.freeze([...p])))));
 const ROAD_PIECES = KINGDOM.legs.flatMap(splitLeg);
 const rectOf = (p) =>
   p.axis === 'x'
@@ -422,7 +451,8 @@ const ROAD_RECTS = ROAD_PIECES.map(rectOf);
 
 const distToRect = (x, z, r) => Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));
 const distToRoads = (x, z) => ROAD_RECTS.reduce((d, r) => Math.min(d, distToRect(x, z, r)), Infinity);
-const rectsApart = (a, b, gap) => a.x1 + gap <= b.x0 || b.x1 + gap <= a.x0 || a.z1 + gap <= b.z0 || b.z1 + gap <= a.z0;
+const rectsApart = (a, b, gap) =>
+  a.x1 + gap <= b.x0 || b.x1 + gap <= a.x0 || a.z1 + gap <= b.z0 || b.z1 + gap <= a.z0;
 
 // ---------------------------------------------------------------------------
 // Zonas livres e limites (usados nos testes)
@@ -452,16 +482,17 @@ export function clearanceZones() {
   const y0 = PLAZA.top + 1.05;
   const y1 = PLAZA.top + 8;
   const r = DIM.plazaHalf - 1;
-  zones.push({ name: 'Caminho Leste do Lobby', min: [10, y0, -4], max: [r, y1, 4] });
-  zones.push({ name: 'Caminho Oeste do Lobby', min: [-r, y0, -4], max: [-10, y1, 4] });
-  zones.push({ name: 'Caminho Sul do Lobby', min: [-4, y0, 10], max: [4, y1, r] });
-  zones.push({ name: 'Caminho Norte do Lobby', min: [-4, y0, -r], max: [4, y1, -10] });
+  const f = FOUNTAIN_HALF + 1; // os caminhos começam na borda da fonte
+  zones.push({ name: 'Caminho Leste do Lobby', min: [f, y0, -4], max: [r, y1, 4] });
+  zones.push({ name: 'Caminho Oeste do Lobby', min: [-r, y0, -4], max: [-f, y1, 4] });
+  zones.push({ name: 'Caminho Sul do Lobby', min: [-4, y0, f], max: [4, y1, r] });
+  zones.push({ name: 'Caminho Norte do Lobby', min: [-4, y0, -r], max: [4, y1, -f] });
   return zones;
 }
 
 export const ENVELOPE = Object.freeze({
   min: [-DIM.seaHalf, DIM.seaBottom, -DIM.seaHalf],
-  max: [DIM.seaHalf, 90, DIM.seaHalf],
+  max: [DIM.seaHalf, 160, DIM.seaHalf],
 });
 
 // ---------------------------------------------------------------------------
@@ -469,26 +500,67 @@ export const ENVELOPE = Object.freeze({
 // ---------------------------------------------------------------------------
 const deco = { canCollide: false };
 
-/** Árvore: tronco, galho e copa octogonal em camadas (dois blocos girados 45°). */
-function tree(b, model, x, y, z, rand, autumn) {
-  const big = rand() < 0.45;
-  const H = (autumn ? 9 : 7) + rand() * 4 + (big ? 2 : 0);
-  const w = (autumn ? 10 : 8) + rand() * 4 + (big ? 3 : 0);
-  const rot = Math.round(rand() * 8) * 5.625;
-  const light = rand() < 0.5;
-  const [c1, c2] = autumn ? [C.autumn, C.autumnDark] : light ? [C.leafLight, C.leaf] : [C.leaf, C.leafDark];
-  b.box(model, 'Tronco', [x, y + H / 2, z], [1.6, H, 1.6], C.trunk);
-  const side = rand() < 0.5 ? -1 : 1;
-  b.box(model, 'Galho', [x + side * 1.6, y + H * 0.62, z], [3.4, 0.8, 0.8], C.trunk, {
-    ...deco,
-    rotation: [0, rot, side * 25],
+/**
+ * Montanha natural: camadas empilhadas, cada uma é a união de vários blocos sorteados
+ * dentro de um bloco da camada de baixo (terraços irregulares, como os rochedos clássicos).
+ * Devolve os topos de grama livres (para plantar pinheiros) e a altura do pico.
+ */
+function mountain(b, model, cx, cz, R, H, rand, snowy) {
+  const nL = Math.max(2, Math.round(H / 7));
+  let y = DIM.land - 0.1;
+  let prev = null;
+  const layers = [];
+  for (let k = 0; k < nL; k++) {
+    const f = 1 - k / (nL + 1);
+    const h = 5 + Math.round(rand() * 4);
+    const boxes = [];
+    const n = k === 0 ? 5 : Math.max(1, 4 - Math.floor(k / 2));
+    for (let i = 0; i < n; i++) {
+      const base = prev ? prev[Math.floor(rand() * prev.length)] : { x0: cx - R, x1: cx + R, z0: cz - R, z1: cz + R };
+      const bw = base.x1 - base.x0;
+      const bd = base.z1 - base.z0;
+      const px = (base.x0 + base.x1) / 2 + (rand() - 0.5) * bw * (prev ? 0.5 : 0.4);
+      const pz = (base.z0 + base.z1) / 2 + (rand() - 0.5) * bd * (prev ? 0.5 : 0.4);
+      const hw = R * f * (0.35 + rand() * 0.3);
+      const hd = R * f * (0.35 + rand() * 0.3);
+      const r = {
+        x0: Math.round(Math.max(base.x0 + (prev ? 1 : 0), px - hw)),
+        x1: Math.round(Math.min(base.x1 - (prev ? 1 : 0), px + hw)),
+        z0: Math.round(Math.max(base.z0 + (prev ? 1 : 0), pz - hd)),
+        z1: Math.round(Math.min(base.z1 - (prev ? 1 : 0), pz + hd)),
+      };
+      if (r.x1 - r.x0 >= 4 && r.z1 - r.z0 >= 4) boxes.push(r);
+    }
+    if (!boxes.length) break;
+    const top = y + h;
+    const lastLayers = k >= nL - 2;
+    const capColor = snowy && lastLayers ? C.snow : k < Math.ceil(nL * 0.6) ? C.grass : k % 2 ? C.rockDark : C.rock;
+    for (const r of boxes) {
+      b.span(model, 'Rocha', [r.x0, y, r.z0], [r.x1, top - 0.8, r.z1], k % 2 ? C.rockDark : C.rock);
+      b.span(model, snowy && lastLayers ? 'Neve' : 'Topo', [r.x0, top - 0.8, r.z0], [r.x1, top, r.z1], capColor);
+    }
+    layers.push({ boxes, top, grass: capColor === C.grass });
+    prev = boxes;
+    y = top;
+  }
+  // pontos de grama livres (fora dos blocos da camada de cima) para os pinheiros
+  const spots = [];
+  layers.forEach((L, k) => {
+    if (!L.grass) return;
+    const above = layers[k + 1]?.boxes ?? [];
+    for (const r of L.boxes) {
+      for (let tries = 0; tries < 3; tries++) {
+        const x = r.x0 + 2.5 + rand() * (r.x1 - r.x0 - 5);
+        const z = r.z0 + 2.5 + rand() * (r.z1 - r.z0 - 5);
+        if (r.x1 - r.x0 < 6 || r.z1 - r.z0 < 6) continue;
+        if (above.some((o) => x > o.x0 - 2.5 && x < o.x1 + 2.5 && z > o.z0 - 2.5 && z < o.z1 + 2.5)) continue;
+        if (L.boxes.some((o) => o !== r && x > o.x0 - 1 && x < o.x1 + 1 && z > o.z0 - 1 && z < o.z1 + 1)) continue;
+        spots.push([Math.round(x * 10) / 10, L.top, Math.round(z * 10) / 10]);
+        break;
+      }
+    }
   });
-  const layer = (ww, hh, yy) => {
-    b.box(model, 'Copa', [x, yy, z], [ww, hh, ww], c1, { ...deco, rotation: [0, rot, 0] });
-    b.box(model, 'Copa', [x, yy, z], [ww * 0.94, hh * 1.04, ww * 0.94], c2, { ...deco, rotation: [0, rot + 45, 0] });
-  };
-  layer(w, 2.6, y + H + 1.3);
-  if (big || autumn) layer(w * 0.62, 2.2, y + H + 2.6 + 1.1);
+  return { spots, peak: y };
 }
 
 /** Pedras: blocos girados e meio enterrados (sem colisão). */
@@ -535,7 +607,7 @@ export function buildMap() {
   const b = classicBuilder();
   const rand = mulberry32(SEED);
   const { land, beach, cap, bottom } = DIM;
-  const landmarks = { bridges: [], mesas: [], farms: [], mines: [], docks: [], groves: {} };
+  const landmarks = { bridges: [], farms: [], mines: [], docks: [], villages: [], towers: [], camps: [], groves: {} };
 
   // --- Mar (base de tudo) ---------------------------------------------------
   b.span('Mar', 'Mar', [-DIM.seaHalf, DIM.seaBottom, -DIM.seaHalf], [DIM.seaHalf, 0, DIM.seaHalf], C.sea, {
@@ -621,20 +693,8 @@ export function buildMap() {
   }
   b.box(PR, 'Mosaico', [0, pt + 0.05, 0], [30, 0.1, 30], C.plazaDark);
   b.box(PR, 'Mosaico', [0, pt + 0.05, 0], [30, 0.1, 30], C.plazaDark, { ...deco, rotation: [0, 45, 0] });
-  const pd = pt + 0.1;
-  b.box(PR, 'Pedestal', [0, pd + 1, 0], [14, 2, 14], C.plazaDark);
-  b.box(PR, 'Pedestal', [0, pd + 1, 0], [14, 2, 14], C.plazaDark, { rotation: [0, 45, 0] });
-  b.box(PR, 'Base da Estátua', [0, pd + 2.6, 0], [8, 1.2, 8], C.statue);
-  // estátua do rei: pernas, armadura, cabeça com coroa, espada erguida e escudo
-  const sy = pd + 3.2;
-  for (const dx of [-1, 1]) b.box(PR, 'Estátua', [dx, sy + 2, 0], [1.4, 4, 1.4], C.statue);
-  b.box(PR, 'Estátua', [0, sy + 6.2, 0], [4, 4.4, 2.4], C.statue);
-  b.box(PR, 'Estátua', [0, sy + 9.5, 0], [2.2, 2.2, 2.2], C.statue);
-  b.box(PR, 'Coroa', [0, sy + 11, 0], [2.4, 0.8, 2.4], C.gold);
-  b.box(PR, 'Estátua', [2.6, sy + 8.2, 0], [1.2, 3.6, 1.2], C.statue);
-  b.box(PR, 'Espada', [2.6, sy + 13.5, 0], [0.4, 7, 0.9], C.stoneOre);
-  b.box(PR, 'Guarda da Espada', [2.6, sy + 10.2, 0], [0.6, 0.4, 2.6], C.gold);
-  b.box(PR, 'Escudo', [-2.3, sy + 6.2, 0], [0.6, 4, 3.2], C.bannerDark);
+  // fonte com a estátua do boneco clássico (R6) erguendo o logo do Roblox, sobre o mosaico
+  fountainStatue(b, `${PR}/Fonte`, 0, pt + 0.1, 0);
   // estandartes nos cantos da praça
   for (const [x, z] of [
     [40, 40],
@@ -798,82 +858,126 @@ export function buildMap() {
     b.span(L, 'Bandeira', [fx + 0.25, kt + 8.6, fz - 0.1], [fx + 4.25, kt + 11.4, fz + 0.1], C.cloth, deco);
   }
 
-  // --- Relevo: planaltos de rocha com topo de grama ---------------------------
-  const blocked = []; // retângulos já ocupados (planaltos, campos, jazidas, cais)
+  // --- Relevo: montanhas altas (algumas com neve) e colinas, em terraços irregulares ---
+  const blocked = []; // retângulos já ocupados (montanhas, vilas, campos, jazidas, cais)
   const free = (r, gap) => blocked.every((o) => rectsApart(r, o, gap));
   const awayFromPlots = (x, z, d) => PLOTS.every((p) => Math.hypot(p.x - x, p.z - z) >= half + d);
   const awayFromRoads = (r, gap) => ROAD_RECTS.every((o) => rectsApart(r, o, gap));
-  const mesaTops = [];
-  for (let attempt = 0; attempt < 6000 && landmarks.mesas.length < 16; attempt++) {
-    const x = Math.round((rand() * 2 - 1) * 500);
-    const z = Math.round((rand() * 2 - 1) * 500);
-    const w = 26 + Math.round(rand() * 30);
-    const d = 26 + Math.round(rand() * 30);
-    const r = { x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2 };
-    const ok =
-      Math.hypot(x, z) > 90 + Math.max(w, d) &&
-      allGrass(r.x0 - 6, r.x1 + 6, r.z0 - 6, r.z1 + 6) &&
-      awayFromPlots(x, z, 20 + Math.hypot(w, d) / 2) &&
-      awayFromRoads(r, 10) &&
-      free(r, 12);
-    if (!ok) continue;
-    const M = `Relevo/Planalto ${String(landmarks.mesas.length + 1).padStart(2, '0')}`;
-    b.span(M, 'Base de Rocha', [r.x0 - 1.5, land - 0.1, r.z0 - 1.5], [r.x1 + 1.5, land + 2, r.z1 + 1.5], C.rockDark);
-    const top1 = land + 2 + 8 + Math.round(rand() * 10);
-    b.span(M, 'Rocha', [r.x0, land + 2, r.z0], [r.x1, top1, r.z1], C.rock);
-    b.span(M, 'Topo de Grama', [r.x0 - 0.4, top1, r.z0 - 0.4], [r.x1 + 0.4, top1 + 0.8, r.z1 + 0.4], C.grass);
-    let top = top1 + 0.8;
-    let area = [r.x0, r.x1, r.z0, r.z1];
-    // escadaria de pedra no lado oeste, para o jogador subir no planalto (degraus de até 1 stud)
-    const H = top - land;
-    const n = Math.ceil(H);
-    const zc = Math.round((r.z0 + r.z1) / 2);
-    const stair = { x0: r.x0 - 0.4 - n * 1.25, x1: r.x0 - 0.4, z0: zc - 3, z1: zc + 3 };
-    const plotRect = (p) => ({ x0: p.x - half, x1: p.x + half, z0: p.z - half, z1: p.z + half });
-    const stairOk =
-      allGrass(stair.x0 - 2, stair.x1, stair.z0 - 2, stair.z1 + 2, 2) &&
-      awayFromRoads(stair, 6) &&
-      PLOTS.every((p) => rectsApart(stair, plotRect(p), 8)) &&
-      free(stair, 4);
-    if (stairOk) {
-      blocked.push({ x0: stair.x0 - 2, x1: stair.x1, z0: stair.z0 - 2, z1: stair.z1 + 2 });
-      for (let k = 1; k <= n; k++) {
-        let y = land + (H * k) / n;
-        if (Math.abs(y - (land + 2)) < 0.05) y += 0.1; // não empatar com o topo da base de rocha
-        const xa = r.x0 - 0.4 - (n - k + 1) * 1.25;
-        b.span(M, 'Degrau', [xa, land - 0.12, stair.z0], [xa + 1.25, y, stair.z1], C.plazaDark);
-      }
-      // fecha a fresta de 0,4 entre o último degrau e a parede de rocha (embaixo da borda de grama)
-      b.span(M, 'Rocha', [r.x0 - 0.4, land + 2, stair.z0], [r.x0, top1, stair.z1], C.rock);
+  const clearOfPlots = (r, gap) => PLOTS.every((p) => rectsApart(r, plotRect(p), gap));
+  const mountainSpots = [];
+  landmarks.mountains = [];
+  landmarks.hills = [];
+  const relief = [
+    { list: landmarks.mountains, want: 9, R: [36, 58], H: [40, 78], name: 'Montanha' },
+    { list: landmarks.hills, want: 10, R: [18, 30], H: [12, 22], name: 'Colina' },
+  ];
+  for (const kind of relief) {
+    for (let attempt = 0; attempt < 6000 && kind.list.length < kind.want; attempt++) {
+      const x = Math.round((rand() * 2 - 1) * 500);
+      const z = Math.round((rand() * 2 - 1) * 500);
+      const R = Math.round(kind.R[0] + rand() * (kind.R[1] - kind.R[0]));
+      const H = Math.round(kind.H[0] + rand() * (kind.H[1] - kind.H[0]));
+      const r = { x0: x - R, x1: x + R, z0: z - R, z1: z + R };
+      const ok =
+        Math.hypot(x, z) > 150 + R &&
+        allGrass(r.x0 - 4, r.x1 + 4, r.z0 - 4, r.z1 + 4) &&
+        clearOfPlots(r, 20) &&
+        awayFromRoads(r, 10) &&
+        free(r, 14);
+      if (!ok) continue;
+      const M = `Relevo/${kind.name} ${String(kind.list.length + 1).padStart(2, '0')}`;
+      const m = mountain(b, M, x, z, R, H, rand, kind.name === 'Montanha' && H >= 55);
+      blocked.push(r);
+      mountainSpots.push(...m.spots);
+      kind.list.push([x, z, m.peak, R]);
     }
-    if (w >= 34 && d >= 34) {
-      // segundo degrau, menor e deslocado (como os rochedos das referências)
-      const w2 = Math.round(w * 0.55);
-      const d2 = Math.round(d * 0.55);
-      const ox = r.x0 + 3 + Math.round(rand() * (w - w2 - 6));
-      const oz = r.z0 + 3 + Math.round(rand() * (d - d2 - 6));
-      const h2 = 6 + Math.round(rand() * 6);
-      b.span(M, 'Rocha', [ox, top, oz], [ox + w2, top + h2, oz + d2], C.rock);
-      b.span(
-        M,
-        'Topo de Grama',
-        [ox - 0.4, top + h2, oz - 0.4],
-        [ox + w2 + 0.4, top + h2 + 0.8, oz + d2 + 0.4],
-        C.grass,
-      );
-      area = [ox, ox + w2, oz, oz + d2];
-      top += h2 + 0.8;
-    }
-    // o próprio planalto só entra em "blocked" depois da escada (senão a escada colide com ele mesmo)
-    blocked.push({ x0: r.x0 - 2, x1: r.x1 + 2, z0: r.z0 - 2, z1: r.z1 + 2 });
-    mesaTops.push({ area, top, arrival: stairOk ? [r.x0, zc] : null });
-    landmarks.mesas.push([x, z, top, stairOk]);
   }
 
-  // --- Recursos: campos de trigo, jazidas de ouro e pedreiras -----------------
-  for (let attempt = 0; attempt < 4000 && landmarks.farms.length < 6; attempt++) {
-    const x = Math.round((rand() * 2 - 1) * 440);
-    const z = Math.round((rand() * 2 - 1) * 440);
+  // --- Vilas: poço no meio, casas viradas para ele, celeiro, feno e moinho -----
+  // trilhas de terra (4 studs) ligando cada lugar ao ponto mais próximo da malha de estradas
+  const trailLegs = [];
+  const trailRects = [];
+  const plotAvoid = PLOTS.map((p) => plotRect(p, 3));
+  landmarks.trails = 0;
+  const addTrail = (x, z, own) => {
+    const ctx = { half: 2, bridges: false, avoid: [...plotAvoid, ...blocked, own], own, gap: 8 };
+    const r = connect([x, z], [...KINGDOM.legs, ...trailLegs], [], ctx);
+    if (!r) return false;
+    landmarks.trails++;
+    for (const [a, c] of r.legs) {
+      trailLegs.push([a, c]);
+      const q = {
+        x0: Math.min(a[0], c[0]) - 2,
+        x1: Math.max(a[0], c[0]) + 2,
+        z0: Math.min(a[1], c[1]) - 2,
+        z1: Math.max(a[1], c[1]) + 2,
+      };
+      trailRects.push(q);
+      b.span('Trilhas', 'Trilha', [q.x0, land - 0.03, q.z0], [q.x1, land + 0.2, q.z1], C.path);
+    }
+    return true;
+  };
+  const facing = (dx, dz) => (Math.abs(dx) > Math.abs(dz) ? (dx > 0 ? 'w' : 'e') : dz > 0 ? 'n' : 's');
+  const canPlace = (kind, x, z, face, onTrail = false) => {
+    const fp = footprint(kind, face);
+    const r = { x0: x - fp.w / 2, x1: x + fp.w / 2, z0: z - fp.d / 2, z1: z + fp.d / 2 };
+    const ok =
+      allGrass(r.x0 - 2, r.x1 + 2, r.z0 - 2, r.z1 + 2, 2) &&
+      awayFromRoads(r, 4) &&
+      clearOfPlots(r, 10) &&
+      Math.max(Math.abs(x), Math.abs(z)) > LOBBY_GUARD + 30 &&
+      (onTrail || trailRects.every((t) => rectsApart(r, t, 1))) &&
+      free(r, 3);
+    return ok ? r : null;
+  };
+  const placeBuilding = (model, kind, x, z, face, onTrail = false) => {
+    const r = canPlace(kind, x, z, face, onTrail);
+    if (!r) return null;
+    building(b, model, kind, x, land, z, face, rand);
+    blocked.push(r);
+    return r;
+  };
+  for (let attempt = 0; attempt < 6000 && landmarks.villages.length < 3; attempt++) {
+    const x = Math.round((rand() * 2 - 1) * 430);
+    const z = Math.round((rand() * 2 - 1) * 430);
+    const area = { x0: x - 44, x1: x + 44, z0: z - 44, z1: z + 44 };
+    const ok =
+      Math.hypot(x, z) > 170 &&
+      allGrass(area.x0, area.x1, area.z0, area.z1, 4) &&
+      clearOfPlots(area, 12) &&
+      awayFromRoads(area, 2) &&
+      distToRoads(x, z) < 110 &&
+      free(area, 10) &&
+      landmarks.villages.every(([vx, vz]) => Math.hypot(vx - x, vz - z) > 260);
+    if (!ok) continue;
+    const V = `Vila/Vila ${landmarks.villages.length + 1}`;
+    // primeiro a trilha até a estrada; as casas ficam em volta, sem bloquear a trilha
+    if (!canPlace('poco', x, z, 's', true) || !addTrail(x, z, area)) continue;
+    placeBuilding(`${V}/Poço`, 'poco', x, z, 's', true);
+    let count = 1;
+    const slots = [
+      [24, 0, 'casa'],
+      [-24, 0, 'casa'],
+      [0, 24, 'casa'],
+      [0, -24, 'casa'],
+      [22, 22, 'casa'],
+      [-22, -22, 'celeiro'],
+      [-22, 22, 'feno'],
+      [22, -24, 'moinho'],
+    ];
+    slots.forEach(([dx, dz, kind], k) => {
+      if (placeBuilding(`${V}/${kind === 'casa' ? 'Casa' : kind[0].toUpperCase() + kind.slice(1)} ${k + 1}`, kind, x + dx, z + dz, facing(dx, dz)))
+        count++;
+    });
+    landmarks.villages.push([x, z, count]);
+  }
+
+  // --- Recursos: campos de trigo (perto das vilas), jazidas de ouro e pedreiras ---
+  for (let attempt = 0; attempt < 6000 && landmarks.farms.length < 8; attempt++) {
+    const v = landmarks.villages[attempt % Math.max(1, landmarks.villages.length)];
+    const near = v && attempt < 3000;
+    const x = Math.round(near ? v[0] + (rand() * 2 - 1) * 90 : (rand() * 2 - 1) * 440);
+    const z = Math.round(near ? v[1] + (rand() * 2 - 1) * 90 : (rand() * 2 - 1) * 440);
     const r = { x0: x - 15, x1: x + 15, z0: z - 11, z1: z + 11 };
     const ok =
       Math.hypot(x, z) > PLAZA_REACH + 36 &&
@@ -882,6 +986,7 @@ export function buildMap() {
       awayFromRoads(r, 4) &&
       free(r, 8);
     if (!ok) continue;
+    if (!addTrail(x, z, r)) continue; // campo sem caminho até a estrada não faz sentido
     blocked.push(r);
     const F = `Recursos/Campo de Trigo ${landmarks.farms.length + 1}`;
     landmarks.farms.push([x, z]);
@@ -915,6 +1020,7 @@ export function buildMap() {
       distToRoads(x, z) > 14 &&
       free(r, 8);
     if (!ok) continue;
+    if (!addTrail(x, z, r)) continue;
     blocked.push(r);
     const isGold = gold < 4 && (quarry >= 4 || rand() < 0.5);
     const R = isGold ? `Recursos/Jazida de Ouro ${++gold}` : `Recursos/Pedreira ${++quarry}`;
@@ -964,58 +1070,125 @@ export function buildMap() {
     blocked.push({ x0: cx - 20, x1: cx + 20, z0: cz - 20, z1: cz + 20 });
   }
 
-  // --- Vegetação: florestas verdes e de outono --------------------------------
-  // Primeiro os candidatos (grade com sorteio); se passar do limite, pega um a cada k
-  // para a vegetação ficar espalhada pelo mapa inteiro.
+  // --- Torres de vigia perto das estradas e acampamentos nas clareiras ---------
+  for (let attempt = 0; attempt < 4000 && landmarks.towers.length < 5; attempt++) {
+    const x = Math.round((rand() * 2 - 1) * 500);
+    const z = Math.round((rand() * 2 - 1) * 500);
+    const d = distToRoads(x, z);
+    if (d < 14 || d > 24 || Math.hypot(x, z) < 160) continue;
+    if (landmarks.towers.some(([tx, tz]) => Math.hypot(tx - x, tz - z) < 200)) continue;
+    const r = canPlace('torre', x, z, 's');
+    if (!r || !addTrail(x, z, r)) continue;
+    placeBuilding(`Torres de Vigia/Torre ${landmarks.towers.length + 1}`, 'torre', x, z, 's', true);
+    landmarks.towers.push([x, z]);
+  }
+  for (let attempt = 0; attempt < 4000 && landmarks.camps.length < 3; attempt++) {
+    const x = Math.round((rand() * 2 - 1) * 480);
+    const z = Math.round((rand() * 2 - 1) * 480);
+    if (noise(x, z, 120, 7) < 0.55 || Math.hypot(x, z) < 160 || distToRoads(x, z) < 20) continue;
+    const r = canPlace('tenda', x, z, 's');
+    if (!r || !addTrail(x, z, r)) continue;
+    placeBuilding(`Acampamentos/Acampamento ${landmarks.camps.length + 1}`, 'tenda', x, z, 's', true);
+    landmarks.camps.push([x, z]);
+  }
+
+  // --- Trilhas de terra: cada lugar (vila, campo, jazida, torre, acampamento) liga na estrada ---
+  const distToTrails = (x, z) => trailRects.reduce((d, r) => Math.min(d, distToRect(x, z, r)), Infinity);
+
+  // --- Vegetação: biomas de árvores, coqueiros na praia, pinheiros nas montanhas ---
+  const KIND_MODEL = {
+    carvalho: 'Carvalhos',
+    pinheiro: 'Pinheiros',
+    betula: 'Bétulas',
+    cerejeira: 'Cerejeiras',
+    redonda: 'Árvores Redondas',
+    seca: 'Árvores Secas',
+    coqueiro: 'Coqueiros',
+    outono: 'Bosque de Outono',
+  };
+  const plant = (kind, x, y, z) => plantTree(b, `Vegetação/${KIND_MODEL[kind]}`, kind, x, y, z, rand);
+  const forestKind = (x, z) => {
+    const n = noise(x, z, 90, 9);
+    if (n > 0.62) return 'outono';
+    if (n < 0.32) return 'pinheiro';
+    if (n < 0.42) return 'betula';
+    if (n < 0.47) return 'redonda';
+    return 'carvalho';
+  };
+  const meadowKind = () => {
+    const t = rand();
+    return t < 0.35 ? 'carvalho' : t < 0.6 ? 'redonda' : t < 0.78 ? 'cerejeira' : t < 0.9 ? 'betula' : 'seca';
+  };
+  const groundFree = (x, z, r) =>
+    allGrass(x - r, x + r, z - r, z + r, 3) &&
+    Math.hypot(x, z) > PLAZA_REACH + 12 &&
+    awayFromPlots(x, z, 10) &&
+    distToRoads(x, z) > 7 &&
+    distToTrails(x, z) > 5 &&
+    free({ x0: x, x1: x, z0: z, z1: z }, 4);
+  // primeiro os candidatos (grade com sorteio); se passar do limite, pega um a cada k
   const spots = [];
   const step = 15;
   for (let gx = -540; gx <= 540; gx += step) {
     for (let gz = -540; gz <= 540; gz += step) {
       const x = Math.round((gx + (rand() - 0.5) * step * 0.8) * 10) / 10;
       const z = Math.round((gz + (rand() - 0.5) * step * 0.8) * 10) / 10;
-      const want = noise(x, z, 120, 7) > 0.6 ? rand() < 0.75 : rand() < 0.04;
-      if (!want) continue;
-      const ok =
-        allGrass(x - 3, x + 3, z - 3, z + 3, 3) &&
-        Math.hypot(x, z) > PLAZA_REACH + 12 &&
-        awayFromPlots(x, z, 10) &&
-        distToRoads(x, z) > 7 &&
-        free({ x0: x, x1: x, z0: z, z1: z }, 4);
-      if (ok) spots.push([x, z, noise(x, z, 90, 9) > 0.58]);
+      const forest = noise(x, z, 120, 7) > 0.6;
+      const want = forest ? rand() < 0.75 : rand() < 0.05;
+      if (!want || !groundFree(x, z, 3)) continue;
+      spots.push([x, z, forest ? forestKind(x, z) : meadowKind()]);
     }
   }
-  const MAX_TREES = 460;
+  const MAX_TREES = 480;
   const chosen = spots.length > MAX_TREES ? spots.filter((_, k) => (k * MAX_TREES) % spots.length < MAX_TREES) : spots;
-  for (const [x, z, autumn] of chosen) {
-    tree(b, `Vegetação/${autumn ? 'Bosque de Outono' : 'Floresta'}`, x, land, z, rand, autumn);
-    if (rand() < 0.35) {
-      const bx = x + (rand() < 0.5 ? -1 : 1) * (3 + rand() * 2);
-      const bz = z + (rand() - 0.5) * 6;
-      if (terrainAt(bx, bz) === T.GRASS && distToRoads(bx, bz) > 6 && awayFromPlots(bx, bz, 8)) {
-        const s = 2 + rand() * 2;
-        b.box('Vegetação/Arbustos', 'Arbusto', [bx, land - 0.05 + s * 0.4, bz], [s, s * 0.8, s], C.bush, {
-          ...deco,
-          rotation: [0, Math.round(rand() * 90), 0],
-        });
-      }
-    }
+  for (const [x, z, kind] of chosen) {
+    plant(kind, x, land, z);
+    blocked.push({ x0: x - 1.5, x1: x + 1.5, z0: z - 1.5, z1: z + 1.5 });
   }
   landmarks.groves.green = densest(
-    chosen.filter((s) => !s[2]),
+    chosen.filter((s) => s[2] === 'carvalho' || s[2] === 'pinheiro'),
     45,
   );
   landmarks.groves.autumn = densest(
-    chosen.filter((s) => s[2]),
+    chosen.filter((s) => s[2] === 'outono'),
     45,
   );
-  for (const { area, top, arrival } of mesaTops) {
-    const [x0, x1, z0, z1] = area;
-    const n = 1 + Math.floor(rand() * 3);
-    for (let k = 0; k < n; k++) {
-      const x = x0 + 4 + rand() * (x1 - x0 - 8);
-      const z = z0 + 4 + rand() * (z1 - z0 - 8);
-      if (arrival && x < arrival[0] + 8 && Math.abs(z - arrival[1]) < 6) continue; // chegada da escada livre
-      tree(b, 'Vegetação/Árvores do Planalto', x, top, z, rand, rand() < 0.3);
+  // pinheiros nos terraços de grama das montanhas e colinas
+  for (const [x, y, z] of mountainSpots) plant('pinheiro', x, y, z);
+  // coqueiros na praia
+  let palms = 0;
+  for (let attempt = 0; attempt < 6000 && palms < 45; attempt++) {
+    const x = Math.round((rand() * 2 - 1) * 580 * 10) / 10;
+    const z = Math.round((rand() * 2 - 1) * 580 * 10) / 10;
+    let sand = true;
+    for (const [dx, dz] of [
+      [0, 0],
+      [-3, -3],
+      [3, 3],
+      [-3, 3],
+      [3, -3],
+    ])
+      if (terrainAt(x + dx, z + dz) !== T.SAND) sand = false;
+    if (!sand || !free({ x0: x, x1: x, z0: z, z1: z }, 6)) continue;
+    blocked.push({ x0: x - 3, x1: x + 3, z0: z - 3, z1: z + 3 });
+    plant('coqueiro', x, beach, z);
+    palms++;
+  }
+  landmarks.palms = palms;
+  // arbustos e canteiros de flores silvestres pelos campos
+  let bushes = 0;
+  let flowers = 0;
+  for (let attempt = 0; attempt < 8000 && (bushes < 110 || flowers < 50); attempt++) {
+    const x = Math.round((rand() * 2 - 1) * 540 * 10) / 10;
+    const z = Math.round((rand() * 2 - 1) * 540 * 10) / 10;
+    if (!groundFree(x, z, 3)) continue;
+    blocked.push({ x0: x - 2, x1: x + 2, z0: z - 2, z1: z + 2 });
+    if (bushes < 110 && (flowers >= 50 || rand() < 0.65)) {
+      bush(b, 'Vegetação/Arbustos', x, land, z, rand);
+      bushes++;
+    } else {
+      flowerPatch(b, 'Vegetação/Flores', x, land, z, rand);
+      flowers++;
     }
   }
   // pedras soltas pelo campo
@@ -1023,13 +1196,7 @@ export function buildMap() {
   for (let attempt = 0; attempt < 5000 && rockN < 60; attempt++) {
     const x = (rand() * 2 - 1) * 540;
     const z = (rand() * 2 - 1) * 540;
-    const ok =
-      allGrass(x - 6, x + 6, z - 6, z + 6, 3) &&
-      Math.hypot(x, z) > PLAZA_REACH + 10 &&
-      awayFromPlots(x, z, 14) &&
-      distToRoads(x, z) > 10 &&
-      free({ x0: x, x1: x, z0: z, z1: z }, 6);
-    if (!ok) continue;
+    if (!groundFree(x, z, 6) || distToRoads(x, z) <= 10) continue;
     rockN++;
     rocks(b, 'Relevo/Pedras', x, land, z, rand, 2 + Math.floor(rand() * 3), 1, C.rock);
   }

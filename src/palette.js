@@ -46,6 +46,31 @@ export const C = Object.freeze({
   gold: [210, 178, 100],
   stoneOre: [150, 154, 164],
 
+  // Mais árvores
+  pine: [56, 98, 70], // pinheiros
+  pineDark: [42, 80, 56],
+  birchBark: [214, 210, 200], // bétula (tronco claro)
+  birchLeaf: [150, 176, 98],
+  blossom: [204, 160, 160], // cerejeira (rosa fosco)
+  blossomDark: [180, 136, 138],
+  palmLeaf: [104, 150, 84], // coqueiros da praia
+  palmTrunk: [150, 124, 92],
+  deadWood: [120, 108, 96], // árvore seca
+  hay: [206, 182, 110], // feno
+
+  // Montanhas e trilhas
+  snow: [232, 234, 236],
+  path: [150, 134, 110], // trilha de terra batida
+
+  // Construções da vila
+  plaster: [218, 210, 192], // parede rebocada
+  timber: [92, 70, 52], // enxaimel (vigas aparentes)
+  brick: [160, 110, 92],
+  roofRed: [150, 84, 72],
+  roofSlate: [96, 104, 118],
+  roofThatch: [184, 160, 110],
+  statueDark: [128, 128, 124],
+
   // Bandeiras e toldos
   banner: [164, 84, 76],
   bannerDark: [124, 68, 62],

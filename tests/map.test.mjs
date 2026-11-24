@@ -66,9 +66,10 @@ test('o Lobby fica na grama, com a estátua e um único spawn sobre o piso', () 
   const s = spawns[0];
   assert.ok(Math.abs(s.position[1] - s.size[1] / 2 - PLAZA.top) < 1e-6, 'spawn apoiado no piso do Lobby');
   assert.ok(Math.hypot(s.position[0], s.position[2]) < DIM.plazaHalf, 'spawn dentro do Lobby');
-  for (const n of ['Pedestal', 'Estátua', 'Coroa', 'Espada', 'Escudo', 'Estandarte']) {
-    assert.ok(count((p) => p.model === 'Lobby' && p.name === n) > 0, `Lobby sem "${n}"`);
-  }
+  const fonte = parts.filter((p) => p.model.startsWith('Lobby/Fonte'));
+  assert.ok(fonte.some((p) => p.name === 'Logo'), 'a estátua não ergue o logo do Roblox');
+  assert.ok(fonte.some((p) => p.name.startsWith('Água') && !p.canCollide), 'fonte sem água');
+  assert.ok(count((p) => p.model === 'Lobby' && p.name === 'Estandarte') >= 4, 'Lobby sem estandartes');
 });
 
 test('estradas ligam todos os lotes ao Lobby (malha contínua de estrada, ponte e escadaria)', () => {
@@ -112,17 +113,71 @@ test('estradas só sobre a grama e pontes só onde há rio', () => {
   }
 });
 
-test('decoração variada: florestas, outono, planaltos, pedras, recursos e cais', () => {
-  const trunks = (m) => count((p) => p.name === 'Tronco' && p.model === m);
-  assert.ok(trunks('Vegetação/Floresta') >= 150, `só ${trunks('Vegetação/Floresta')} árvores verdes`);
-  assert.ok(trunks('Vegetação/Bosque de Outono') >= 30, `só ${trunks('Vegetação/Bosque de Outono')} de outono`);
-  assert.ok(landmarks.mesas.length >= 6, `só ${landmarks.mesas.length} planaltos`);
-  assert.ok(trunks('Vegetação/Árvores do Planalto') >= landmarks.mesas.length, 'planaltos sem árvore no topo');
+test('natureza variada: vários tipos de árvore, coqueiros na praia, montanhas altas e colinas', () => {
+  const trunks = (m) => count((p) => p.name === 'Tronco' && p.model === `Vegetação/${m}`);
+  const kinds = ['Carvalhos', 'Pinheiros', 'Bétulas', 'Cerejeiras', 'Árvores Redondas', 'Bosque de Outono', 'Coqueiros'];
+  for (const k of kinds) assert.ok(trunks(k) >= 5, `só ${trunks(k)} árvores em ${k}`);
+  assert.ok(count((p) => p.name === 'Tronco' && p.model.startsWith('Vegetação/')) >= 350, 'poucas árvores');
+  assert.ok(landmarks.mountains.length >= 6, `só ${landmarks.mountains.length} montanhas`);
+  assert.ok(Math.max(...landmarks.mountains.map((m) => m[2])) >= 50, 'montanhas baixas demais');
+  assert.ok(landmarks.hills.length >= 4, `só ${landmarks.hills.length} colinas`);
+  // montanhas naturais: cada uma tem vários blocos por camada, nunca uma caixa só
+  for (const m of new Set(parts.filter((p) => p.model.startsWith('Relevo/Montanha')).map((p) => p.model))) {
+    assert.ok(count((p) => p.model === m && p.name === 'Rocha') >= 8, `${m} parece uma caixa`);
+  }
   assert.ok(count((p) => p.model === 'Relevo/Pedras') >= 60, 'poucas pedras soltas');
-  assert.ok(landmarks.farms.length >= 3, `só ${landmarks.farms.length} campos de trigo`);
+  assert.ok(count((p) => p.model === 'Vegetação/Flores') >= 30, 'poucas flores');
+});
+
+test('vida no reino: vilas com casas, campos, jazidas, torres de vigia, acampamentos e cais', () => {
+  assert.ok(landmarks.villages.length >= 2, `só ${landmarks.villages.length} vilas`);
+  for (const [, , n] of landmarks.villages) assert.ok(n >= 4, `vila com só ${n} construções`);
+  assert.ok(count((p) => p.model.startsWith('Vila/') && p.model.includes('/Casa')) > 0, 'vilas sem casas');
+  assert.ok(landmarks.farms.length >= 4, `só ${landmarks.farms.length} campos de trigo`);
   const mines = (k) => landmarks.mines.filter((m) => m[2] === k).length;
   assert.ok(mines('ouro') >= 2 && mines('pedra') >= 2, `jazidas: ${mines('ouro')} de ouro, ${mines('pedra')} de pedra`);
+  assert.ok(landmarks.towers.length >= 2, `só ${landmarks.towers.length} torres de vigia`);
+  assert.ok(landmarks.camps.length >= 1, 'nenhum acampamento');
   assert.ok(landmarks.docks.length >= 1, 'nenhum cais na praia');
+});
+
+test('trilhas ligam cada lugar à malha de estradas (nada solto no meio do mato)', () => {
+  const net = parts.filter(
+    (p) =>
+      p.model === 'Estradas' ||
+      p.model === 'Trilhas' ||
+      (p.model.startsWith('Pontes/') && p.name === 'Tabuleiro') ||
+      ['Base do Lobby', 'Piso do Lobby', 'Degrau do Lobby'].includes(p.name),
+  );
+  const bx = net.map(aabb);
+  const parent = net.map((_, i) => i);
+  const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
+  const touch = (a, b) => [0, 1, 2].every((k) => a.min[k] <= b.max[k] + 0.01 && b.min[k] <= a.max[k] + 0.01);
+  for (let i = 0; i < net.length; i++) {
+    for (let j = i + 1; j < net.length; j++) if (touch(bx[i], bx[j])) parent[find(i)] = find(j);
+  }
+  const lobby = find(net.findIndex((p) => p.name === 'Piso do Lobby'));
+  const loose = net.filter((p, i) => p.model === 'Trilhas' && find(i) !== lobby);
+  assert.deepEqual(loose.map((p) => p.position.join(',')), [], 'trilhas soltas');
+  const places = ['villages', 'farms', 'mines', 'towers', 'camps'].reduce((n, k) => n + landmarks[k].length, 0);
+  assert.equal(landmarks.trails, places, 'cada vila, campo, jazida, torre e acampamento tem a sua trilha');
+});
+
+test('estradas não atravessam outros lotes', () => {
+  for (const p of parts.filter((x) => x.model === 'Estradas')) {
+    const { min, max } = aabb(p);
+    const crossed = PLOTS.filter((q) => {
+      const h = DIM.plotSize / 2;
+      // a estrada entra no próprio lote (até o centro); atravessar um lote de ponta a ponta é proibido
+      return min[0] < q.x - h && max[0] > q.x + h && min[2] < q.z + h && max[2] > q.z - h;
+    }).concat(
+      PLOTS.filter((q) => {
+        const h = DIM.plotSize / 2;
+        return min[2] < q.z - h && max[2] > q.z + h && min[0] < q.x + h && max[0] > q.x - h;
+      }),
+    );
+    assert.deepEqual(crossed.map((q) => q.name), [], `Estrada @ [${p.position}] atravessa lote`);
+  }
 });
 
 test('Lobby elevado: 4 escadarias de degraus de 1 stud até o piso, com mureta na borda', () => {
@@ -153,22 +208,6 @@ test('Lobby vivo como nas referências: mercado com toldos, caixotes, canteiros 
     for (const k of ['Balcão', 'Tampo do Balcão', 'Poste da Barraca', 'Toldo', 'Franja']) {
       assert.ok(names.has(k), `Barraca ${n} sem "${k}"`);
     }
-  }
-});
-
-test('escadarias dos planaltos: degraus de até 1 stud que chegam ao topo de grama', () => {
-  const stairs = new Set(parts.filter((p) => p.name === 'Degrau').map((p) => p.model));
-  assert.ok(stairs.size >= 2, `só ${stairs.size} planaltos com escada`);
-  const top = (p) => p.position[1] + p.size[1] / 2;
-  for (const m of stairs) {
-    const steps = parts.filter((p) => p.model === m && p.name === 'Degrau').sort((a, b) => top(a) - top(b));
-    let prev = DIM.land;
-    for (const s of steps) {
-      assert.ok(top(s) - prev <= 1.1 + 1e-9, `${m}: degrau sobe ${(top(s) - prev).toFixed(2)} studs`);
-      prev = top(s);
-    }
-    const grass = parts.filter((p) => p.model === m && p.name === 'Topo de Grama').map(top);
-    assert.ok(Math.abs(prev - Math.min(...grass)) < 1e-6, `${m}: a escada não chega ao topo`);
   }
 });
 

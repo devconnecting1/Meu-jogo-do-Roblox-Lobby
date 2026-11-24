@@ -172,9 +172,15 @@ const plot = [...PLOTS].sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.
 const VIEWS = [
   { id: 'overview', title: 'Visão geral do reino', ...OVERVIEW },
   { id: 'top', title: 'Mapa visto de cima (30 lotes, estradas, rio e lago)', pos: [0, 1300, 140], target: [0, 0, 0] },
-  { id: 'lobby', title: 'Lobby: estátua do rei, mercado e colunas antigas', ...look(0, 0, 78, 48, 96, 10) },
+  { id: 'lobby', title: 'Lobby: fonte com a estátua clássica, mercado e colunas antigas', ...look(0, 0, 78, 48, 96, 10) },
   { id: 'market', title: 'Mercado do Lobby (altura do jogador)', pos: [0, 17, 40], target: [0, 13, 0] },
   { id: 'lobby-stairs', title: 'Escadaria de madeira do Lobby', pos: [74, 17, 26], target: [44, 8, 0] },
+  {
+    id: 'fountain',
+    title: 'Fonte do Lobby: estátua do boneco clássico com o logo',
+    pos: [22, 20, 30],
+    target: [0, 22, 0],
+  },
   { id: 'plot', title: `${plot.name}: fundação do castelo`, ...look(plot.x, plot.z, 52, 34, 62, 5) },
   {
     id: 'plots',
@@ -207,8 +213,28 @@ if (landmarks.groves.autumn) {
   const [x, z] = landmarks.groves.autumn;
   add({ id: 'autumn', title: 'Bosque de outono', ...look(x, z, 62, 40, 62, 8) });
 }
-const mesa = landmarks.mesas.find((m) => m[3]) ?? landmarks.mesas[0];
-if (mesa) add({ id: 'mesa', title: 'Planalto de rocha com escadaria', ...look(mesa[0], mesa[1], -70, 34, 40, 10) });
+const tallest = [...landmarks.mountains].sort((p, q) => q[2] - p[2])[0];
+if (tallest) {
+  const [x, z, peak, R] = tallest;
+  add({ id: 'mountain', title: 'Montanha com neve e pinheiros', ...look(x, z, R * 2.2, peak * 0.9, R * 2.2, peak * 0.4) });
+}
+if (landmarks.hills.length) {
+  const [x, z, peak, R] = landmarks.hills[0];
+  add({ id: 'hill', title: 'Colina em terraços', ...look(x, z, R * 2.2, peak + 18, R * 2, 8) });
+}
+if (landmarks.villages.length) {
+  const [x, z] = landmarks.villages[0];
+  add({ id: 'village', title: 'Vila: casas, poço, celeiro e moinho', ...look(x, z, 60, 42, 70, 6) });
+  add({ id: 'village-walk', title: 'Rua da vila (altura do jogador)', pos: [x + 34, 11, z + 6], target: [x, 8, z] });
+}
+if (landmarks.towers.length) {
+  const [x, z] = landmarks.towers[0];
+  add({ id: 'tower', title: 'Torre de vigia na beira da estrada', ...look(x, z, 30, 22, 34, 10) });
+}
+if (landmarks.camps.length) {
+  const [x, z] = landmarks.camps[0];
+  add({ id: 'camp', title: 'Acampamento na floresta', ...look(x, z, 26, 18, 30, 4) });
+}
 if (landmarks.farms.length) {
   const [x, z] = landmarks.farms[0];
   add({ id: 'farm', title: 'Campo de trigo', ...look(x, z, 34, 22, 38, 3) });
@@ -221,6 +247,8 @@ if (landmarks.docks.length) {
   const [tx, tz] = out(20);
   add({ id: 'dock', title: 'Cais e barco na praia', ...look(tx, tz, 34, 20, 34, 2) });
 }
+const palm = parts.find((p) => p.model === 'Vegetação/Coqueiros' && p.name === 'Tronco');
+if (palm) add({ id: 'beach', title: 'Praia com coqueiros', ...look(palm.position[0], palm.position[2], 36, 18, 36, 6) });
 VIEWS.push(
   { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
   { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },

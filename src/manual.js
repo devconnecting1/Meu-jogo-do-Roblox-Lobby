@@ -15,8 +15,18 @@ export const PHASES = [
   { id: 'estradas', title: 'Estradas de pedra', match: (p) => p.model === 'Estradas' },
   { id: 'pontes', title: 'Pontes de madeira', match: (p) => p.model.startsWith('Pontes') },
   { id: 'lotes', title: 'Lotes dos castelos (30)', match: (p) => p.model.startsWith('Lotes') },
-  { id: 'relevo', title: 'Planaltos de rocha', match: (p) => p.model.startsWith('Relevo/Planalto') },
+  {
+    id: 'relevo',
+    title: 'Montanhas e colinas',
+    match: (p) => p.model.startsWith('Relevo/Montanha') || p.model.startsWith('Relevo/Colina'),
+  },
+  { id: 'trilhas', title: 'Trilhas de terra', match: (p) => p.model === 'Trilhas' },
   { id: 'recursos', title: 'Recursos: trigo, ouro e pedra', match: (p) => p.model.startsWith('Recursos') },
+  {
+    id: 'construcoes',
+    title: 'Vilas, torres de vigia e acampamentos',
+    match: (p) => /^(Vila|Torres de Vigia|Acampamentos)/.test(p.model),
+  },
   { id: 'costa', title: 'Cais e barcos', match: (p) => p.model.startsWith('Costa') },
   { id: 'natureza', title: 'Florestas, arbustos e pedras', match: () => true },
 ];

@@ -69,6 +69,10 @@ test('projeto: Lighting Future, dia claro e efeitos sutis', () => {
   assert.equal(L['Brilho'].$className, 'BloomEffect');
   assert.ok(L['Brilho'].$properties.Intensity <= 0.3, 'bloom forte demais');
   assert.equal(L['Neblina Leve'].$className, 'Atmosphere');
+  assert.equal(L['Raios de Sol'].$className, 'SunRaysEffect');
+  assert.ok(L['Raios de Sol'].$properties.Intensity <= 0.1, 'raios de sol fortes demais');
+  const atm = L['Neblina Leve'].$properties;
+  assert.ok(atm.Density >= 0.2 && atm.Density <= 0.4, 'neblina: o horizonte some suave, mas o mapa continua visível');
 });
 
 test('projeto: só Workspace + Lighting (sem scripts, UI, NPC ou gameplay por enquanto)', () => {

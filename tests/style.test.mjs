@@ -80,9 +80,9 @@ test('valores numéricos válidos e transparência controlada', () => {
   }
 });
 
-test('orçamento: até 8000 Parts e 60 luzes', () => {
+test('orçamento: até 10000 Parts e 60 luzes', () => {
   const s = stats(parts);
-  assert.ok(s.total <= 8000, `${s.total} Parts`);
+  assert.ok(s.total <= 10000, `${s.total} Parts`);
   assert.ok(s.lights <= 60, `${s.lights} luzes`);
 });
 

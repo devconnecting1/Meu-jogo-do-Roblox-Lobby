@@ -26,8 +26,11 @@ A prisão antiga (projeto anterior) está guardada no branch `arquivo/prisao`. E
 8. **Lotes:** 30 fundações de 32×32 sobre a grama, a pelo menos 84 studs uma da outra (120 quando cabe), 110 da praça e do lago e 52 do rio, espalhadas pelos quatro quadrantes. **Toda** fundação liga na praça por estrada (testado). Lote que não dá para ligar é trocado de lugar automaticamente (`planKingdom`).
 9. **Estradas e pontes:** estradas de 8 studs, só sobre a grama, em trechos retos (L ou Z). Sobre o rio vira ponte de madeira (até 50 studs) com vigas, postes e corrimão; o guarda-corpo é interrompido onde outra estrada cruza. Curva de estrada nunca fica em cima da água.
 10. **Cada coisa no seu lugar:** o **Lobby** fica no centro: plataforma elevada de 88×88, 6 studs acima da grama, com mureta na borda e **4 escadarias de madeira** (6 degraus de 1 stud, postes e corrimão) que descem até o começo das estradas. Em cima: estátua do rei, mercado com 4 barracas de toldo listrado, caixotes, canteiros de flores, colunas antigas e o spawn, com 4 caminhos livres até as escadarias. Estrada nunca entra no quadrado do Lobby + escadarias (`LOBBY_GUARD`); planaltos, florestas, campos, jazidas e cais ficam longe dos lotes e das estradas. Decoração (copa, galho, arbusto, pedra, flor, trigo, bandeira, toldo) não colide.
+10b. **Montanhas naturais, não caixas:** `mountain()` empilha camadas irregulares (vários blocos sorteados por camada, cada um dentro de um bloco da camada de baixo, recuado 1 stud), com grama nas camadas baixas, rocha listrada no meio e neve no topo das mais altas (≥ 55). Pinheiros só nos terraços de grama livres. Colinas usam o mesmo gerador, mais baixas.
+10c. **Tudo liga em algo:** a malha de estradas cresce do Lobby para fora; cada lote liga no ponto mais próximo da malha (cruzamento em "T"), sem atravessar outros lotes e sem correr colada (< 16 studs) numa estrada paralela. Cada vila, campo, jazida, torre de vigia e acampamento **só é construído se a sua trilha de terra (4 studs) chegar na estrada** (`addTrail`); nas vilas a trilha vem primeiro e as casas ficam em volta, sem bloqueá-la.
+10d. **Módulos de peças (`src/props/`)**: `statue.js` (fonte com o boneco R6 clássico erguendo o logo), `trees.js` (8 tipos de árvore, arbustos e flores), `buildings.js` (casa, celeiro, moinho, poço, torre de vigia, feno, tenda). Cada módulo tem o seu teste isolado (`tests/statue|trees|buildings.test.mjs`) que monta a peça sobre um chão e roda apoio, z-fighting, paleta e colisão. Peça nova = função no módulo + caso no teste.
 11. **Peça girada:** pode girar em Y e ainda colidir (piso octogonal, pedestal, caixote torto). Inclinada em X ou Z **nunca colide** (pedras, galhos, pedaço de coluna). O teste de z-fighting ignora peças giradas; o de apoio usa a caixa envolvente.
-12. **Luz de dia equilibrada:** Lighting Future, `ClockTime` de dia, `Brightness` 1 a 3, ambiente ≤ 0,6, correção de cor sem saturar, bloom leve e `Atmosphere` "Neblina Leve" (o horizonte some suave).
+12. **Luz de dia realista:** Lighting Future, tarde (`ClockTime` 14,6, latitude 32), sol 2,4 com sombra macia, ambiente ≤ 0,6, `ColorShift_Top` levemente quente, correção de cor com contraste leve e saturação ≤ 0, bloom ≤ 0,3, `SunRaysEffect` ≤ 0,1 e `Atmosphere` "Neblina Leve" (densidade 0,2 a 0,4: o horizonte some suave, o mapa continua legível). Sem `Sky` customizado.
 13. **Segredos:** a chave Open Cloud só existe no GitHub (Secrets/Variables). Nunca commitar chaves; o publicador mascara a chave no log.
 
 ## 3. Mapa do repositório
@@ -60,7 +63,7 @@ b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 - **Unidades:** studs, Y para cima. Ilha em x,z ∈ [−600, 600] (grade de 16), mar até ±800. Grama no topo y = 4, areia y = 3, água y = 2,6, mar y = 0. **Medidas saem de `DIM`**: mude a escala lá, nunca com números soltos.
 - **Escala do jogador:** personagem de 5 studs, degraus de até 1 stud (escadas dos planaltos), estradas de 8, caminhos da praça de 8.
 - **Apoio:** toda peça precisa **encostar** em outra já ligada ao `Mar`. Peças baixas entram 0,1 na grama (ex.: fundação começa em y = 3,9).
-- **Base de peça deitada:** cada tipo tem sua altura de base para não empatar (fundação e Lobby 3,9; terra arada 3,92; degraus 3,88; estrada 4,0).
+- **Base de peça deitada:** cada tipo tem sua altura de base para não empatar (fundação, Lobby, montanhas e construções 3,9; terra arada 3,92; arbustos e flores 3,95; trilha 3,97; degraus 3,88; estrada 4,0).
 - **Nova área transitável:** adicione uma zona em `clearanceZones()`.
 - **Nova decoração:** sorteie com `rand()` (nunca `Math.random`), respeite `free()`, `awayFromPlots()`, `distToRoads()` e `allGrass()`, e registre o retângulo em `blocked`.
 - **Nova cor:** adicione em `src/palette.js` (saturação ≤ 0,55) e reutilize.
@@ -77,7 +80,10 @@ b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 | lotes | menos de 30, nomes repetidos, perto demais, fora da grama, um quadrante vazio |
 | estradas | lote sem caminho até a praça, estrada fora da grama, ponte fora do rio |
 | Lobby | sem estátua, spawn fora do piso, escadaria com degrau > 1 stud ou que não chega ao piso, sem corrimão ou mureta, barraca incompleta, sem caixotes, canteiros ou colunas |
-| escadarias | degrau maior que 1,1 stud ou escada que não chega ao topo |
+| relevo | menos de 6 montanhas ou 4 colinas, montanha baixa (< 50) ou feita de poucos blocos (parece caixa) |
+| trilhas | vila, campo, jazida, torre ou acampamento sem trilha até a estrada; trilha solta |
+| estradas x lotes | estrada atravessando um lote de ponta a ponta |
+| props isolados | cada prop (estátua, 8 árvores, 7 construções, 4 lados) sem apoio, com z-fighting, cor fora da paleta ou fora do terreno declarado |
 | decoração | poucas árvores, sem outono, planaltos, pedras, campos, jazidas ou cais |
 | estilo | classe, shape, material, Neon sem luz, campos desconhecidos (UI/NPC/script), cor fora da paleta, studs fora do lugar |
 | orçamento | mais de 8000 Parts ou 60 luzes |
