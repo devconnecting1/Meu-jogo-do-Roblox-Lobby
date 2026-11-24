@@ -23,7 +23,9 @@ Escopo atual: **somente a prisão**. Não criar UI, NPC, script, sistema de jogo
 7. **Tudo se sustenta:** nenhuma peça flutua, nenhuma face visível faz z-fighting, nenhuma peça bloqueia passagem, e toda borda com queda tem guarda-corpo. O **manual de montagem** (`src/manual.js`) precisa conseguir montar cada peça sobre algo já montado.
 8. **Nada apertado:** a escala segue a prisão de referência, com mínimos verificados em `tests/space.test.mjs`: cela de 14×16 com pé-direito de 16, corredor de 10, átrio de 48, 27 studs do 2º andar ao teto, escada de 14 e ponte de 10. **Corte em terraços:** a galeria do 2º andar fica em cima das celas do térreo e as celas de cima são recuadas. Nenhuma laje pode cobrir o corredor do térreo: corredor e átrio formam um vão aberto de 68 studs até o teto. Colunas a cada 30 studs e poucos móveis deixam o espaço respirar. Nunca reduza esses valores para "caber" algo; aumente o prédio.
 9. **Segredos:** a chave Open Cloud só existe no GitHub (Secrets/Variables). Nunca commitar chaves; o publicador mascara a chave no log.
-10. **Cada função tem sua sala:** o bloco de celas (átrio, corredores e galerias) não recebe móveis de outras funções. Refeitório, almoxarifado e enfermaria ficam na **ala oeste**, ligada ao hall por um vão de 12 studs e organizada em torno de um corredor de serviço com faixas no piso. Sala dos guardas e rouparia ficam nos cantos do hall, e o estoque de uniformes fica sob o mezanino (testado em `tests/rooms.test.mjs`). Função nova = sala nova, com porta e zona livre.
+10. **Cada função tem sua sala:** o bloco de celas (átrio, corredores e galerias) não recebe móveis de outras funções. Refeitório, almoxarifado e enfermaria ficam na **ala oeste**, ligada ao hall por um vão de 12 studs e organizada em torno de um corredor de serviço com faixas no piso. Sala dos guardas e rouparia ficam nos cantos do hall; sala de visitas e estoque de uniformes ficam **fechados** sob o mezanino. No 2º andar não existe piso abandonado: o mezanino tem Sala de Controle (vidraça para o vão), Diretoria, Arquivo, Descanso e Vestiário, e os cantos oeste têm Biblioteca e Sala de Aula, cada uma com parede, porta, forro em y=33 e luz (testado em `tests/rooms.test.mjs`). Função nova = sala nova, com porta e zona livre.
+11. **Sem vãos sobrando:** todo espaço entre a última cela e uma parede vira sala ou é fechado por parede (`Parede Técnica`). Um buraco do tamanho de uma cela parece cela faltando.
+12. **Luz que faz sentido:** o vão de pé-direito duplo usa luminárias de galpão presas ao teto (`HIGH_BAY`, SurfaceLight 120°) entre as vigas, a galeria usa `GALLERY_LIGHT`, e cada sala fechada tem painéis no próprio forro (`panelLight`). Nada de pendente com haste longa no meio do vão.
 
 ## 3. Mapa do repositório
 
@@ -58,6 +60,7 @@ b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 - **Apoio:** toda peça precisa **encostar** em outra que já esteja ligada à `Laje Térreo`. Luminárias levam haste até o teto (`hangingLight`) ou encostam no teto (`panelLight`).
 - **Peça decorativa colada em superfície** (friso, faixa, placa): use `canCollide: false` e desloque-a para fora da face (por exemplo, `-0.08`), **nunca** no mesmo plano da face.
 - **Recortes (janela/porta):** monte a parede em pedaços em volta do vão. Caixilhos ficam **dentro** do vão, não sobre a parede.
+- **Paredes de sala:** use `wallRun(b, modelo, 'x'|'z', u0, u1, w0, w1, y0, h, [door(a, c), win(a, c)])`; ele já monta verga, peitoril, vidro, batentes e caixilhos. Feche os cantos (a parede lateral começa onde a frontal começa) para não sobrar fresta.
 - **Nova área transitável:** adicione uma zona em `clearanceZones()`. Bordas novas com queda vão em `fallEdges()`.
 - **Nova cor:** adicione em `src/palette.js` (neutra) e reutilize.
 - **Luz:** sempre numa peça `Neon` sem colisão. `light: { type: 'Point' | 'Surface', range, brightness, color }`. Orçamento: até 120 luzes.
@@ -93,6 +96,8 @@ Quando um teste falhar, a mensagem lista a peça (`Modelo/Nome @ [x, y, z]`). Co
 - **Colisão invisível:** peças decorativas (frisos, portas abertas, lâmpadas) usam `canCollide: false`. Vidro de guarda-corpo **colide** de propósito.
 - **Degrau alto:** o personagem sobe no máximo cerca de 1 stud sem pular. A escada usa degraus de 1 × 1,125.
 - **Sobreposição de colisão em passagens:** sempre confira `clearanceZones()` ao mover móveis.
+- **Fresta no canto de duas paredes:** se a parede frontal termina em z=12 e a lateral começa em x+0,6, sobra um furo de 0,6×0,6. Comece a lateral no mesmo x da frontal.
+- **SurfaceLight:** o ângulo vem de `light.angle` (padrão 90). No visualizador só átrio, hall e galerias recebem luz real; as salas usam o emissivo.
 - **Peças giradas** ficam fora da checagem de z-fighting. Evite girar; só tampos cilíndricos.
 - **Open Cloud:** a API recusa `.rbxlx` feito à mão ("Invalid Content stream"). Publique sempre o `.rbxl` **binário do Rojo**.
 - **`Lighting.Technology`** não é alterável por script; vai no `default.project.json` (Future = 4). Se o Rojo mudar de versão, confira o `verify-place`.

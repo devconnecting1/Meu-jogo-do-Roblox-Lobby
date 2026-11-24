@@ -37,7 +37,29 @@ test('átrio do bloco de celas sem móveis (só colunas, escada e luminárias)',
     (p) =>
       p.canCollide &&
       inside(p, [-LEVELS.ROW, LEVELS.STAIR_X0 - 2], [-LEVELS.EDGE + 2, LEVELS.EDGE - 2]) &&
-      !/^(Pisos|Estrutura|Galerias|Escada)/.test(p.model),
+      !/^(Envoltória|Pisos|Estrutura|Galerias|Escada)/.test(p.model),
   );
   assert.equal(blocked.length, 0, blocked.map((p) => `${p.model}/${p.name}`).join('\n'));
+});
+
+test('2º andar sem piso abandonado: mezanino e cantos viram salas fechadas', () => {
+  for (const m of [
+    'Salas/Controle',
+    'Salas/Diretoria',
+    'Salas/Arquivo',
+    'Salas/Descanso',
+    'Salas/Vestiário',
+    'Salas/Biblioteca',
+    'Salas/Sala de Aula',
+  ]) {
+    const room = parts.filter((p) => p.model === m);
+    assert.ok(room.some((p) => p.name === 'Forro'), `${m} sem forro`);
+    assert.ok(room.some((p) => p.name === 'Batente Topo'), `${m} sem porta`);
+    assert.ok(room.some((p) => p.light), `${m} sem luz`);
+  }
+});
+
+test('vão depois da última cela fechado (nenhuma "cela faltando")', () => {
+  const walls = parts.filter((p) => p.name === 'Parede Técnica');
+  assert.equal(walls.length, 2, 'falta a parede técnica no fim de cada ala do térreo');
 });

@@ -171,10 +171,10 @@ for (const list of buckets.values()) {
   groupNode(p0.group).add(mesh);
 }
 
-// Luzes reais só nas luminárias pendentes do átrio/hall (o resto é ambiente + emissivo).
+// Luzes reais só nas luminárias do teto (átrio, hall e galerias); o resto é ambiente + emissivo.
 for (const p of parts) {
-  if (!p.light || p.light.type !== 'Point' || !/Iluminação\/(Átrio|Hall|Corredor)/.test(p.model)) continue;
-  const l = new THREE.PointLight(srgb(p.light.color), 55, 42, 1.6);
+  if (!p.light || !/Iluminação\/(Átrio|Hall|Galeria)/.test(p.model)) continue;
+  const l = new THREE.PointLight(srgb(p.light.color), 70, p.light.range * 1.2, 1.4);
   l.position.set(p.position[0], p.position[1] - 1, p.position[2]);
   scene.add(l);
 }
@@ -214,6 +214,12 @@ const VIEWS = [
   { id: 'guards', title: 'Sala dos guardas', pos: [-62, 8, 37], target: [-84, 3, 57] },
   { id: 'stairs', title: 'Escada para o mezanino', pos: [22, 7, 3], target: [52, 10, 0] },
   { id: 'visits', title: 'Sala de visitas', pos: [68, 6.5, -22], target: [78, 3.5, 8] },
+  { id: 'mezzanine', title: '2º andar: salas do mezanino', pos: [30, 27, -6], target: [80, 22, 4] },
+  { id: 'control', title: 'Sala de controle (vidraça para o vão)', pos: [86, 23.5, -10], target: [72, 21, 3] },
+  { id: 'office', title: 'Diretoria', pos: [86, 23.5, 30], target: [74, 19, 16] },
+  { id: 'rest', title: 'Sala de descanso dos guardas', pos: [62, 23.5, 46], target: [84, 18.5, 56] },
+  { id: 'library', title: 'Biblioteca (2º andar)', pos: [-62, 23.5, 46], target: [-82, 19, 57] },
+  { id: 'classroom', title: 'Sala de aula (2º andar)', pos: [-62, 23.5, -46], target: [-86, 19, -52] },
   { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
   { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },
   { id: 'build-75', title: 'Montagem — 75% das etapas', ...OVERVIEW, step: 0.75 },

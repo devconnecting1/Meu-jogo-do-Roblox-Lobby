@@ -70,7 +70,6 @@ const WING_X1 = -IN_X - 1; // -89: face oeste da parede que separa o hall da ala
 const WING_X0 = WING_X1 - DIM.wing; // -151
 const OXW = WING_X0 - W; // -153: face externa da parede oeste
 const WC = DIM.wingCeiling;
-const HANG_Y = 30; // altura das luminárias pendentes do vão
 
 export const LEVELS = Object.freeze({
   F2,
@@ -89,6 +88,11 @@ export const LEVELS = Object.freeze({
 });
 
 const HANG_LIGHT = { type: 'Point', range: 32, brightness: 1.2, color: C.neon };
+// luminária de galpão presa ao teto: ilumina o vão de pé-direito duplo de cima para baixo
+const HIGH_BAY = { type: 'Surface', range: 52, brightness: 2.4, color: C.neon, angle: 120 };
+const GALLERY_LIGHT = { type: 'Surface', range: 34, brightness: 1.8, color: C.neon, angle: 120 };
+const FIXTURE_Y = ROOF - 1.4; // luminárias presas ao teto com haste curta (1,2)
+const UPPER_CEIL = TOP; // forro das salas do 2º andar (mesma altura do topo das celas de cima)
 const PANEL_LIGHT = { type: 'Surface', range: 18, brightness: 1.4, color: C.neon };
 
 /** Centro X da cela i (0..7). */
@@ -123,16 +127,34 @@ export function clearanceZones() {
       min: [BRIDGE[0] + 0.5, F2 + 0.2, -CELL_FRONT + 0.6],
       max: [BRIDGE[1] - 0.5, F2 + 7, CELL_FRONT - 0.6],
     },
-    { name: 'Patamar do mezanino', min: [STAIR_X1 + 0.5, F2 + 0.2, -SH + 0.2], max: [IN_X - 0.5, F2 + 7, SH - 0.2] },
-    { name: 'Passagem sob o mezanino', min: [STAIR_X1 + 0.5, 0.6, -E + 1], max: [STAIR_X1 + 5.5, 8, E - 1] },
+    { name: 'Corredor do mezanino', min: [STAIR_X1 + 0.5, F2 + 0.2, -CELL_FRONT + 0.6], max: [STAIR_X1 + 5.4, F2 + 7, CELL_FRONT - 0.6] },
+    { name: 'Passagem da sala de visitas', min: [STAIR_X1 + 0.7, 0.6, -E + 1], max: [STAIR_X1 + 5.5, 8, E - 1] },
+    // salas do 2º andar e do térreo sob o mezanino
+    { name: 'Porta da sala de controle', min: [STAIR_X1 + 4, F2 + 0.6, -1.6], max: [STAIR_X1 + 8.5, F2 + 9.6, 1.6] },
     // ala oeste
     { name: 'Vão hall → ala oeste', min: [WING_X1 - 1, 0.6, -5.5], max: [-IN_X + 0.5, 11, 5.5] },
     { name: 'Corredor de serviço', min: [WING_X0 + 0.5, 0.6, -5], max: [WING_X1 - 0.5, 8, 5] },
     { name: 'Porta do refeitório', min: [-125.5, 0.6, 4], max: [-114.5, 11, 9] },
-    { name: 'Corredor entre as mesas', min: [-143, 0.6, 29.5], max: [-90, 8, 36.5] },
+    { name: 'Corredor entre as mesas', min: [-150, 0.6, 27], max: [-90, 8, 33] },
     { name: 'Porta do almoxarifado', min: [-134.5, 0.6, -9], max: [-127.5, 11, -4] },
     { name: 'Corredor do almoxarifado', min: [-138, 0.6, -58], max: [-131, 8, -7.5] },
     { name: 'Porta da enfermaria', min: [-108.5, 0.6, -9], max: [-101.5, 11, -4] },
+    ...[-1, 1].flatMap((s) => {
+      const zr2 = (a, c) => (s < 0 ? [-c, -a] : [a, c]);
+      const t = s < 0 ? 'Sul' : 'Norte';
+      const box = (name, x0, x1, za, zc, y0, y1) => {
+        const [z0, z1] = zr2(za, zc);
+        return { name: `${name} ${t}`, min: [x0, y0, z0], max: [x1, y1, z1] };
+      };
+      return [
+        box('Galeria do mezanino', STAIR_X1 - 0.5, IN_X - 0.5, CELL_FRONT + 0.6, UPPER_FRONT - 0.6, F2 + 0.6, F2 + 7),
+        box('Porta da diretoria/arquivo', STAIR_X1 + 4, STAIR_X1 + 8.5, 26.3, 29.7, F2 + 0.6, F2 + 9.6),
+        box('Porta descanso/vestiário', 70.3, 73.7, UPPER_FRONT - 2, UPPER_FRONT + 2.5, F2 + 0.6, F2 + 9.6),
+        box('Porta biblioteca/aula', -75.7, -72.3, UPPER_FRONT - 2, UPPER_FRONT + 2.5, F2 + 0.6, F2 + 9.6),
+        box('Porta da sala de visitas', STAIR_X1 - 2, STAIR_X1 + 3, 16.3, 19.7, 0.6, 9.6),
+        box('Porta dos uniformes', STAIR_X1 - 2, STAIR_X1 + 3, 28.3, 31.7, 0.6, 9.6),
+      ];
+    }),
     { name: 'Corredor da enfermaria', min: [-116, 0.6, -49], max: [-90, 8, -16] },
   );
   for (let k = 0; k < F2; k++) {
@@ -207,13 +229,24 @@ function crate(b, model, x, y, z, s = 4) {
 }
 
 /** Estante metálica (ao longo de X). items: 'caixas' (almoxarifado) ou 'roupas' (rouparia/uniformes). */
-function rack(b, model, x, z, len = 10, depth = 3.5, h = 11, items = 'caixas') {
+function rack(b, model, x, z, len = 10, depth = 3.5, h = 11, items = 'caixas', y0 = 0) {
   for (const dx of [-len / 2 + 0.3, 0, len / 2 - 0.3]) {
     for (const dz of [-depth / 2 + 0.3, depth / 2 - 0.3]) {
-      b.box(model, 'Montante', [x + dx, h / 2, z + dz], [0.5, h, 0.5], C.steel);
+      b.box(model, 'Montante', [x + dx, y0 + h / 2, z + dz], [0.5, h, 0.5], C.steel);
     }
   }
-  [0.6, 4.2, 7.8].forEach((sy, i) => b.box(model, `Prateleira ${i + 1}`, [x, sy, z], [len, 0.3, depth], C.steelLight));
+  [0.6, 4.2, 7.8].forEach((sy, i) => b.box(model, `Prateleira ${i + 1}`, [x, y0 + sy, z], [len, 0.3, depth], C.steelLight));
+  if (items === 'livros') {
+    [0.75, 4.35, 7.95].forEach((sy) => {
+      for (const [dx, col] of [
+        [-2.4, C.wood],
+        [2.4, C.blanket],
+      ]) {
+        b.box(model, 'Livros', [x + dx, y0 + sy + 0.7, z], [2.4, 1.4, depth - 0.8], col);
+      }
+    });
+    return;
+  }
   // itens sempre entre os montantes (montantes em x, x ± (len/2 - 0.3))
   if (items === 'roupas') {
     [0.75, 4.35, 7.95].forEach((sy, i) => {
@@ -221,14 +254,14 @@ function rack(b, model, x, z, len = 10, depth = 3.5, h = 11, items = 'caixas') {
         [-2.4, i % 2 ? C.blanket : C.sheet],
         [2.4, i % 2 ? C.sheet : C.blanket],
       ]) {
-        b.box(model, 'Pilha de Roupas', [x + dx, sy + 0.6, z], [2.4, 1.2, depth - 1.2], col);
+        b.box(model, 'Pilha de Roupas', [x + dx, y0 + sy + 0.6, z], [2.4, 1.2, depth - 1.2], col);
       }
     });
     return;
   }
-  crate(b, model, x - 2.4, 0.75, z, 2.4);
-  crate(b, model, x + 2.4, 4.35, z, 2.4);
-  crate(b, model, x - 2.4, 7.95, z, 2.4);
+  crate(b, model, x - 2.4, y0 + 0.75, z, 2.4);
+  crate(b, model, x + 2.4, y0 + 4.35, z, 2.4);
+  crate(b, model, x - 2.4, y0 + 7.95, z, 2.4);
 }
 
 /** Mesa redonda (tampo cilíndrico) com dois bancos de encosto, ao longo de X. */
@@ -244,6 +277,40 @@ function diningTable(b, model, tx, tz) {
   }
 }
 
+/**
+ * Parede reta com portas e janelas. axis 'x': corre em X (espessura em Z = w0..w1);
+ * axis 'z': corre em Z (espessura em X). y0 = piso, h = altura.
+ * openings: { a, c, kind: 'door' | 'window', top, bottom } (a/c ao longo da parede; top/bottom relativos a y0).
+ */
+function wallRun(b, model, axis, u0, u1, w0, w1, y0, h, openings = []) {
+  const P = (u, y, w) => (axis === 'x' ? [u, y, w] : [w, y, u]);
+  const wl = Math.min(w0, w1);
+  const wh = Math.max(w0, w1);
+  const seg = (name, ua, ub, ya, yb, wa, wb, color, opts) => b.span(model, name, P(ua, ya, wa), P(ub, yb, wb), color, opts);
+  let cur = u0;
+  for (const op of [...openings].sort((p, q) => p.a - q.a)) {
+    if (op.a > cur) seg('Parede', cur, op.a, y0, y0 + h, wl, wh, C.wall);
+    if (op.kind === 'door') {
+      seg('Verga Porta', op.a, op.c, y0 + op.top, y0 + h, wl, wh, C.wall);
+      seg('Batente E', op.a, op.a + 0.2, y0, y0 + op.top, wl - 0.05, wh + 0.05, C.steel);
+      seg('Batente D', op.c - 0.2, op.c, y0, y0 + op.top, wl - 0.05, wh + 0.05, C.steel);
+      seg('Batente Topo', op.a, op.c, y0 + op.top - 0.2, y0 + op.top, wl - 0.05, wh + 0.05, C.steel);
+    } else {
+      seg('Peitoril', op.a, op.c, y0, y0 + op.bottom, wl, wh, C.wall);
+      seg('Verga Janela', op.a, op.c, y0 + op.top, y0 + h, wl, wh, C.wall);
+      seg('Vidro', op.a, op.c, y0 + op.bottom, y0 + op.top, wl + 0.2, wl + 0.4, C.glass, { transparency: 0.6 });
+      seg('Caixilho E', op.a, op.a + 0.2, y0 + op.bottom, y0 + op.top, wl - 0.05, wh + 0.05, C.steel);
+      seg('Caixilho D', op.c - 0.2, op.c, y0 + op.bottom, y0 + op.top, wl - 0.05, wh + 0.05, C.steel);
+      seg('Caixilho Topo', op.a, op.c, y0 + op.top - 0.2, y0 + op.top, wl - 0.05, wh + 0.05, C.steel);
+      seg('Caixilho Base', op.a, op.c, y0 + op.bottom, y0 + op.bottom + 0.2, wl - 0.05, wh + 0.05, C.steel);
+    }
+    cur = op.c;
+  }
+  if (cur < u1) seg('Parede', cur, u1, y0, y0 + h, wl, wh, C.wall);
+}
+const door = (a, c, top = 10) => ({ a, c, kind: 'door', top });
+const win = (a, c, bottom = 3, top = 11) => ({ a, c, kind: 'window', bottom, top });
+
 /** Parede reta ao longo de X (espessura em Z) com vãos [x0, x1, alturaDoVão]. */
 function wallX(b, model, x0, x1, z0, z1, h, openings = []) {
   let cur = x0;
@@ -256,14 +323,14 @@ function wallX(b, model, x0, x1, z0, z1, h, openings = []) {
 }
 
 /** Luminária pendente: carcaça + 2 tubos Neon + hastes até o teto. */
-function hangingLight(b, model, x, y, z) {
+function hangingLight(b, model, x, y, z, light = HANG_LIGHT) {
   const stem = ROOF - (y + 0.2);
   b.box(model, 'Carcaça', [x, y, z], [8, 0.4, 1.8], C.steel, { canCollide: false });
   for (const o of [-1.9, 1.9]) {
     b.box(model, 'Tubo', [x + o, y - 0.3, z], [3.6, 0.25, 1.1], C.neon, {
       canCollide: false,
       material: 'Neon',
-      light: o < 0 ? HANG_LIGHT : null,
+      light: o < 0 ? light : null,
     });
     b.box(model, 'Haste', [x + o * 1.4, y + 0.2 + stem / 2, z], [0.3, stem, 0.3], C.steel, { canCollide: false });
   }
@@ -504,8 +571,7 @@ export function buildPrison() {
     // Iluminação: pendentes sobre o corredor (vão aberto) e sobre a galeria
     for (let i = 0; i < DIM.cellsPerRow; i++) {
       const lx = cellCenterX(i);
-      if (i % 2 === 0) hangingLight(b, `Iluminação/Corredor ${t}`, lx, HANG_Y, side * (E + 5));
-      hangingLight(b, `Iluminação/Galeria ${t}`, lx, ROOF - 5, side * (CELL_FRONT + 5));
+      hangingLight(b, `Iluminação/Galeria ${t}`, lx, FIXTURE_Y, side * (CELL_FRONT + 5), i % 2 ? null : GALLERY_LIGHT);
     }
   }
 
@@ -553,7 +619,7 @@ export function buildPrison() {
   b.span(HL, 'Tampo Balcão', [-74.3, 3.5, 11.7], [-69.7, 3.8, 20.3], C.steelLight);
   b.span(HL, 'Vidro Balcão', [-69.9, 3.8, 12], [-69.8, 7.5, 20], C.glass, { transparency: 0.6 });
   b.span(HL, 'Painel Monitores', [-IN_X, 6, 13], [-IN_X + 0.3, 9.5, 19], C.steel, { canCollide: false });
-  for (const z of [-12, 12]) hangingLight(b, 'Iluminação/Hall', -71, HANG_Y, z);
+  for (const z of [-14, 14]) hangingLight(b, 'Iluminação/Hall', -74, FIXTURE_Y, z, HIGH_BAY);
 
   // --- Salas do bloco (cantos oeste do térreo): guardas e rouparia ----------
   for (const s of [-1, 1]) {
@@ -592,8 +658,9 @@ export function buildPrison() {
   }
 
   // --- Átrio: livre (refeitório e caixas ficam em salas próprias na ala oeste) -
-  for (let i = 0; i < DIM.cellsPerRow; i += 2) {
-    for (const z of [-10, 10]) hangingLight(b, 'Iluminação/Átrio', cellCenterX(i), HANG_Y, z);
+  // grade de luminárias de galpão entre as vigas (cobre átrio e corredores do térreo)
+  for (const x of [-45, -15, 15, 45]) {
+    for (const z of [-(E + 5), -12, 12, E + 5]) hangingLight(b, 'Iluminação/Átrio', x, FIXTURE_Y, z, HIGH_BAY);
   }
 
   // --- Sala de visitas (sob o mezanino) -------------------------------------
@@ -612,12 +679,112 @@ export function buildPrison() {
   }
   for (const z of [-15, 0, 15]) panelLight(b, V, 77, F2 - 1, z);
 
+  // paredes da sala de visitas (porta em cada lado da escada) e do depósito de uniformes
+  for (const s of [-1, 1]) {
+    const zs = (a, c) => (s < 0 ? [-c, -a] : [a, c]);
+    const [v0, v1] = zs(SH + 0.8, E);
+    wallRun(b, V, 'z', v0, v1, STAIR_X1, STAIR_X1 + 0.6, 0, F2 - 1, [
+      s < 0 ? door(-20, -16) : door(16, 20),
+    ]);
+    b.span(V, 'Parede Fundo Visitas', [STAIR_X1 + 0.6, 0, s * E], [IN_X, F2 - 1, s * (E + 0.6)], C.wall);
+    const U = `Salas/Uniformes ${s < 0 ? 'Sul' : 'Norte'}`;
+    const [u0, u1] = zs(E, IN_Z);
+    wallRun(b, U, 'z', u0, u1, STAIR_X1, STAIR_X1 + 0.6, 0, F2 - 1, [
+      s < 0 ? door(-32, -28) : door(28, 32),
+    ]);
+    // o vão entre a última cela e o mezanino é fechado (não é uma cela faltando)
+    b.span('Estrutura/Paredes', 'Parede Técnica', [ROW, 0, s * CELL_FRONT], [STAIR_X1, F2 - 1, s * (CELL_FRONT + 0.6)], C.wall);
+  }
+
   // --- Estoque de uniformes sob o mezanino (estantes) -----------------------
   for (const s of [-1, 1]) {
     const D = `Salas/Uniformes ${s < 0 ? 'Sul' : 'Norte'}`;
     for (const z of [30, 40, 50]) rack(b, D, 77, s * z, 10, 3.5, 11, 'roupas');
     panelLight(b, D, 77, F2 - 1, s * 35);
     panelLight(b, D, 77, F2 - 1, s * 45, 5, 1.4, false);
+  }
+
+  // --- Salas do 2º andar: mezanino leste ---------------------------------------
+  const y2 = F2;
+  const RH = UPPER_CEIL - F2; // 16
+  const LX = STAIR_X1 + 6; // 72: frente das salas do mezanino (atrás do patamar)
+  // Sala de Controle (vidraça voltada para o vão)
+  const CT = 'Salas/Controle';
+  wallRun(b, CT, 'z', -12, 12, LX, LX + 0.6, y2, RH, [win(-11, -3, 3, 11), door(-2, 2), win(3, 11, 3, 11)]);
+  for (const s of [-1, 1]) b.span(CT, 'Parede Lateral', [LX, y2, s * 12], [IN_X, y2 + RH, s * 12.6], C.wall);
+  b.span(CT, 'Forro', [LX, UPPER_CEIL, -12.6], [IN_X, UPPER_CEIL + 1, 12.6], C.cellWall, { group: 'Teto' });
+  for (const s of [-1, 1]) {
+    const [c0, c1] = s < 0 ? [-10, -3] : [3, 10];
+    b.span(CT, 'Console', [LX + 1.5, y2 + 0.1, c0], [LX + 4.5, y2 + 3, c1], C.facade);
+    b.span(CT, 'Tampo Console', [LX + 1.3, y2 + 3, c0 - 0.2], [LX + 4.7, y2 + 3.3, c1 + 0.2], C.steelLight);
+    for (const m of [c0 + 1, c0 + 4]) {
+      b.span(CT, 'Monitor', [LX + 3.8, y2 + 3.3, m], [LX + 4.2, y2 + 5.3, m + 2], C.steel, { canCollide: false });
+    }
+  }
+  b.span(CT, 'Parede de Monitores', [IN_X - 0.3, y2 + 4, -8], [IN_X, y2 + 10, 8], C.steel, { canCollide: false });
+  for (const z of [-6, 6]) panelLight(b, CT, 80, UPPER_CEIL, z);
+  // Diretoria (norte) e Arquivo (sul)
+  for (const s of [-1, 1]) {
+    const R2 = s > 0 ? 'Salas/Diretoria' : 'Salas/Arquivo';
+    const zs = (a, c) => (s < 0 ? [-c, -a] : [a, c]);
+    const [r0, r1] = zs(12.6, 32);
+    wallRun(b, R2, 'z', r0, r1, LX, LX + 0.6, y2, RH, [s < 0 ? door(-30, -26) : door(26, 30)]);
+    b.span(R2, 'Parede Fundo', [LX, y2, s * 32], [IN_X, y2 + RH, s * 32.6], C.wall);
+    b.span(R2, 'Forro', [LX, UPPER_CEIL, s * 12.6], [IN_X, UPPER_CEIL + 1, s * 32.6], C.cellWall, { group: 'Teto' });
+    panelLight(b, R2, 80, UPPER_CEIL, s * 22);
+    if (s > 0) {
+      b.span(R2, 'Mesa', [79, y2 + 2.5, 19], [86, y2 + 2.8, 23], C.wood);
+      for (const lx of [79.5, 85]) b.span(R2, 'Mesa Pé', [lx, y2 + 0.1, 19.5], [lx + 0.5, y2 + 2.5, 22.5], C.steel);
+      rack(b, R2, 81, 14.5, 10, 2.5, 9, 'livros', y2 + 0.1);
+    } else {
+      for (let k = 0; k < 6; k++) {
+        b.span(R2, 'Arquivo de Aço', [74 + k * 2, y2 + 0.1, -32], [76 + k * 2, y2 + 5, -30.4], C.steelLight);
+      }
+      b.span(R2, 'Mesa', [78, y2 + 2.5, -22], [86, y2 + 2.8, -18], C.wood);
+      for (const lx of [78.5, 85]) b.span(R2, 'Mesa Pé', [lx, y2 + 0.1, -21.5], [lx + 0.5, y2 + 2.5, -18.5], C.steel);
+    }
+  }
+  // Sala de Descanso (norte) e Vestiário (sul), atrás da galeria; incluem o vão depois da última cela
+  for (const s of [-1, 1]) {
+    const R3 = s > 0 ? 'Salas/Descanso' : 'Salas/Vestiário';
+    wallRun(b, R3, 'x', ROW, IN_X, s * UPPER_FRONT, s * (UPPER_FRONT + 0.6), y2, RH, [door(70, 74), win(76, 86, 3, 11)]);
+    b.span(R3, 'Forro', [ROW, UPPER_CEIL, s * UPPER_FRONT], [IN_X, UPPER_CEIL + 1, s * IN_Z], C.cellWall, { group: 'Teto' });
+    panelLight(b, R3, 77, UPPER_CEIL, s * 52);
+    if (s > 0) {
+      b.span(R3, 'Sofá Assento', [74, y2 + 0.1, 54], [84, y2 + 1.6, 57], C.blanket);
+      b.span(R3, 'Sofá Encosto', [74, y2 + 0.1, 57], [84, y2 + 3.5, 58.2], C.blanket);
+      b.span(R3, 'Mesa de Centro', [76, y2 + 0.1, 49], [82, y2 + 1.4, 51.5], C.wood);
+      b.span(R3, 'Geladeira', [85, y2 + 0.1, 46], [87.5, y2 + 6.5, 48.5], C.porcelain);
+    } else {
+      for (let k = 0; k < 9; k++) {
+        b.span(R3, 'Armário', [68 + k * 2, y2 + 0.1, -IN_Z], [70 + k * 2, y2 + 7, -IN_Z + 1.6], C.steelLight);
+      }
+      b.span(R3, 'Banco', [70, y2 + 0.1, -53], [84, y2 + 1.6, -51.6], C.wood);
+    }
+  }
+
+  // --- Salas do 2º andar: cantos oeste (Biblioteca e Sala de Aula) -----------
+  for (const s of [-1, 1]) {
+    const R4 = s > 0 ? 'Salas/Biblioteca' : 'Salas/Sala de Aula';
+    wallRun(b, R4, 'x', -IN_X, -ROW, s * UPPER_FRONT, s * (UPPER_FRONT + 0.6), y2, RH, [win(-86, -79, 3, 11), door(-76, -72)]);
+    b.span(R4, 'Forro', [-IN_X, UPPER_CEIL, s * UPPER_FRONT], [-ROW, UPPER_CEIL + 1, s * IN_Z], C.cellWall, { group: 'Teto' });
+    panelLight(b, R4, -74, UPPER_CEIL, s * 52);
+    if (s > 0) {
+      rack(b, R4, -80, 57.5, 10, 2.5, 9, 'livros', y2);
+      rack(b, R4, -67, 57.5, 10, 2.5, 9, 'livros', y2);
+      b.span(R4, 'Mesa de Leitura', [-80, y2 + 2.5, 49], [-72, y2 + 2.8, 52], C.wood);
+      for (const lx of [-79.5, -73]) b.span(R4, 'Mesa Pé', [lx, y2, 49.5], [lx + 0.5, y2 + 2.5, 51.5], C.steel);
+    } else {
+      for (const dx of [-84, -78, -72]) {
+        for (const dz of [-51, -56]) {
+          b.span(R4, 'Carteira', [dx - 1.2, y2 + 2.4, dz - 0.8], [dx + 1.2, y2 + 2.7, dz + 0.8], C.wood);
+          b.span(R4, 'Carteira Pé', [dx - 0.2, y2, dz - 0.2], [dx + 0.2, y2 + 2.4, dz + 0.2], C.steel);
+        }
+      }
+      b.span(R4, 'Mesa do Professor', [-68, y2 + 2.5, -55], [-63, y2 + 2.8, -50], C.wood);
+      for (const lz of [-54.5, -51]) b.span(R4, 'Mesa Pé', [-67.5, y2, lz], [-63.5, y2 + 2.5, lz + 0.5], C.steel);
+      b.span(R4, 'Quadro', [-IN_X, y2 + 4, -56], [-IN_X + 0.3, y2 + 9, -48], C.steel, { canCollide: false });
+    }
   }
 
   // --- Ala oeste: corredor de serviço + refeitório + almoxarifado + enfermaria --
@@ -651,19 +818,23 @@ export function buildPrison() {
 
   // Refeitório (norte): balcão de servir, quadros de cardápio e mesas redondas
   b.span(RN, 'Piso Refeitório', [WING_X0, 0, 6.6], [WING_X1, 0.1, IN_Z], C.floorAtrium, { studs: true });
-  b.span(RN, 'Balcão de Servir', [-147, 0.1, 16], [-144, 3.5, 50], C.facade);
-  b.span(RN, 'Tampo Balcão', [-147.3, 3.5, 15.7], [-143.7, 3.8, 50.3], C.steelLight);
-  b.span(RN, 'Vidro Protetor', [-145.6, 3.8, 16], [-145.4, 7, 50], C.glass, { transparency: 0.6 });
-  for (const z of [22, 33, 44]) {
-    b.span(RN, 'Quadro Cardápio', [WING_X0, 8, z - 4], [WING_X0 + 0.3, 13, z + 4], C.steel);
-    b.span(RN, 'Lâmpada do Quadro', [WING_X0, 13, z - 3.6], [WING_X0 + 0.5, 13.3, z + 3.6], C.neon, {
+  // balcão de servir na parede do fundo, com quadros de cardápio iluminados
+  b.span(RN, 'Balcão de Servir', [-140, 0.1, 54], [-100, 3.5, 57], C.facade);
+  b.span(RN, 'Tampo Balcão', [-140.3, 3.5, 53.7], [-99.7, 3.8, 57.3], C.steelLight);
+  b.span(RN, 'Vidro Protetor', [-140, 3.8, 54.4], [-100, 7, 54.6], C.glass, { transparency: 0.6 });
+  for (const x of [-132, -120, -108]) {
+    b.span(RN, 'Quadro Cardápio', [x - 4, 8, IN_Z - 0.3], [x + 4, 13, IN_Z], C.steel);
+    b.span(RN, 'Lâmpada do Quadro', [x - 3.6, 13, IN_Z - 0.5], [x + 3.6, 13.3, IN_Z], C.neon, {
       canCollide: false,
       material: 'Neon',
     });
   }
-  for (const tx of [-136, -118, -100]) for (const tz of [22, 44]) diningTable(b, RN, tx, tz);
-  for (const x of [-136, -118, -100]) {
-    for (const z of [14, 33, 52]) panelLight(b, 'Iluminação/Refeitório', x, WC, z, 5, 1.4, z === 33 || x === -118);
+  // 8 mesas em 2 fileiras, com corredor largo entre elas
+  for (const tx of [-142, -127, -112, -97]) for (const tz of [20, 40]) diningTable(b, RN, tx, tz);
+  for (const x of [-142, -127, -112, -97]) {
+    for (const z of [14, 30, 46]) {
+      panelLight(b, 'Iluminação/Refeitório', x, WC, z, 5, 1.4, z === 30 || (z === 14 && x === -127) || (z === 46 && x === -112));
+    }
   }
 
   // Almoxarifado (sudoeste): estantes em fileiras com corredor central e caixas perto da porta
