@@ -880,10 +880,12 @@ export function createWorld(seed = SEED) {
       for (const [a, c] of r.legs) {
         trailLegs.push([a, c]);
         const q = {
-          x0: Math.min(a[0], c[0]) - 2,
-          x1: Math.max(a[0], c[0]) + 2,
-          z0: Math.min(a[1], c[1]) - 2,
-          z1: Math.max(a[1], c[1]) + 2,
+          // meia-largura 2,05: a borda da trilha nunca cai no mesmo plano da borda de um campo
+          // ou construção (coordenadas inteiras ou meias), o que daria z-fighting lateral
+          x0: Math.min(a[0], c[0]) - 2.05,
+          x1: Math.max(a[0], c[0]) + 2.05,
+          z0: Math.min(a[1], c[1]) - 2.05,
+          z1: Math.max(a[1], c[1]) + 2.05,
         };
         trailRects.push(q);
         b.span('Trilhas', 'Trilha', [q.x0, land - 0.03, q.z0], [q.x1, land + 0.2, q.z1], C.path);
