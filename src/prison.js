@@ -1564,10 +1564,14 @@ export function buildPrison() {
     b.span(RC, 'Borda Partida', [x0, y0, z0], [x1, ROOF + 1, z1], C.ceiling, { canCollide: false });
   }
   for (const x of [3, 8.5, 19]) {
-    b.span(RC, 'Vergalhão', [x - 0.08, ROOF + 0.35, hz0], [x + 0.08, ROOF + 0.5, hz0 + 2.4], C.rust, { canCollide: false });
+    b.span(RC, 'Vergalhão', [x - 0.08, ROOF + 0.35, hz0], [x + 0.08, ROOF + 0.5, hz0 + 2.4], C.rust, {
+      canCollide: false,
+    });
   }
   for (const z of [-4, 3.5]) {
-    b.span(RC, 'Vergalhão', [hx1 - 2.6, ROOF + 0.35, z - 0.08], [hx1, ROOF + 0.5, z + 0.08], C.rust, { canCollide: false });
+    b.span(RC, 'Vergalhão', [hx1 - 2.6, ROOF + 0.35, z - 0.08], [hx1, ROOF + 0.5, z + 0.08], C.rust, {
+      canCollide: false,
+    });
   }
   // o que caiu: lajes grandes (com colisão), uma laje tombada, o pedaço da viga e muito entulho
   b.span(SC, 'Laje Caída', [2, 0.1, 4.5], [12, 1.1, 10.5], C.ceiling);
@@ -1607,9 +1611,16 @@ export function buildPrison() {
     });
     for (let y = ROOF - 1.5; y > ROOF - len + 0.5; y -= 1.6 + r() * 1.2) {
       const side = r() < 0.5 ? -1 : 1;
-      b.span(RC, 'Folhagem', [x + side * 0.12, y - 0.5, z - 0.4], [x + side * (0.12 + 0.5 + r() * 0.5), y + 0.3, z + 0.4], C.moss, {
-        canCollide: false,
-      });
+      b.span(
+        RC,
+        'Folhagem',
+        [x + side * 0.12, y - 0.5, z - 0.4],
+        [x + side * (0.12 + 0.5 + r() * 0.5), y + 0.3, z + 0.4],
+        C.moss,
+        {
+          canCollide: false,
+        },
+      );
     }
   };
   // presas na face de baixo da laje, logo além da borda do rombo
@@ -1631,17 +1642,33 @@ export function buildPrison() {
   const ropeX = 8.5;
   const ropeZ = hz0 - 0.15;
   for (let k = 0; k < 3; k++) {
-    b.span(RF, 'Colchão Empilhado', [ropeX - 2 + k * 0.3, 0.1 + k * 0.6, ropeZ - 2.4], [ropeX + 1.8 + k * 0.2, 0.7 + k * 0.6, ropeZ + 1.6], C.sheet, {
-      canCollide: false,
-    });
+    b.span(
+      RF,
+      'Colchão Empilhado',
+      [ropeX - 2 + k * 0.3, 0.1 + k * 0.6, ropeZ - 2.4],
+      [ropeX + 1.8 + k * 0.2, 0.7 + k * 0.6, ropeZ + 1.6],
+      C.sheet,
+      {
+        canCollide: false,
+      },
+    );
   }
   for (let y = 1.9; y < ROOF; y += 1.75) {
     const top = Math.min(y + 1.5, ROOF);
-    b.span(RF, 'Lençol Amarrado', [ropeX - 0.3, y, ropeZ - 0.1], [ropeX + 0.3, top, ropeZ + 0.1], C.sheet, { canCollide: false });
+    b.span(RF, 'Lençol Amarrado', [ropeX - 0.3, y, ropeZ - 0.1], [ropeX + 0.3, top, ropeZ + 0.1], C.sheet, {
+      canCollide: false,
+    });
     if (top < ROOF) {
-      b.span(RF, 'Nó', [ropeX - 0.45, top, ropeZ - 0.18], [ropeX + 0.45, Math.min(top + 0.25, ROOF), ropeZ + 0.18], C.sheet, {
-        canCollide: false,
-      });
+      b.span(
+        RF,
+        'Nó',
+        [ropeX - 0.45, top, ropeZ - 0.18],
+        [ropeX + 0.45, Math.min(top + 0.25, ROOF), ropeZ + 0.18],
+        C.sheet,
+        {
+          canCollide: false,
+        },
+      );
     }
   }
   // túnel cavado na cela 17: buraco no piso, terra amontoada e a colher usada para cavar
@@ -1655,9 +1682,16 @@ export function buildPrison() {
       [0.4, -1.8, 1.8, 0.5],
       [-1.2, -1.2, 1, 0.9],
     ]) {
-      b.span(RT2, 'Terra', [cx + 1.6 + dx - w / 2, 0.1, zc + dz - w / 2], [cx + 1.6 + dx + w / 2, 0.1 + h, zc + dz + w / 2], C.dirt, {
-        canCollide: false,
-      });
+      b.span(
+        RT2,
+        'Terra',
+        [cx + 1.6 + dx - w / 2, 0.1, zc + dz - w / 2],
+        [cx + 1.6 + dx + w / 2, 0.1 + h, zc + dz + w / 2],
+        C.dirt,
+        {
+          canCollide: false,
+        },
+      );
     }
     b.span(RT2, 'Colher', [cx + 4.2, 0.1, zc + 1.4], [cx + 4.9, 0.15, zc + 1.55], C.steelLight, { canCollide: false });
   }
@@ -1700,7 +1734,10 @@ export function buildPrison() {
     [-69, 31.8],
   ]) {
     const fy = z < CELL_FRONT ? 0.1 : 0; // no corredor o piso tem acabamento
-    b.span(RI, 'Caco de Vidro', [x, fy, z], [x + 0.8, fy + 0.05, z + 0.6], C.glass, { canCollide: false, transparency: 0.5 });
+    b.span(RI, 'Caco de Vidro', [x, fy, z], [x + 0.8, fy + 0.05, z + 0.6], C.glass, {
+      canCollide: false,
+      transparency: 0.5,
+    });
   }
 
   // sala de controle invadida: monitores no chão, papéis espalhados e cacos dos dois lados
@@ -1762,18 +1799,31 @@ export function buildPrison() {
   }
   const lr = rng(490);
   for (let k = 0; k < 14; k++) {
-    b.box(RBi, 'Livro', [-70 + lr() * 9, F2 + 0.2, 50 + lr() * 4.5], [1.2, 0.4, 0.9], [C.wood, C.blanket, C.debris][k % 3], {
-      canCollide: false,
-      rotation: [0, Math.round(lr() * 8) * 11.25, 0],
-    });
+    b.box(
+      RBi,
+      'Livro',
+      [-70 + lr() * 9, F2 + 0.2, 50 + lr() * 4.5],
+      [1.2, 0.4, 0.9],
+      [C.wood, C.blanket, C.debris][k % 3],
+      {
+        canCollide: false,
+        rotation: [0, Math.round(lr() * 8) * 11.25, 0],
+      },
+    );
   }
 
   // enfermaria: suporte de soro em pé e outro caído, papéis no chão
   const REn = 'Ruínas/Enfermaria';
   b.span(REn, 'Base do Suporte', [-105.6, 0.1, -52.1], [-104.4, 0.3, -50.9], C.steel);
   b.span(REn, 'Suporte de Soro', [-105.1, 0.3, -51.6], [-104.9, 7, -51.4], C.steel);
-  b.span(REn, 'Bolsa de Soro', [-104.9, 5.4, -51.65], [-104.3, 6.6, -51.35], C.sheet, { canCollide: false, transparency: 0.3 });
-  b.box(REn, 'Suporte de Soro Caído', [-99, 0.2, -47], [6.5, 0.2, 0.2], C.steel, { canCollide: false, rotation: [0, 22.5, 0] });
+  b.span(REn, 'Bolsa de Soro', [-104.9, 5.4, -51.65], [-104.3, 6.6, -51.35], C.sheet, {
+    canCollide: false,
+    transparency: 0.3,
+  });
+  b.box(REn, 'Suporte de Soro Caído', [-99, 0.2, -47], [6.5, 0.2, 0.2], C.steel, {
+    canCollide: false,
+    rotation: [0, 22.5, 0],
+  });
 
   // --- terremoto: rachadura atravessando o piso do átrio e subindo a parede do hall -------
   const RR = 'Ruínas/Rachadura';
