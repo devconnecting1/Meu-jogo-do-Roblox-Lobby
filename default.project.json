@@ -16,16 +16,8 @@
         },
         "ClockTime": 0,
         "Brightness": 0,
-        "Ambient": [
-          0.1,
-          0.105,
-          0.11
-        ],
-        "OutdoorAmbient": [
-          0.05,
-          0.055,
-          0.06
-        ],
+        "Ambient": [0.1, 0.105, 0.11],
+        "OutdoorAmbient": [0.05, 0.055, 0.06],
         "EnvironmentDiffuseScale": 0.1,
         "EnvironmentSpecularScale": 0.15,
         "ExposureCompensation": -0.1,
@@ -38,11 +30,7 @@
           "Brightness": -0.02,
           "Contrast": 0.22,
           "Saturation": -0.3,
-          "TintColor": [
-            0.9,
-            0.97,
-            0.96
-          ]
+          "TintColor": [0.9, 0.97, 0.96]
         }
       },
       "Brilho das Lampadas": {
@@ -58,16 +46,8 @@
         "$properties": {
           "Density": 0.38,
           "Offset": 0.1,
-          "Color": [
-            0.42,
-            0.47,
-            0.47
-          ],
-          "Decay": [
-            0.12,
-            0.14,
-            0.15
-          ],
+          "Color": [0.42, 0.47, 0.47],
+          "Decay": [0.12, 0.14, 0.15],
           "Glare": 0,
           "Haze": 1.6
         }

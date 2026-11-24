@@ -652,7 +652,8 @@ function cell(b, index, side, y0, number) {
   r('Trilho', 2, 8, 10, 10.3, -0.5, 0, C.steel);
   if (wrecked) {
     // porta arrancada do trilho, caída no chão do corredor (deitada: a altura vira comprimento em x)
-    const lay = (name, a, c, ya, yb) => r(name, 2 + (ya - 0.5), 2 + (yb - 0.5), 0.1, 0.4, -1 - (c - 5.6), -1 - (a - 5.6), C.steel, deco);
+    const lay = (name, a, c, ya, yb) =>
+      r(name, 2 + (ya - 0.5), 2 + (yb - 0.5), 0.1, 0.4, -1 - (c - 5.6), -1 - (a - 5.6), C.steel, deco);
     lay('Porta Topo', 5.6, 8, 9.7, 10);
     lay('Porta Base', 5.6, 8, 0.5, 0.8);
     lay('Porta Montante E', 5.6, 5.85, 0.5, 10);

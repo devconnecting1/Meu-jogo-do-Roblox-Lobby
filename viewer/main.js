@@ -293,7 +293,12 @@ const VIEWS = [
   { id: 'breach', title: 'Rombo na parede do bloco e coluna rachada', pos: [-66, 9, -6], target: [-88, 22, 22] },
   { id: 'column', title: 'Coluna rachada no átrio', pos: [-22, 8, -6], target: [-30, 11, -24] },
   { id: 'collapse', title: 'Coluna desabada: toco, topo partido e fuste caído', pos: [-8, 9, 12], target: [12, 8, 24] },
-  { id: 'wrecked-cell', title: 'Cela destruída (porta arrancada, vidro estilhaçado, parede furada)', pos: [-4.5, 6.5, 29], target: [-9.5, 3, 47] },
+  {
+    id: 'wrecked-cell',
+    title: 'Cela destruída (porta arrancada, vidro estilhaçado, parede furada)',
+    pos: [-4.5, 6.5, 29],
+    target: [-9.5, 3, 47],
+  },
   { id: 'locked-cell', title: 'Cela trancada com cadeado', pos: [-31, 5.5, 28.5], target: [-34.5, 5, 35] },
   { id: 'intake', title: 'Triagem (sala lateral da eclusa de entrada)', pos: [-154, 7, 17], target: [-162, 3, 28] },
   { id: 'machines', title: 'Casa de máquinas (fundo do túnel)', pos: [-208, 8, 17], target: [-216, 4, 27] },
