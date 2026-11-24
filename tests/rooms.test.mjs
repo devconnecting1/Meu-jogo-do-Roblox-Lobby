@@ -53,9 +53,18 @@ test('2º andar sem piso abandonado: mezanino e cantos viram salas fechadas', ()
     'Salas/Sala de Aula',
   ]) {
     const room = parts.filter((p) => p.model === m);
-    assert.ok(room.some((p) => p.name === 'Forro'), `${m} sem forro`);
-    assert.ok(room.some((p) => p.name === 'Batente Topo'), `${m} sem porta`);
-    assert.ok(room.some((p) => p.light), `${m} sem luz`);
+    assert.ok(
+      room.some((p) => p.name === 'Forro'),
+      `${m} sem forro`,
+    );
+    assert.ok(
+      room.some((p) => p.name === 'Batente Topo'),
+      `${m} sem porta`,
+    );
+    assert.ok(
+      room.some((p) => p.light),
+      `${m} sem luz`,
+    );
   }
 });
 

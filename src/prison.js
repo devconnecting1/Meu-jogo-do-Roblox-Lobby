@@ -127,7 +127,11 @@ export function clearanceZones() {
       min: [BRIDGE[0] + 0.5, F2 + 0.2, -CELL_FRONT + 0.6],
       max: [BRIDGE[1] - 0.5, F2 + 7, CELL_FRONT - 0.6],
     },
-    { name: 'Corredor do mezanino', min: [STAIR_X1 + 0.5, F2 + 0.2, -CELL_FRONT + 0.6], max: [STAIR_X1 + 5.4, F2 + 7, CELL_FRONT - 0.6] },
+    {
+      name: 'Corredor do mezanino',
+      min: [STAIR_X1 + 0.5, F2 + 0.2, -CELL_FRONT + 0.6],
+      max: [STAIR_X1 + 5.4, F2 + 7, CELL_FRONT - 0.6],
+    },
     { name: 'Passagem da sala de visitas', min: [STAIR_X1 + 0.7, 0.6, -E + 1], max: [STAIR_X1 + 5.5, 8, E - 1] },
     // salas do 2º andar e do térreo sob o mezanino
     { name: 'Porta da sala de controle', min: [STAIR_X1 + 4, F2 + 0.6, -1.6], max: [STAIR_X1 + 8.5, F2 + 9.6, 1.6] },
@@ -235,7 +239,9 @@ function rack(b, model, x, z, len = 10, depth = 3.5, h = 11, items = 'caixas', y
       b.box(model, 'Montante', [x + dx, y0 + h / 2, z + dz], [0.5, h, 0.5], C.steel);
     }
   }
-  [0.6, 4.2, 7.8].forEach((sy, i) => b.box(model, `Prateleira ${i + 1}`, [x, y0 + sy, z], [len, 0.3, depth], C.steelLight));
+  [0.6, 4.2, 7.8].forEach((sy, i) =>
+    b.box(model, `Prateleira ${i + 1}`, [x, y0 + sy, z], [len, 0.3, depth], C.steelLight),
+  );
   if (items === 'livros') {
     [0.75, 4.35, 7.95].forEach((sy) => {
       for (const [dx, col] of [
@@ -286,7 +292,8 @@ function wallRun(b, model, axis, u0, u1, w0, w1, y0, h, openings = []) {
   const P = (u, y, w) => (axis === 'x' ? [u, y, w] : [w, y, u]);
   const wl = Math.min(w0, w1);
   const wh = Math.max(w0, w1);
-  const seg = (name, ua, ub, ya, yb, wa, wb, color, opts) => b.span(model, name, P(ua, ya, wa), P(ub, yb, wb), color, opts);
+  const seg = (name, ua, ub, ya, yb, wa, wb, color, opts) =>
+    b.span(model, name, P(ua, ya, wa), P(ub, yb, wb), color, opts);
   let cur = u0;
   for (const op of [...openings].sort((p, q) => p.a - q.a)) {
     if (op.a > cur) seg('Parede', cur, op.a, y0, y0 + h, wl, wh, C.wall);
@@ -683,17 +690,19 @@ export function buildPrison() {
   for (const s of [-1, 1]) {
     const zs = (a, c) => (s < 0 ? [-c, -a] : [a, c]);
     const [v0, v1] = zs(SH + 0.8, E);
-    wallRun(b, V, 'z', v0, v1, STAIR_X1, STAIR_X1 + 0.6, 0, F2 - 1, [
-      s < 0 ? door(-20, -16) : door(16, 20),
-    ]);
+    wallRun(b, V, 'z', v0, v1, STAIR_X1, STAIR_X1 + 0.6, 0, F2 - 1, [s < 0 ? door(-20, -16) : door(16, 20)]);
     b.span(V, 'Parede Fundo Visitas', [STAIR_X1 + 0.6, 0, s * E], [IN_X, F2 - 1, s * (E + 0.6)], C.wall);
     const U = `Salas/Uniformes ${s < 0 ? 'Sul' : 'Norte'}`;
     const [u0, u1] = zs(E, IN_Z);
-    wallRun(b, U, 'z', u0, u1, STAIR_X1, STAIR_X1 + 0.6, 0, F2 - 1, [
-      s < 0 ? door(-32, -28) : door(28, 32),
-    ]);
+    wallRun(b, U, 'z', u0, u1, STAIR_X1, STAIR_X1 + 0.6, 0, F2 - 1, [s < 0 ? door(-32, -28) : door(28, 32)]);
     // o vão entre a última cela e o mezanino é fechado (não é uma cela faltando)
-    b.span('Estrutura/Paredes', 'Parede Técnica', [ROW, 0, s * CELL_FRONT], [STAIR_X1, F2 - 1, s * (CELL_FRONT + 0.6)], C.wall);
+    b.span(
+      'Estrutura/Paredes',
+      'Parede Técnica',
+      [ROW, 0, s * CELL_FRONT],
+      [STAIR_X1, F2 - 1, s * (CELL_FRONT + 0.6)],
+      C.wall,
+    );
   }
 
   // --- Estoque de uniformes sob o mezanino (estantes) -----------------------
@@ -747,8 +756,13 @@ export function buildPrison() {
   // Sala de Descanso (norte) e Vestiário (sul), atrás da galeria; incluem o vão depois da última cela
   for (const s of [-1, 1]) {
     const R3 = s > 0 ? 'Salas/Descanso' : 'Salas/Vestiário';
-    wallRun(b, R3, 'x', ROW, IN_X, s * UPPER_FRONT, s * (UPPER_FRONT + 0.6), y2, RH, [door(70, 74), win(76, 86, 3, 11)]);
-    b.span(R3, 'Forro', [ROW, UPPER_CEIL, s * UPPER_FRONT], [IN_X, UPPER_CEIL + 1, s * IN_Z], C.cellWall, { group: 'Teto' });
+    wallRun(b, R3, 'x', ROW, IN_X, s * UPPER_FRONT, s * (UPPER_FRONT + 0.6), y2, RH, [
+      door(70, 74),
+      win(76, 86, 3, 11),
+    ]);
+    b.span(R3, 'Forro', [ROW, UPPER_CEIL, s * UPPER_FRONT], [IN_X, UPPER_CEIL + 1, s * IN_Z], C.cellWall, {
+      group: 'Teto',
+    });
     panelLight(b, R3, 77, UPPER_CEIL, s * 52);
     if (s > 0) {
       b.span(R3, 'Sofá Assento', [74, y2 + 0.1, 54], [84, y2 + 1.6, 57], C.blanket);
@@ -766,8 +780,13 @@ export function buildPrison() {
   // --- Salas do 2º andar: cantos oeste (Biblioteca e Sala de Aula) -----------
   for (const s of [-1, 1]) {
     const R4 = s > 0 ? 'Salas/Biblioteca' : 'Salas/Sala de Aula';
-    wallRun(b, R4, 'x', -IN_X, -ROW, s * UPPER_FRONT, s * (UPPER_FRONT + 0.6), y2, RH, [win(-86, -79, 3, 11), door(-76, -72)]);
-    b.span(R4, 'Forro', [-IN_X, UPPER_CEIL, s * UPPER_FRONT], [-ROW, UPPER_CEIL + 1, s * IN_Z], C.cellWall, { group: 'Teto' });
+    wallRun(b, R4, 'x', -IN_X, -ROW, s * UPPER_FRONT, s * (UPPER_FRONT + 0.6), y2, RH, [
+      win(-86, -79, 3, 11),
+      door(-76, -72),
+    ]);
+    b.span(R4, 'Forro', [-IN_X, UPPER_CEIL, s * UPPER_FRONT], [-ROW, UPPER_CEIL + 1, s * IN_Z], C.cellWall, {
+      group: 'Teto',
+    });
     panelLight(b, R4, -74, UPPER_CEIL, s * 52);
     if (s > 0) {
       rack(b, R4, -80, 57.5, 10, 2.5, 9, 'livros', y2);
@@ -833,7 +852,16 @@ export function buildPrison() {
   for (const tx of [-142, -127, -112, -97]) for (const tz of [20, 40]) diningTable(b, RN, tx, tz);
   for (const x of [-142, -127, -112, -97]) {
     for (const z of [14, 30, 46]) {
-      panelLight(b, 'Iluminação/Refeitório', x, WC, z, 5, 1.4, z === 30 || (z === 14 && x === -127) || (z === 46 && x === -112));
+      panelLight(
+        b,
+        'Iluminação/Refeitório',
+        x,
+        WC,
+        z,
+        5,
+        1.4,
+        z === 30 || (z === 14 && x === -127) || (z === 46 && x === -112),
+      );
     }
   }
 
