@@ -507,7 +507,7 @@ export function createWorld(seed = SEED) {
    * dentro de um bloco da camada de baixo (terraços irregulares, como os rochedos clássicos).
    * Devolve os topos de grama livres (para plantar pinheiros) e a altura do pico.
    */
-  function mountain(b, model, cx, cz, R, H, rand, snowy) {
+  function mountain(b, model, cx, cz, R, H, rand, snowy, rocky = false) {
     const nL = Math.max(2, Math.round(H / 7));
     let y = DIM.land - 0.1;
     let prev = null;
@@ -536,7 +536,14 @@ export function createWorld(seed = SEED) {
       if (!boxes.length) break;
       const top = y + h;
       const lastLayers = k >= nL - 2;
-      const capColor = snowy && lastLayers ? C.snow : k < Math.ceil(nL * 0.6) ? C.grass : k % 2 ? C.rockDark : C.rock;
+      const capColor =
+        snowy && lastLayers
+          ? C.snow
+          : !rocky && k < Math.ceil(nL * 0.6)
+            ? C.grass
+            : k % 2
+              ? C.rockDark
+              : C.rock;
       for (const r of boxes) {
         b.span(model, 'Rocha', [r.x0, y, r.z0], [r.x1, top - 0.8, r.z1], k % 2 ? C.rockDark : C.rock);
         b.span(model, snowy && lastLayers ? 'Neve' : 'Topo', [r.x0, top - 0.8, r.z0], [r.x1, top, r.z1], capColor);
@@ -912,55 +919,126 @@ export function createWorld(seed = SEED) {
       blocked.push(r);
       return r;
     };
-    for (let attempt = 0; attempt < 9000 && landmarks.villages.length < 3; attempt++) {
+    // Vila como cidade de verdade: rua de pedra atravessando a vila, praça com o poço no meio,
+    // casas dos dois lados viradas para a rua (cada uma com calçada até a porta), quintal
+    // cercado com jardim atrás, e celeiro, feno e moinho na saída da vila. Uma ponta da rua
+    // liga na malha de estradas por trilha.
+    const VL = 50; // meia-extensão da rua
+    for (let attempt = 0; attempt < 12000 && landmarks.villages.length < 4; attempt++) {
       const x = Math.round((rand() * 2 - 1) * 430);
       const z = Math.round((rand() * 2 - 1) * 430);
-      const area = { x0: x - 36, x1: x + 36, z0: z - 36, z1: z + 36 };
+      const alongX = rand() < 0.5;
+      // (t, w) = (ao longo da rua, atravessado); world() converte para (x, z)
+      const world = (t, w) => (alongX ? [x + t, z + w] : [x + w, z + t]);
+      const rectTW = (t0, t1, w0, w1) => {
+        const [ax, az] = world(t0, w0);
+        const [cx, cz] = world(t1, w1);
+        return { x0: Math.min(ax, cx), x1: Math.max(ax, cx), z0: Math.min(az, cz), z1: Math.max(az, cz) };
+      };
+      const area = rectTW(-VL - 30, VL + 30, -36, 80);
       const ok =
         Math.hypot(x, z) > 170 &&
         allGrass(area.x0, area.x1, area.z0, area.z1, 4) &&
         clearOfPlots(area, 12) &&
         awayFromRoads(area, 0) &&
-        distToRoads(x, z) < 120 &&
+        distToRoads(x, z) < 160 &&
         free(area, 8) &&
         landmarks.villages.every(([vx, vz]) => Math.hypot(vx - x, vz - z) > 220);
       if (!ok) continue;
+      // a ponta da rua mais perto da estrada recebe a trilha; o resto da vila vem depois
+      const ends = [world(VL, 0), world(-VL, 0)].sort((p, q) => distToRoads(...p) - distToRoads(...q));
+      if (!canPlace('poco', x, z, 's', true) || !ends.some(([ex, ez]) => addTrail(ex, ez, area))) continue;
       const V = `Vila/Vila ${landmarks.villages.length + 1}`;
-      // primeiro a trilha até a estrada; as casas ficam em volta, sem bloquear a trilha
-      if (!canPlace('poco', x, z, 's', true) || !addTrail(x, z, area)) continue;
+      const street = rectTW(-VL, VL, -3, 3);
+      b.span(`${V}/Rua`, 'Rua da Vila', [street.x0, land - 0.04, street.z0], [street.x1, land + 0.24, street.z1], C.plazaDark);
+      const square = rectTW(-9, 9, -9, 9);
+      b.span(`${V}/Praça`, 'Praça da Vila', [square.x0, land - 0.05, square.z0], [square.x1, land + 0.27, square.z1], C.plaza);
+      trailLegs.push([world(-VL, 0), world(VL, 0)]); // outras trilhas podem ligar na rua
+      trailRects.push(street, square);
       placeBuilding(`${V}/Poço`, 'poco', x, z, 's', true);
       let count = 1;
-      const slots = [
-        [24, 0, 'casa'],
-        [-24, 0, 'casa'],
-        [0, 24, 'casa'],
-        [0, -24, 'casa'],
-        [22, 22, 'casa'],
-        [-22, -22, 'celeiro'],
-        [-22, 22, 'feno'],
-        [22, -24, 'moinho'],
-      ];
-      slots.forEach(([dx, dz, kind], k) => {
-        if (
-          placeBuilding(
-            `${V}/${kind === 'casa' ? 'Casa' : kind[0].toUpperCase() + kind.slice(1)} ${k + 1}`,
-            kind,
-            x + dx,
-            z + dz,
-            facing(dx, dz),
-          )
-        )
+      // casas dos dois lados da rua, porta virada para ela
+      const doorFace = (s) => (alongX ? (s > 0 ? 'n' : 's') : s > 0 ? 'w' : 'e');
+      let n = 0;
+      for (const t of [-38, -16, 16, 38]) {
+        for (const s of [-1, 1]) {
+          n++;
+          const kind = 'casa';
+          const fp = footprint(kind, doorFace(s));
+          const depth = alongX ? fp.d : fp.w; // medida atravessada à rua
+          const width = alongX ? fp.w : fp.d;
+          const w = s * (5 + depth / 2);
+          const [hx, hz] = world(t, w);
+          if (!placeBuilding(`${V}/Casa ${n}`, kind, hx, hz, doorFace(s))) continue;
           count++;
-      });
+          // calçada da porta até a rua
+          const walk = rectTW(t - 1, t + 1, s > 0 ? 3 : -5, s > 0 ? 5 : -3);
+          b.span(`${V}/Casa ${n}`, 'Calçada', [walk.x0, land - 0.02, walk.z0], [walk.x1, land + 0.22, walk.z1], C.path);
+          // quintal cercado atrás da casa, com jardim
+          const back = s * (5 + depth);
+          const fence = s * (5 + depth + 5);
+          const half = width / 2;
+          const Q = `${V}/Quintal ${n}`;
+          for (const tt of [t - half, t, t + half]) {
+            const post = rectTW(tt - 0.2, tt + 0.2, fence - 0.2, fence + 0.2);
+            b.span(Q, 'Estaca da Cerca', [post.x0, land - 0.1, post.z0], [post.x1, land + 2, post.z1], C.woodDark, deco);
+          }
+          const rail = rectTW(t - half, t + half, fence - 0.1, fence + 0.1);
+          b.span(Q, 'Cerca', [rail.x0, land + 1.2, rail.z0], [rail.x1, land + 1.5, rail.z1], C.wood, deco);
+          for (const tt of [t - half + 0.1, t + half - 0.1]) {
+            const side = rectTW(tt - 0.1, tt + 0.1, Math.min(back, fence), Math.max(back, fence));
+            b.span(Q, 'Cerca', [side.x0, land + 1.2, side.z0], [side.x1, land + 1.5, side.z1], C.wood, deco);
+          }
+          const yard = rectTW(t - half, t + half, Math.min(back, fence), Math.max(back, fence));
+          const [gx, gz] = world(t - half / 2, (back + fence) / 2);
+          flowerPatch(b, `${Q}/Jardim`, gx, land, gz, rand);
+          if (rand() < 0.6) {
+            const [tx, tz] = world(t + half / 2, (back + fence) / 2);
+            plantTree(b, 'Vegetação/Árvores do Quintal', rand() < 0.5 ? 'cerejeira' : 'carvalho', tx, land, tz, rand);
+          }
+          blocked.push(yard);
+        }
+      }
+      // rua lateral saindo da praça até um largo, com casas em volta (como os pátios de uma vila real)
+      const side = rectTW(-3, 3, 9, 52);
+      b.span(`${V}/Rua`, 'Rua da Vila', [side.x0, land - 0.04, side.z0], [side.x1, land + 0.24, side.z1], C.plazaDark);
+      const court = rectTW(-8, 8, 46, 62);
+      b.span(`${V}/Largo`, 'Largo da Vila', [court.x0, land - 0.05, court.z0], [court.x1, land + 0.27, court.z1], C.plaza);
+      trailLegs.push([world(0, 9), world(0, 54)]);
+      trailRects.push(side, court);
+      const towardT = (dir) => (alongX ? (dir > 0 ? 'e' : 'w') : dir > 0 ? 's' : 'n');
+      const towardMinusW = alongX ? 'n' : 'w';
+      for (const [t, w, face] of [
+        [-16, 54, towardT(1)],
+        [16, 54, towardT(-1)],
+        [0, 70, towardMinusW],
+      ]) {
+        n++;
+        const [hx, hz] = world(t, w);
+        if (placeBuilding(`${V}/Casa ${n}`, 'casa', hx, hz, face)) count++;
+      }
+      // saída da vila: celeiro, feno e moinho fora do eixo da rua (a trilha passa livre)
+      for (const [t, w, kind, name] of [
+        [VL + 16, 18, 'celeiro', 'Celeiro'],
+        [VL + 14, -16, 'feno', 'Feno'],
+        [-VL - 14, 18, 'moinho', 'Moinho'],
+        [-VL - 12, -16, 'feno', 'Feno 2'],
+      ]) {
+        const [bx, bz] = world(t, w);
+        const face = alongX ? (w > 0 ? 'n' : 's') : w > 0 ? 'w' : 'e';
+        if (placeBuilding(`${V}/${name}`, kind, bx, bz, face)) count++;
+      }
       landmarks.villages.push([x, z, count]);
     }
 
     const mountainSpots = [];
     landmarks.mountains = [];
     landmarks.hills = [];
+    landmarks.outcrops = [];
     const relief = [
       { list: landmarks.mountains, want: 9, R: [36, 58], H: [40, 78], name: 'Montanha' },
-      { list: landmarks.hills, want: 10, R: [18, 30], H: [12, 22], name: 'Colina' },
+      { list: landmarks.hills, want: 16, R: [18, 30], H: [12, 22], name: 'Colina' },
+      { list: landmarks.outcrops, want: 22, R: [7, 13], H: [5, 9], name: 'Afloramento' },
     ];
     for (const kind of relief) {
       for (let attempt = 0; attempt < 6000 && kind.list.length < kind.want; attempt++) {
@@ -978,7 +1056,7 @@ export function createWorld(seed = SEED) {
           free(r, 14);
         if (!ok) continue;
         const M = `Relevo/${kind.name} ${String(kind.list.length + 1).padStart(2, '0')}`;
-        const m = mountain(b, M, x, z, R, H, rand, kind.name === 'Montanha' && H >= 55);
+        const m = mountain(b, M, x, z, R, H, rand, kind.name === 'Montanha' && H >= 55, kind.name === 'Afloramento');
         blocked.push(r);
         mountainSpots.push(...m.spots);
         kind.list.push([x, z, m.peak, R]);
@@ -1146,13 +1224,20 @@ export function createWorld(seed = SEED) {
       for (let gz = -540; gz <= 540; gz += step) {
         const x = Math.round((gx + (rand() - 0.5) * step * 0.8) * 10) / 10;
         const z = Math.round((gz + (rand() - 0.5) * step * 0.8) * 10) / 10;
-        const forest = nz(x, z, 120, 7) > 0.6;
-        const want = forest ? rand() < 0.75 : rand() < 0.05;
+        // floresta densa nas manchas de ruído e num anel em volta de cada vila; campo aberto
+        // também tem árvores (bosquetes), para não sobrar grama vazia
+        const ring = landmarks.villages.some(([vx, vz]) => {
+          const d = Math.hypot(x - vx, z - vz);
+          return d > 95 && d < 165;
+        });
+        const forest = nz(x, z, 120, 7) > 0.6 || ring;
+        const grove = nz(x, z, 45, 11) > 0.62;
+        const want = forest ? rand() < 0.85 : grove ? rand() < 0.5 : rand() < 0.12;
         if (!want || !groundFree(x, z, 3)) continue;
         spots.push([x, z, forest ? forestKind(x, z) : meadowKind()]);
       }
     }
-    const MAX_TREES = 480;
+    const MAX_TREES = 900;
     const chosen =
       spots.length > MAX_TREES ? spots.filter((_, k) => (k * MAX_TREES) % spots.length < MAX_TREES) : spots;
     for (const [x, z, kind] of chosen) {
@@ -1192,12 +1277,12 @@ export function createWorld(seed = SEED) {
     // arbustos e canteiros de flores silvestres pelos campos
     let bushes = 0;
     let flowers = 0;
-    for (let attempt = 0; attempt < 8000 && (bushes < 110 || flowers < 50); attempt++) {
+    for (let attempt = 0; attempt < 16000 && (bushes < 260 || flowers < 110); attempt++) {
       const x = Math.round((rand() * 2 - 1) * 540 * 10) / 10;
       const z = Math.round((rand() * 2 - 1) * 540 * 10) / 10;
       if (!groundFree(x, z, 3)) continue;
       blocked.push({ x0: x - 2, x1: x + 2, z0: z - 2, z1: z + 2 });
-      if (bushes < 110 && (flowers >= 50 || rand() < 0.65)) {
+      if (bushes < 260 && (flowers >= 110 || rand() < 0.65)) {
         bush(b, 'Vegetação/Arbustos', x, land, z, rand);
         bushes++;
       } else {
@@ -1207,13 +1292,43 @@ export function createWorld(seed = SEED) {
     }
     // pedras soltas pelo campo
     let rockN = 0;
-    for (let attempt = 0; attempt < 5000 && rockN < 60; attempt++) {
+    for (let attempt = 0; attempt < 8000 && rockN < 110; attempt++) {
       const x = (rand() * 2 - 1) * 540;
       const z = (rand() * 2 - 1) * 540;
       if (!groundFree(x, z, 6) || distToRoads(x, z) <= 10) continue;
       rockN++;
       rocks(b, 'Relevo/Pedras', x, land, z, rand, 2 + Math.floor(rand() * 3), 1, C.rock);
     }
+
+    // mato e pedrinhas pelo chão (1 a 2 peças cada, sem colisão): o campo nunca fica liso
+    let tufts = 0;
+    let pebbles = 0;
+    for (let attempt = 0; attempt < 30000 && (tufts < 900 || pebbles < 260); attempt++) {
+      const x = Math.round((rand() * 2 - 1) * 560 * 10) / 10;
+      const z = Math.round((rand() * 2 - 1) * 560 * 10) / 10;
+      if (terrainAt(x, z) !== T.GRASS || !allGrass(x - 1.5, x + 1.5, z - 1.5, z + 1.5, 1.5)) continue;
+      if (Math.hypot(x, z) < PLAZA_REACH + 8 || !awayFromPlots(x, z, 3)) continue;
+      if (distToRoads(x, z) < 5 || distToTrails(x, z) < 3 || !free({ x0: x, x1: x, z0: z, z1: z }, 1.5)) continue;
+      const rot = Math.round(rand() * 90);
+      if (tufts < 900 && (pebbles >= 260 || rand() < 0.78)) {
+        const h = 1 + rand() * 1.4;
+        const col = rand() < 0.5 ? C.grassDark : C.leafDark;
+        b.box('Vegetação/Mato', 'Mato', [x, land - 0.05 + h / 2, z], [0.5, h, 1.6], col, { ...deco, rotation: [0, rot, 0] });
+        b.box('Vegetação/Mato', 'Mato', [x, land - 0.05 + h * 0.4, z], [1.6, h * 0.8, 0.5], C.bush, {
+          ...deco,
+          rotation: [0, rot + 30, 0],
+        });
+        tufts++;
+      } else {
+        const sz = 0.8 + rand() * 1.2;
+        b.box('Relevo/Pedrinhas', 'Pedrinha', [x, land + sz * 0.25, z], [sz, sz * 0.7, sz * 0.9], rand() < 0.5 ? C.rock : C.stoneOre, {
+          ...deco,
+          rotation: [Math.round((rand() - 0.5) * 20), rot, Math.round((rand() - 0.5) * 20)],
+        });
+        pebbles++;
+      }
+    }
+    landmarks.groundCover = tufts + pebbles;
 
     return { parts: b.parts, landmarks };
   }

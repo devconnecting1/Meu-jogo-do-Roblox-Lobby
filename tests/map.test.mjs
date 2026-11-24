@@ -147,6 +147,18 @@ test('vida no reino: vilas com casas, campos, jazidas, torres de vigia, acampame
   assert.ok(landmarks.villages.length >= 2, `só ${landmarks.villages.length} vilas`);
   for (const [, , n] of landmarks.villages) assert.ok(n >= 4, `vila com só ${n} construções`);
   assert.ok(count((p) => p.model.startsWith('Vila/') && p.model.includes('/Casa')) > 0, 'vilas sem casas');
+  // vila como cidade: rua de pedra, praça com poço, largo e casas com calçada até a rua
+  landmarks.villages.forEach((_, i) => {
+    const V = `Vila/Vila ${i + 1}`;
+    const inV = (p) => p.model.startsWith(`${V}/`);
+    for (const n of ['Rua da Vila', 'Praça da Vila', 'Largo da Vila']) {
+      assert.ok(parts.some((p) => inV(p) && p.name === n), `${V} sem "${n}"`);
+    }
+    assert.ok(count((p) => inV(p) && p.name === 'Calçada') >= 3, `${V}: casas sem calçada até a rua`);
+    assert.ok(count((p) => inV(p) && p.name === 'Cerca') >= 3, `${V}: quintais sem cerca`);
+  });
+  assert.ok(landmarks.groundCover >= 900, `pouco mato e pedrinhas no chão (${landmarks.groundCover})`);
+  assert.ok(landmarks.outcrops.length >= 8, `só ${landmarks.outcrops.length} afloramentos de rocha`);
   assert.ok(landmarks.farms.length >= 4, `só ${landmarks.farms.length} campos de trigo`);
   const mines = (k) => landmarks.mines.filter((m) => m[2] === k).length;
   assert.ok(mines('ouro') >= 2 && mines('pedra') >= 2, `jazidas: ${mines('ouro')} de ouro, ${mines('pedra')} de pedra`);

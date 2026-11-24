@@ -173,6 +173,10 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Renderizar vistas
         run: node tools/screenshots.mjs out/previews
+      - name: Fotografar o catálogo de peças
+        # se o catálogo falhar, as capturas do mapa ainda são publicadas (o teste do catálogo roda no job test)
+        continue-on-error: true
+        run: node tools/catalog-shots.mjs out/previews
       - name: Gerar manual de montagem
         run: node tools/manual.mjs out/previews
       - uses: actions/upload-artifact@v4

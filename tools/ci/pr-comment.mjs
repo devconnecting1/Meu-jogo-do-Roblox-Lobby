@@ -61,8 +61,26 @@ function previewsBody() {
     body += `### Montagem passo a passo\n\n| ${build.map((v) => v.title.replace('Montagem — ', '')).join(' | ')} |\n|${build.map(() => '---').join('|')}|\n`;
     body += `| ${build.map((v) => `![${v.title}](${base}/${v.id}.png)`).join(' | ')} |\n\n`;
   }
+  body += catalogSection(file.replace(/manifest\.json$/, 'catalogo.json'), base, blob);
   body += `[Execução no Actions](${runUrl})\n`;
   return body;
+}
+
+/** Tabela compacta do catálogo de peças (tools/catalog-shots.mjs), se ele foi gerado. */
+function catalogSection(catalogFile, base, blob) {
+  if (!existsSync(catalogFile)) return '';
+  const { entries, overview } = JSON.parse(readFileSync(catalogFile, 'utf8'));
+  const page = `https://raw.githack.com/${repo}/${env.HEAD_REF || 'main'}/viewer/catalog.html`;
+  const img = (name, alt) => `<img src="${base}/${name}" width="220" alt="${alt}">`;
+  let s = `### Catálogo de peças\n\n${entries.length} peças · [tabela completa](${blob}/CATALOG.md) · [catálogo 3D](${page})\n\n`;
+  if (overview) s += `<img src="${base}/${overview.normal}" width="660" alt="Todas as peças">\n\n`;
+  s += '| Peça | Partes | Com colisão | Normal | Colisão |\n|---|---:|---:|---|---|\n';
+  for (const e of entries) {
+    const normal = e.images?.normal ?? `catalogo-${e.id}.png`;
+    const colisao = e.images?.colisao ?? `catalogo-${e.id}-colisao.png`;
+    s += `| **${e.title}**<br><sub>${e.group}</sub> | ${e.parts} | ${e.collidable} | ${img(normal, e.title)} | ${img(colisao, `${e.title} (colisão)`)} |\n`;
+  }
+  return s + '\n';
 }
 
 function lintBody() {

@@ -17,8 +17,8 @@ export const PHASES = [
   { id: 'lotes', title: 'Lotes dos castelos (30)', match: (p) => p.model.startsWith('Lotes') },
   {
     id: 'relevo',
-    title: 'Montanhas e colinas',
-    match: (p) => p.model.startsWith('Relevo/Montanha') || p.model.startsWith('Relevo/Colina'),
+    title: 'Montanhas, colinas e afloramentos de rocha',
+    match: (p) => /^Relevo\/(Montanha|Colina|Afloramento)/.test(p.model),
   },
   { id: 'trilhas', title: 'Trilhas de terra', match: (p) => p.model === 'Trilhas' },
   { id: 'recursos', title: 'Recursos: trigo, ouro e pedra', match: (p) => p.model.startsWith('Recursos') },

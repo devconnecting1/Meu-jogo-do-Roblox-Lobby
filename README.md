@@ -22,6 +22,8 @@ Mapa base de um jogo de estratégia no estilo **Lords Mobile**, feito só com **
 - **Costa:** cais de madeira com barco amarrado.
 - **Dia claro** (Lighting Future), sombra suave e neblina leve no horizonte.
 - **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado.
+- **Catálogo de peças:** cada peça reaproveitável (estátua, árvores, arbusto, flores e construções) sozinha no seu chão de studs, fotografada pelo CI normal e com a colisão destacada em vermelho ([`viewer/catalog.html`](viewer/catalog.html), tabela em `CATALOG.md` no branch `ci-previews`).
+- **Fuzz de 100 mil mapas:** um workflow separado (*Actions → Fuzz de mapas → Run workflow*, e toda segunda-feira) testa as regras de layout em 100 mil sementes e a construção completa numa amostra; todo PR testa 26 sementes. Veja [docs/FUZZ.md](docs/FUZZ.md).
 
 A prisão do projeto anterior está guardada no branch [`arquivo/prisao`](https://github.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/tree/arquivo/prisao).
 
