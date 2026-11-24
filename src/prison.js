@@ -595,7 +595,8 @@ function puddle(b, model, x, z, w, d, floorY, seed) {
     const dd = d * (0.6 + r() * 0.4);
     const px = x + (r() - 0.5) * (w - ww);
     const pz = z + (r() - 0.5) * (d - dd);
-    b.span(model, 'Poça', [px - ww / 2, floorY, pz - dd / 2], [px + ww / 2, floorY + 0.06, pz + dd / 2], C.puddle, {
+    // a base fica 0,02 dentro do piso: assim não divide plano com entulho, musgo ou lajes caídas
+    b.span(model, 'Poça', [px - ww / 2, floorY - 0.02, pz - dd / 2], [px + ww / 2, floorY + 0.04, pz + dd / 2], C.puddle, {
       canCollide: false,
     });
   }
@@ -643,7 +644,7 @@ function cell(b, index, side, y0, number) {
     r('Vidro Janela', -6, -4.4, 3, 5.6, 0.2, 0.4, C.glass, { transparency: 0.7 });
     r('Vidro Janela', -0.6, 1, 7.4, 11, 0.2, 0.4, C.glass, { transparency: 0.7 });
     for (const [a, c, d0] of [
-      [-5.6, -4.6, 1.2],
+      [-6.6, -5.6, 1.2],
       [-3.2, -2.1, 2.4],
       [-1.4, -0.6, 1.6],
       [3.6, 4.4, 4.4],
@@ -1554,22 +1555,23 @@ export function buildPrison() {
   const SC = 'Estrutura/Telhado Caído'; // pedaços grandes, com colisão e fora das passagens
   // bordas irregulares do rombo (ainda presas na laje) e vergalhões expostos
   for (const [x0, x1, y0, z0, z1] of [
-    [hx0, hx0 + 2.5, ROOF, -3, 2],
-    [hx0, hx0 + 1.5, ROOF, hz0, hz0 + 4],
-    [6, 10, ROOF, hz0, hz0 + 1.8],
-    [15, 18, ROOF - 0.4, hz1 - 2.2, hz1],
-    [hx1 - 3, hx1, ROOF - 0.6, 4, hz1],
-    [hx1 - 1.6, hx1, ROOF, hz0, hz0 + 3],
+    // pedaços de laje que ficaram pendurados sob a borda (entram 1 stud sob a laje que os segura)
+    [hx0 - 1, hx0 + 2.5, ROOF - 0.8, -3, 2],
+    [hx0 - 1, hx0 + 1.5, ROOF - 0.6, hz0 - 1, hz0 + 4],
+    [6, 10, ROOF - 0.7, hz0 - 1, hz0 + 1.8],
+    [15, 18, ROOF - 1.1, hz1 - 2.2, hz1 + 1],
+    [hx1 - 3, hx1 + 1, ROOF - 1.3, 4, hz1 + 1],
+    [hx1 - 1.6, hx1 + 1, ROOF - 0.7, hz0 - 1, hz0 + 3],
   ]) {
-    b.span(RC, 'Borda Partida', [x0, y0, z0], [x1, ROOF + 1, z1], C.ceiling, { canCollide: false });
+    b.span(RC, 'Borda Partida', [x0, y0, z0], [x1, ROOF, z1], C.ceiling, { canCollide: false });
   }
   for (const x of [3, 8.5, 19]) {
-    b.span(RC, 'Vergalhão', [x - 0.08, ROOF + 0.35, hz0], [x + 0.08, ROOF + 0.5, hz0 + 2.4], C.rust, {
+    b.span(RC, 'Vergalhão', [x - 0.08, ROOF - 0.15, hz0 - 1], [x + 0.08, ROOF, hz0 + 2.4], C.rust, {
       canCollide: false,
     });
   }
   for (const z of [-4, 3.5]) {
-    b.span(RC, 'Vergalhão', [hx1 - 2.6, ROOF + 0.35, z - 0.08], [hx1, ROOF + 0.5, z + 0.08], C.rust, {
+    b.span(RC, 'Vergalhão', [hx1 - 2.6, ROOF - 0.15, z - 0.08], [hx1 + 1, ROOF, z + 0.08], C.rust, {
       canCollide: false,
     });
   }
@@ -1600,7 +1602,7 @@ export function buildPrison() {
     const x = hx0 + 2 + mr() * (hx1 - hx0 - 4);
     const z = hz0 + 1 + mr() * (hz1 - hz0 - 2);
     const w = 1.5 + mr() * 3;
-    b.span(RC, 'Musgo', [x - w / 2, 0.1, z - w / 3], [x + w / 2, 0.16, z + w / 3], k % 2 ? C.moss : C.mossDark, {
+    b.span(RC, 'Musgo', [x - w / 2, 0.09, z - w / 3], [x + w / 2, 0.13, z + w / 3], k % 2 ? C.moss : C.mossDark, {
       canCollide: false,
     });
   }
