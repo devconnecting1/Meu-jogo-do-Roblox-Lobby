@@ -138,7 +138,7 @@
     }
   ],
   "stats": {
-    "total": 8633,
+    "total": 15326,
     "lights": 0,
     "groups": {
       "Mar": 1,
@@ -148,18 +148,18 @@
       "Pontes": 29,
       "Lotes": 330,
       "Trilhas": 28,
-      "Vila": 715,
-      "Relevo": 781,
+      "Vila": 761,
+      "Vegetação": 11206,
+      "Relevo": 1663,
       "Recursos": 152,
       "Costa": 45,
       "Torres de Vigia": 170,
-      "Acampamentos": 72,
-      "Vegetação": 5441
+      "Acampamentos": 72
     }
   },
   "manual": {
-    "parts": 8633,
-    "steps": 1482,
-    "connections": 22404
+    "parts": 15326,
+    "steps": 2379,
+    "connections": 37686
   }
 }
