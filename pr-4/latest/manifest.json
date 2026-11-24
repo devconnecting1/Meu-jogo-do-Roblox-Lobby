@@ -77,6 +77,38 @@
       "title": "Coluna rachada no átrio"
     },
     {
+      "id": "roof",
+      "title": "Telhado desabado: céu de noite, trepadeiras e a corda de lençóis da fuga"
+    },
+    {
+      "id": "roof-floor",
+      "title": "Destroços do telhado no átrio (lajes, viga, poça e musgo)"
+    },
+    {
+      "id": "barricade",
+      "title": "Barricada da rebelião no hall"
+    },
+    {
+      "id": "fire",
+      "title": "Sala dos guardas incendiada"
+    },
+    {
+      "id": "crack",
+      "title": "Rachadura do terremoto no piso do átrio"
+    },
+    {
+      "id": "collapse",
+      "title": "Coluna desabada: toco, topo partido e fuste caído"
+    },
+    {
+      "id": "wrecked-cell",
+      "title": "Cela destruída (porta arrancada, vidro estilhaçado, parede furada)"
+    },
+    {
+      "id": "locked-cell",
+      "title": "Cela trancada com cadeado"
+    },
+    {
       "id": "intake",
       "title": "Triagem (sala lateral da eclusa de entrada)"
     },
@@ -126,29 +158,29 @@
     }
   ],
   "stats": {
-    "total": 3288,
-    "lights": 81,
+    "total": 3714,
+    "lights": 77,
     "groups": {
       "Piso": 2,
       "Paredes": 60,
-      "Teto": 23,
-      "Ruínas": 100,
-      "Estrutura": 48,
+      "Teto": 29,
+      "Ruínas": 469,
+      "Estrutura": 65,
       "Pisos": 49,
-      "Celas": 1650,
+      "Celas": 1692,
       "Galerias": 46,
-      "Iluminação": 211,
+      "Iluminação": 178,
       "Escada": 40,
       "Hall": 6,
-      "Salas": 385,
-      "Sala de Visitas": 55,
+      "Salas": 390,
+      "Sala de Visitas": 57,
       "Ala Oeste": 401,
-      "Túnel": 212
+      "Túnel": 230
     }
   },
   "manual": {
-    "parts": 3288,
-    "steps": 636,
-    "connections": 10012
+    "parts": 3714,
+    "steps": 699,
+    "connections": 11070
   }
 }
