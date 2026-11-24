@@ -99,6 +99,24 @@ Quando um teste falhar, a mensagem lista a peça (`Modelo/Nome @ [x, y, z]`). Co
 
 ## 6. Problemas conhecidos e como evitar
 
+### 6.1 Lições aprendidas no CI (não repetir)
+
+Cada item abaixo já derrubou o CI uma vez. Antes de dar push, confira a peça nova contra esta lista.
+
+| Falha | Causa real | Como evitar |
+|---|---|---|
+| "só os campos conhecidos de Part" / UI | o nome continha `gui` (ex.: "Guia do Piso") e o teste procura `npc\|gui\|decal\|texture\|script` em `modelo/nome` | não use nomes com essas sílabas: "Trilho do Piso", não "Guia" |
+| "tamanho 0.02" | peça com alguma medida < 0,04 | espessura mínima 0,04 (adesivos, marcas e manchas usam 0,04 a 0,06) |
+| z-fighting em Y = topo do piso | duas peças deitadas (poça, musgo, entulho, laje caída) com a **base** no mesmo plano e cores diferentes, cruzando a junta de duas placas do piso | cada tipo de peça deitada tem sua altura de base: poça afunda 0,02 no piso, musgo começa em 0,09, entulho em 0,1 |
+| z-fighting em face lateral | caco, barra ou vergalhão encostado com a face no mesmo plano de outra peça de outra cor | afaste 0,1 ou mude a posição; peça girada fica fora da checagem |
+| "Fora dos limites" (INTERIOR) | peça interna passando do teto (y > 44) ou de uma parede | pedaço pendurado no teto fica **abaixo** de y = 44 e entra 1 stud sob a laje que o segura |
+| "não se apoia em nada montado antes" | peça presa no teto ou na viga, mas a fase do manual dela vem antes do teto (ex.: topo da coluna partida em `Estrutura/Colunas`) | o que pende do teto vai em `Estrutura/Teto`; o que fica no chão da galeria não pode estar na fase "celas" (a galeria é montada depois) |
+| "Bloqueia zona" | decoração com colisão invadindo uma zona livre (cadeado de 0,25 no corredor) | enfeite perto de passagem usa `canCollide: false`; confira `clearanceZones()` |
+| "Neon sem luz é lâmpada falsa" | tubo ou painel brilhando sem emitir luz | lâmpada apagada é `Plastic` `C.lampDead`; `hangingLight` tem um tubo só |
+| átrio com móveis | peça com colisão no átrio fora dos modelos estruturais | destroço grande com colisão fica em `Estrutura/Telhado Caído`, fora das zonas |
+| Prettier | linhas longas escritas à mão | nunca formate à mão: incorpore `autoformat/pr-N` |
+| capturas canceladas | push novo enquanto o job `render` ainda roda (o CI cancela o anterior) | espere "📸 Como ficou" antes do próximo push, a não ser que haja teste vermelho para corrigir |
+
 - **Z-fighting:** duas peças com faces coplanares e cores diferentes. Desloque a decorativa (0,05 a 0,1), deixe uma por dentro da outra, ou use a mesma cor.
 - **Colisão invisível:** peças decorativas (frisos, portas abertas, lâmpadas) usam `canCollide: false`. Vidro de guarda-corpo **colide** de propósito.
 - **Degrau alto:** o personagem sobe no máximo cerca de 1 stud sem pular. A escada usa degraus de 1 × 1,125.
