@@ -899,7 +899,6 @@ export function createWorld(seed = SEED) {
       }
       return true;
     };
-    const facing = (dx, dz) => (Math.abs(dx) > Math.abs(dz) ? (dx > 0 ? 'w' : 'e') : dz > 0 ? 'n' : 's');
     const canPlace = (kind, x, z, face, onTrail = false) => {
       const fp = footprint(kind, face);
       const r = { x0: x - fp.w / 2, x1: x + fp.w / 2, z0: z - fp.d / 2, z1: z + fp.d / 2 };
