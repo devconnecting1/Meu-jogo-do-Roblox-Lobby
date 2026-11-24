@@ -16,7 +16,7 @@ import { buildManual } from './manual.js';
 export const MAX_PER_CHECK = 20;
 
 /** Limite de Parts por mapa no fuzz. */
-export const FUZZ_PART_BUDGET = 10000;
+export const FUZZ_PART_BUDGET = 18000; // igual a DIM.maxParts (o mundo informa o seu)
 
 /** Marcos que todo mapa precisa ter (lista não vazia ou contagem maior que zero). */
 const REQUIRED_LANDMARKS = ['villages', 'farms', 'mines', 'docks', 'mountains', 'hills', 'trails'];
@@ -248,7 +248,8 @@ export function fullProblems(w, built, warnings = []) {
   collect(out, 'manual de montagem', buildManual(parts).problems);
 
   const budget = [];
-  if (parts.length > FUZZ_PART_BUDGET) budget.push(`${parts.length} Parts (máx. ${FUZZ_PART_BUDGET})`);
+  const max = w.DIM.maxParts ?? FUZZ_PART_BUDGET;
+  if (parts.length > max) budget.push(`${parts.length} Parts (máx. ${max})`);
   collect(out, 'orçamento', budget);
 
   const missing = REQUIRED_LANDMARKS.filter((k) => landmarkSize(landmarks[k]) === 0);

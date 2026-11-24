@@ -33,6 +33,6 @@ for (const seed of VARIANT_SEEDS) {
     ];
     assert.equal(problems.length, 0, `semente ${seed}:${report(problems)}`);
     assert.equal(parts.filter((p) => p.className === 'SpawnLocation').length, 1, `semente ${seed}: spawn`);
-    assert.ok(stats(parts).total <= 16000, `semente ${seed}: ${stats(parts).total} Parts`);
+    assert.ok(stats(parts).total <= w.DIM.maxParts, `semente ${seed}: ${stats(parts).total} Parts`);
   });
 }

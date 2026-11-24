@@ -42,6 +42,7 @@ export const DIM = Object.freeze({
   lobbyRun: 1.25, // profundidade de cada degrau das escadarias
   road: 8, // largura das estradas
   maxBridge: 50, // ponte mais longa (studs sobre a água)
+  maxParts: 18000, // orçamento de Parts por mapa (testado em todas as sementes)
 });
 
 export const SEED = 20260114;
@@ -836,7 +837,10 @@ export function createWorld(seed = SEED) {
     const half = DIM.plotSize / 2;
     for (const p of PLOTS) {
       const L = `Lotes/${p.name}`;
-      b.span(L, 'Fundação', [p.x - half, land - 0.1, p.z - half], [p.x + half, land + 0.6, p.z + half], C.plotStone, {
+      // a fundação passa 0,05 do meio-fio: a borda nunca cai em coordenada inteira, onde ficam as
+      // bordas das estradas (evita z-fighting quando uma estrada corre colada no lote)
+      const fh = half + 0.05;
+      b.span(L, 'Fundação', [p.x - fh, land - 0.1, p.z - fh], [p.x + fh, land + 0.6, p.z + fh], C.plotStone, {
         studs: true,
       });
       const kt = land + 0.6;

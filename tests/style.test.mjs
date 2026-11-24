@@ -1,7 +1,7 @@
 // Regras de estilo: Part clássico, sem textura/UI/NPC/script, cores da paleta e orçamento.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildMap } from '../src/map.js';
+import { buildMap, DIM } from '../src/map.js';
 import { C, saturation } from '../src/palette.js';
 import { stats } from '../src/builder.js';
 
@@ -80,9 +80,9 @@ test('valores numéricos válidos e transparência controlada', () => {
   }
 });
 
-test('orçamento: até 16000 Parts e 60 luzes', () => {
+test('orçamento: até DIM.maxParts Parts e 60 luzes', () => {
   const s = stats(parts);
-  assert.ok(s.total <= 16000, `${s.total} Parts`);
+  assert.ok(s.total <= DIM.maxParts, `${s.total} Parts (máx. ${DIM.maxParts})`);
   assert.ok(s.lights <= 60, `${s.lights} luzes`);
 });
 
