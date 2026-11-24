@@ -508,7 +508,13 @@ function brokenColumn(b, x, z) {
     [1, -1],
     [1, 1],
   ]) {
-    b.span(M, 'Vergalhão', [x + dx * 1.1 - 0.1, g0, z + dz * 1.1 - 0.1], [x + dx * 1.1 + 0.1, g1, z + dz * 1.1 + 0.1], C.rust);
+    b.span(
+      M,
+      'Vergalhão',
+      [x + dx * 1.1 - 0.1, g0, z + dz * 1.1 - 0.1],
+      [x + dx * 1.1 + 0.1, g1, z + dz * 1.1 + 0.1],
+      C.rust,
+    );
   }
   // pedaços que ainda seguram (presos embaixo e em cima)
   b.span(M, 'Pedaço da Coluna', [x - h, g0, z - h], [x + 0.3, g0 + 1.4, z + h], C.column);
@@ -811,8 +817,17 @@ export function buildPrison() {
     // Iluminação: pendentes sobre o corredor (vão aberto) e sobre a galeria
     for (let i = 0; i < DIM.cellsPerRow; i++) {
       const lx = cellCenterX(i);
-      const state = (side > 0 && (i === 2 || i === 7)) || (side < 0 && i === 5) ? 'dead' : side < 0 && i === 4 ? 'flicker' : 'ok';
-      hangingLight(b, `Iluminação/Galeria ${t}`, lx, FIXTURE_Y, side * (CELL_FRONT + 5), i % 2 ? null : GALLERY_LIGHT, state);
+      const state =
+        (side > 0 && (i === 2 || i === 7)) || (side < 0 && i === 5) ? 'dead' : side < 0 && i === 4 ? 'flicker' : 'ok';
+      hangingLight(
+        b,
+        `Iluminação/Galeria ${t}`,
+        lx,
+        FIXTURE_Y,
+        side * (CELL_FRONT + 5),
+        i % 2 ? null : GALLERY_LIGHT,
+        state,
+      );
     }
   }
 
@@ -1250,7 +1265,8 @@ export function buildPrison() {
   panelLight(b, TR, -158, CH_H, 22, 5, 1.4, 'flicker');
   // Revista (entrada, sul): pórtico detector de metais, mesa e banco
   const RV = 'Túnel/Revista';
-  for (const px of [-160.5, -156.1]) b.span(RV, 'Pórtico Detector', [px, 0.1, -22.3], [px + 0.6, 8, -21.7], C.steelLight);
+  for (const px of [-160.5, -156.1])
+    b.span(RV, 'Pórtico Detector', [px, 0.1, -22.3], [px + 0.6, 8, -21.7], C.steelLight);
   b.span(RV, 'Pórtico Detector Topo', [-160.5, 8, -22.4], [-155.5, 8.8, -21.6], C.steelLight);
   b.span(RV, 'Marca de Pés', [-159, 0.1, -19.6], [-157, 0.12, -18.4], C.hazard, { canCollide: false });
   b.span(RV, 'Mesa de Revista', [-158, 2.5, -29], [-154, 2.8, -26.5], C.steelLight);
@@ -1338,7 +1354,10 @@ export function buildPrison() {
     rubble(b, RW, x - 1, z - 1, seed, { n: 5, spread: 1.2, floorY, big: 0.7 });
   }
   // banco tombado e caixa caída
-  b.box(RW, 'Banco Tombado', [-135, 1, 50], [7, 1.8, 0.5], C.steelLight, { canCollide: false, rotation: [0, 16.875, 0] });
+  b.box(RW, 'Banco Tombado', [-135, 1, 50], [7, 1.8, 0.5], C.steelLight, {
+    canCollide: false,
+    rotation: [0, 16.875, 0],
+  });
   b.box(RW, 'Caixa Caída', [-134.5, 1.5, -48], [3, 3, 3], C.wood, { canCollide: false, rotation: [0, 28.125, 0] });
   puddle(b, RW, -116, 26, 6, 3, 0.1, 84);
   puddle(b, RW, -100, -40, 4, 3, 0.1, 85);
