@@ -137,6 +137,22 @@ export function createWorld(seed = SEED) {
     [-1, 1],
   ];
 
+  // --- Biomas: cada semente gira as regiões, então cada servidor tem uma ilha diferente ---
+  const brand = mulberry32(seed ^ 0xb10e);
+  const DESERT_ANG = brand() * Math.PI * 2; // setor seco (areia firme, coqueiros, rocha avermelhada)
+  const FOREST_ANG = DESERT_ANG + Math.PI * (0.75 + brand() * 0.5); // floresta escura do outro lado
+  const angDiff = (a, b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
+  /** 'deserto' | 'floresta' | 'campo' no ponto (x, z). */
+  function biomeAt(x, z) {
+    const r = Math.hypot(x, z);
+    const a = Math.atan2(z, x);
+    const wob = (nz(x, z, 90, 21) - 0.5) * 0.6;
+    if (r > 220 && angDiff(a, DESERT_ANG) < 0.62 + wob) return 'deserto';
+    if (r > 170 && r < 470 && angDiff(a, FOREST_ANG) < 0.5 + wob) return 'floresta';
+    return 'campo';
+  }
+  const cliffAt = (x, z) => nz(x, z, 140, 25) > 0.56;
+
   const GRID = (() => {
     const g = [];
     for (let j = 0; j < N; j++) {
@@ -151,9 +167,13 @@ export function createWorld(seed = SEED) {
         if (NEIGHBORS.some(([di, dj]) => (g[j + dj]?.[i + di] ?? T.SEA) === T.SEA)) sand.push([i, j]);
       }
     }
-    for (const [i, j] of sand) g[j][i] = T.SAND;
+    // falésias: em parte da costa a grama vai até a beira (sem praia) e o barranco fica claro
+    for (const [i, j] of sand) if (!cliffAt(cellCenter(i), cellCenter(j))) g[j][i] = T.SAND;
     return g;
   })();
+
+  /** Célula de grama encostada no mar (vira falésia clara). */
+  const coastal = (i, j) => NEIGHBORS.some(([di, dj]) => (GRID[j + dj]?.[i + di] ?? T.SEA) === T.SEA);
 
   /** Tipo do terreno no ponto (x, z): T.SEA, T.GRASS, T.SAND, T.RIVER ou T.LAKE. */
   function terrainAt(x, z) {
@@ -508,7 +528,7 @@ export function createWorld(seed = SEED) {
    * dentro de um bloco da camada de baixo (terraços irregulares, como os rochedos clássicos).
    * Devolve os topos de grama livres (para plantar pinheiros) e a altura do pico.
    */
-  function mountain(b, model, cx, cz, R, H, rand, snowy, rocky = false) {
+  function mountain(b, model, cx, cz, R, H, rand, snowy, rocky = false, dry = false) {
     const nL = Math.max(2, Math.round(H / 7));
     let y = DIM.land - 0.1;
     let prev = null;
@@ -537,10 +557,12 @@ export function createWorld(seed = SEED) {
       if (!boxes.length) break;
       const top = y + h;
       const lastLayers = k >= nL - 2;
-      const capColor =
-        snowy && lastLayers ? C.snow : !rocky && k < Math.ceil(nL * 0.6) ? C.grass : k % 2 ? C.rockDark : C.rock;
+      const rockA = dry ? C.rockDesert : C.rock;
+      const rockB = dry ? C.rock : C.rockDark;
+      const green = dry ? C.desertSand : C.grass;
+      const capColor = snowy && lastLayers ? C.snow : !rocky && k < Math.ceil(nL * 0.6) ? green : k % 2 ? rockB : rockA;
       for (const r of boxes) {
-        b.span(model, 'Rocha', [r.x0, y, r.z0], [r.x1, top - 0.8, r.z1], k % 2 ? C.rockDark : C.rock);
+        b.span(model, 'Rocha', [r.x0, y, r.z0], [r.x1, top - 0.8, r.z1], k % 2 ? rockB : rockA);
         b.span(model, snowy && lastLayers ? 'Neve' : 'Topo', [r.x0, top - 0.8, r.z0], [r.x1, top, r.z1], capColor);
       }
       layers.push({ boxes, top, grass: capColor === C.grass });
@@ -625,15 +647,25 @@ export function createWorld(seed = SEED) {
       let i = 0;
       while (i < N) {
         const t = GRID[j][i];
+        const style = (ii) => {
+          if (GRID[j][ii] !== T.GRASS) return String(GRID[j][ii]);
+          const dry = biomeAt(cellCenter(ii), cellCenter(j)) === 'deserto';
+          return `g${dry ? 'd' : 'v'}${coastal(ii, j) ? 'c' : 'i'}`;
+        };
+        const st = style(i);
         let k = i;
-        while (k + 1 < N && GRID[j][k + 1] === t) k++;
+        while (k + 1 < N && GRID[j][k + 1] === t && style(k + 1) === st) k++;
         const x0 = -DIM.half + i * DIM.cell;
         const x1 = -DIM.half + (k + 1) * DIM.cell;
         if (t === T.GRASS || t === T.SAND) {
           const top = t === T.GRASS ? land : beach;
-          b.span('Terreno', t === T.GRASS ? 'Terra' : 'Barranco', [x0, bottom, z0], [x1, top - cap, z1], C.dirt);
-          const capName = t === T.GRASS ? 'Grama' : 'Areia';
-          b.span('Terreno', capName, [x0, top - cap, z0], [x1, top, z1], t === T.GRASS ? C.grass : C.sand);
+          const cliff = st.endsWith('c');
+          const bodyName = t === T.GRASS ? (cliff ? 'Falésia' : 'Terra') : 'Barranco';
+          b.span('Terreno', bodyName, [x0, bottom, z0], [x1, top - cap, z1], cliff ? C.cliff : C.dirt);
+          const dry = st.startsWith('gd');
+          const capName = t === T.GRASS ? (dry ? 'Areia do Deserto' : 'Grama') : 'Areia';
+          const capColor = t === T.GRASS ? (dry ? C.desertSand : C.grass) : C.sand;
+          b.span('Terreno', capName, [x0, top - cap, z0], [x1, top, z1], capColor);
         } else if (t === T.RIVER || t === T.LAKE) {
           const name = t === T.LAKE ? 'Água do Lago' : 'Água do Rio';
           b.span('Terreno', name, [x0, 0, z0], [x1, DIM.water, z1], C.water, {
@@ -1071,7 +1103,8 @@ export function createWorld(seed = SEED) {
           free(r, 14);
         if (!ok) continue;
         const M = `Relevo/${kind.name} ${String(kind.list.length + 1).padStart(2, '0')}`;
-        const m = mountain(b, M, x, z, R, H, rand, kind.name === 'Montanha' && H >= 55, kind.name === 'Afloramento');
+        const dry = biomeAt(x, z) === 'deserto';
+        const m = mountain(b, M, x, z, R, H, rand, !dry && kind.name === 'Montanha' && H >= 55, kind.name === 'Afloramento', dry);
         blocked.push(r);
         mountainSpots.push(...m.spots);
         kind.list.push([x, z, m.peak, R]);
@@ -1245,14 +1278,29 @@ export function createWorld(seed = SEED) {
           const d = Math.hypot(x - vx, z - vz);
           return d > 95 && d < 165;
         });
-        const forest = nz(x, z, 120, 7) > 0.6 || ring;
+        const biome = biomeAt(x, z);
+        const forest = nz(x, z, 120, 7) > 0.6 || ring || biome === 'floresta';
         const grove = nz(x, z, 45, 11) > 0.62;
-        const want = forest ? rand() < 0.85 : grove ? rand() < 0.5 : rand() < 0.12;
+        let want;
+        let kind;
+        if (biome === 'deserto') {
+          // região seca: coqueiros e árvores secas espaçados, alguns oásis mais verdes
+          want = grove ? rand() < 0.45 : rand() < 0.07;
+          const t = rand();
+          kind = t < 0.5 ? 'coqueiro' : t < 0.8 ? 'seca' : 'redonda';
+        } else if (biome === 'floresta') {
+          // floresta escura: pinheiros fechados
+          want = rand() < 0.92;
+          kind = rand() < 0.8 ? 'pinheiro' : 'redonda';
+        } else {
+          want = forest ? rand() < 0.85 : grove ? rand() < 0.5 : rand() < 0.12;
+          kind = forest ? forestKind(x, z) : meadowKind();
+        }
         if (!want || !groundFree(x, z, 3)) continue;
-        spots.push([x, z, forest ? forestKind(x, z) : meadowKind()]);
+        spots.push([x, z, kind]);
       }
     }
-    const MAX_TREES = 900;
+    const MAX_TREES = 1000;
     const chosen =
       spots.length > MAX_TREES ? spots.filter((_, k) => (k * MAX_TREES) % spots.length < MAX_TREES) : spots;
     for (const [x, z, kind] of chosen) {
@@ -1312,7 +1360,8 @@ export function createWorld(seed = SEED) {
       const z = (rand() * 2 - 1) * 540;
       if (!groundFree(x, z, 6) || distToRoads(x, z) <= 10) continue;
       rockN++;
-      rocks(b, 'Relevo/Pedras', x, land, z, rand, 2 + Math.floor(rand() * 3), 1, C.rock);
+      const rockColor = biomeAt(x, z) === 'deserto' ? C.rockDesert : C.rock;
+      rocks(b, 'Relevo/Pedras', x, land, z, rand, 2 + Math.floor(rand() * 3), 1, rockColor);
     }
 
     // mato e pedrinhas pelo chão (1 a 2 peças cada, sem colisão): o campo nunca fica liso
@@ -1327,12 +1376,13 @@ export function createWorld(seed = SEED) {
       const rot = Math.round(rand() * 90);
       if (tufts < 900 && (pebbles >= 260 || rand() < 0.78)) {
         const h = 1 + rand() * 1.4;
-        const col = rand() < 0.5 ? C.grassDark : C.leafDark;
+        const dryHere = biomeAt(x, z) === 'deserto';
+        const col = dryHere ? C.hay : rand() < 0.5 ? C.grassDark : C.leafDark;
         b.box('Vegetação/Mato', 'Mato', [x, land - 0.05 + h / 2, z], [0.5, h, 1.6], col, {
           ...deco,
           rotation: [0, rot, 0],
         });
-        b.box('Vegetação/Mato', 'Mato', [x, land - 0.05 + h * 0.4, z], [1.6, h * 0.8, 0.5], C.bush, {
+        b.box('Vegetação/Mato', 'Mato', [x, land - 0.05 + h * 0.4, z], [1.6, h * 0.8, 0.5], dryHere ? C.hay : C.bush, {
           ...deco,
           rotation: [0, rot + 30, 0],
         });
@@ -1344,7 +1394,7 @@ export function createWorld(seed = SEED) {
           'Pedrinha',
           [x, land + sz * 0.25, z],
           [sz, sz * 0.7, sz * 0.9],
-          rand() < 0.5 ? C.rock : C.stoneOre,
+          biomeAt(x, z) === 'deserto' ? C.rockDesert : rand() < 0.5 ? C.rock : C.stoneOre,
           {
             ...deco,
             rotation: [Math.round((rand() - 0.5) * 20), rot, Math.round((rand() - 0.5) * 20)],

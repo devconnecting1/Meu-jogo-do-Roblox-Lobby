@@ -58,6 +58,11 @@ export const C = Object.freeze({
   deadWood: [120, 108, 96], // árvore seca
   hay: [206, 182, 110], // feno
 
+  // Biomas: região seca (areia de terra firme e rocha avermelhada) e falésias claras na costa
+  desertSand: [206, 182, 136],
+  rockDesert: [168, 132, 104],
+  cliff: [196, 190, 176],
+
   // Montanhas e trilhas
   snow: [232, 234, 236],
   path: [150, 134, 110], // trilha de terra batida

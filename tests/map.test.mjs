@@ -141,6 +141,11 @@ test('natureza variada: vários tipos de árvore, coqueiros na praia, montanhas 
   }
   assert.ok(count((p) => p.model === 'Relevo/Pedras') >= 60, 'poucas pedras soltas');
   assert.ok(count((p) => p.model === 'Vegetação/Flores') >= 30, 'poucas flores');
+  // biomas: região seca (areia firme, coqueiros, rocha avermelhada), floresta escura e falésias na costa
+  assert.ok(count((p) => p.name === 'Areia do Deserto') >= 5, 'sem região seca');
+  assert.ok(count((p) => p.name === 'Falésia') >= 3, 'costa sem falésias');
+  assert.ok(trunks('Pinheiros') >= 80, `floresta escura rala (${trunks('Pinheiros')} pinheiros)`);
+  assert.ok(trunks('Coqueiros') >= 20, `poucos coqueiros (${trunks('Coqueiros')})`);
 });
 
 test('vida no reino: vilas com casas, campos, jazidas, torres de vigia, acampamentos e cais', () => {
