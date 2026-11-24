@@ -139,7 +139,7 @@ export function clearanceZones() {
     { name: 'Vão hall → ala oeste', min: [WING_X1 - 1, 0.6, -5.5], max: [-IN_X + 0.5, 11, 5.5] },
     { name: 'Corredor de serviço', min: [WING_X0 + 0.5, 0.6, -5], max: [WING_X1 - 0.5, 8, 5] },
     { name: 'Porta do refeitório', min: [-125.5, 0.6, 4], max: [-114.5, 11, 9] },
-    { name: 'Corredor entre as mesas', min: [-150, 0.6, 27], max: [-90, 8, 33] },
+    { name: 'Corredor entre as mesas', min: [-150, 0.6, 25], max: [-90, 8, 35] },
     { name: 'Porta do almoxarifado', min: [-134.5, 0.6, -9], max: [-127.5, 11, -4] },
     { name: 'Corredor do almoxarifado', min: [-138, 0.6, -58], max: [-131, 8, -7.5] },
     { name: 'Porta da enfermaria', min: [-108.5, 0.6, -9], max: [-101.5, 11, -4] },
@@ -519,7 +519,8 @@ export function buildPrison() {
   // --- Pisos do térreo -----------------------------------------------------
   const P = 'Pisos';
   b.span(P, 'Piso Átrio', [-ROW, 0, -(E - 2)], [STAIR_X1, 0.1, E - 2], C.floorAtrium, { studs: true });
-  b.span(P, 'Piso Sala de Visitas', [STAIR_X1, 0, -E], [IN_X, 0.1, E], C.floorCorridor);
+  // o piso começa atrás do fundo da escada (0,4), por dentro das paredes da sala: nenhuma face coplanar
+  b.span(P, 'Piso Sala de Visitas', [STAIR_X1 + 0.4, 0, -E], [IN_X, 0.1, E], C.floorCorridor);
   for (const s of [-1, 1]) {
     const t = s < 0 ? 'Sul' : 'Norte';
     b.span(P, `Corredor ${t}`, [-IN_X, 0, s * (E + 2)], [STAIR_X1, 0.1, s * (CELL_FRONT - 1)], C.floorCorridor);
@@ -849,7 +850,7 @@ export function buildPrison() {
     });
   }
   // 8 mesas em 2 fileiras, com corredor largo entre elas
-  for (const tx of [-142, -127, -112, -97]) for (const tz of [20, 40]) diningTable(b, RN, tx, tz);
+  for (const tx of [-142, -127, -112, -97]) for (const tz of [18, 42]) diningTable(b, RN, tx, tz);
   for (const x of [-142, -127, -112, -97]) {
     for (const z of [14, 30, 46]) {
       panelLight(
