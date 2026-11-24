@@ -39,7 +39,7 @@ ceilingLight.target.position.set(-32, 0, 0);
 scene.add(ceilingLight.target);
 ceilingLight.castShadow = true;
 ceilingLight.shadow.mapSize.set(4096, 4096);
-Object.assign(ceilingLight.shadow.camera, { left: -140, right: 140, top: 110, bottom: -110, near: 10, far: 500 });
+Object.assign(ceilingLight.shadow.camera, { left: -200, right: 140, top: 110, bottom: -110, near: 10, far: 500 });
 ceilingLight.shadow.bias = -0.0004;
 ceilingLight.shadow.normalBias = 0.4;
 scene.add(ceilingLight);
@@ -74,6 +74,52 @@ function studTexture() {
 }
 const STUD_TEX = studTexture();
 
+// Relevo clássico das superfícies Inlet (quadrado rebaixado), Weld (X) e Universal (+).
+function reliefTexture(kind) {
+  const n = 64;
+  const c = document.createElement('canvas');
+  c.width = c.height = n;
+  const g = c.getContext('2d');
+  g.fillStyle = '#e6e6e6';
+  g.fillRect(0, 0, n, n);
+  g.lineCap = 'round';
+  if (kind === 'Inlet') {
+    g.fillStyle = '#b4b4b4';
+    g.fillRect(12, 12, 40, 40);
+    g.fillStyle = '#f4f4f4';
+    g.fillRect(14, 48, 38, 4);
+    g.fillRect(48, 14, 4, 38);
+  } else {
+    const draw = (color, dx) => {
+      g.strokeStyle = color;
+      g.lineWidth = 5;
+      g.beginPath();
+      if (kind === 'Weld') {
+        g.moveTo(14 + dx, 14 + dx);
+        g.lineTo(50 + dx, 50 + dx);
+        g.moveTo(50 + dx, 14 + dx);
+        g.lineTo(14 + dx, 50 + dx);
+      } else {
+        g.moveTo(32 + dx, 14 + dx);
+        g.lineTo(32 + dx, 50 + dx);
+        g.moveTo(14 + dx, 32 + dx);
+        g.lineTo(50 + dx, 32 + dx);
+      }
+      g.stroke();
+    };
+    draw('#f6f6f6', 1.5);
+    draw('#a8a8a8', 0);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+const RELIEF = { Inlet: reliefTexture('Inlet'), Weld: reliefTexture('Weld'), Universal: reliefTexture('Universal') };
+// tamanho (em studs) de cada repetição do relevo
+const RELIEF_TILE = { Inlet: 1, Weld: 2, Universal: 2 };
+
 // ---------------------------------------------------------------------------
 // Parts -> malhas
 // ---------------------------------------------------------------------------
@@ -85,14 +131,14 @@ const cache = new Map();
 const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
 const NO_SHADOW_GROUPS = new Set(['Teto', 'Iluminação']);
 
-function material(p, studs = false) {
-  const k = `${p.color}|${p.transparency}|${p.material}|${studs}`;
+function material(p, studs = false, relief = null) {
+  const k = `${p.color}|${p.transparency}|${p.material}|${studs}|${relief}`;
   if (cache.has(k)) return cache.get(k);
   const color = srgb(p.color);
   const neon = p.material === 'Neon';
   const m = new THREE.MeshStandardMaterial({
     color,
-    map: studs ? STUD_TEX : null,
+    map: studs ? STUD_TEX : relief ? RELIEF[relief] : null,
     roughness: 0.78,
     metalness: 0,
     transparent: p.transparency > 0,
@@ -122,6 +168,24 @@ function studGeometry([sx, , sz]) {
   return g;
 }
 
+// UV em studs em todas as faces (ordem do BoxGeometry: +x, -x, +y, -y, +z, -z).
+function reliefGeometry([sx, sy, sz], tile) {
+  const g = unitBox.clone();
+  const uv = g.attributes.uv;
+  const dims = [
+    [sz, sy],
+    [sz, sy],
+    [sx, sz],
+    [sx, sz],
+    [sx, sy],
+    [sx, sy],
+  ];
+  for (let f = 0; f < 6; f++) {
+    for (let i = f * 4; i < f * 4 + 4; i++) uv.setXY(i, (uv.getX(i) * dims[f][0]) / tile, (uv.getY(i) * dims[f][1]) / tile);
+  }
+  return g;
+}
+
 const manual = buildManual(parts);
 const stepOf = new Array(parts.length);
 for (const st of manual.steps) for (const i of st.parts) stepOf[i] = st.n;
@@ -132,12 +196,16 @@ const castsShadow = (p) => p.transparency < 0.5 && p.material !== 'Neon' && !NO_
 const buckets = new Map();
 const tmp = new THREE.Object3D();
 parts.forEach((p, pi) => {
-  if (p.rotation || p.studs || p.shape === 'Cylinder') {
+  if (p.rotation || p.studs || p.surface || p.shape === 'Cylinder') {
     let geo = p.shape === 'Cylinder' ? unitCyl : unitBox;
     let mat = material(p);
     if (p.studs) {
       geo = studGeometry(p.size);
       mat = [mat, mat, material(p, true), mat, mat, mat];
+    } else if (p.surface) {
+      geo = reliefGeometry(p.size, RELIEF_TILE[p.surface]);
+      const r = material(p, false, p.surface);
+      mat = [r, r, r, mat, r, r]; // a face de baixo fica lisa, como no Roblox
     }
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.fromArray(p.position);
@@ -174,7 +242,7 @@ for (const list of buckets.values()) {
 // Luzes reais só nas luminárias do teto (átrio, hall e galerias); o resto é ambiente + emissivo.
 for (const p of parts) {
   if (!p.light || !/Iluminação\/(Átrio|Hall|Galeria)/.test(p.model)) continue;
-  const l = new THREE.PointLight(srgb(p.light.color), 70, p.light.range * 1.2, 1.4);
+  const l = new THREE.PointLight(srgb(p.light.color), 45, p.light.range * 1.2, 1.4);
   l.position.set(p.position[0], p.position[1] - 1, p.position[2]);
   scene.add(l);
 }
@@ -192,7 +260,7 @@ orbit.enableDamping = true;
 orbit.maxDistance = 400;
 
 const c2 = cellCenterX(2);
-const OVERVIEW = { pos: [-95, 240, 215], target: [-32, 0, 0], cut: true };
+const OVERVIEW = { pos: [-125, 280, 250], target: [-66, 0, 0], cut: true };
 const VIEWS = [
   { id: 'overview', title: 'Visão geral (corte, sem teto)', ...OVERVIEW },
   { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-62, 8, -26], target: [-88, 6, 4] },
@@ -214,6 +282,8 @@ const VIEWS = [
   { id: 'guards', title: 'Sala dos guardas', pos: [-62, 8, 37], target: [-84, 3, 57] },
   { id: 'stairs', title: 'Escada para o mezanino', pos: [22, 7, 3], target: [52, 10, 0] },
   { id: 'visits', title: 'Sala de visitas', pos: [68, 6.5, -22], target: [78, 3.5, 8] },
+  { id: 'gate', title: 'Portal do túnel e portão de emergência (aberto)', pos: [-128, 7, -3], target: [-175, 6, 0] },
+  { id: 'tunnel', title: 'Túnel de acesso até o portão fechado', pos: [-166, 6.5, 3.5], target: [-217, 5.5, 0] },
   { id: 'mezzanine', title: '2º andar: salas do mezanino', pos: [30, 27, -6], target: [80, 22, 4] },
   { id: 'control', title: 'Sala de controle (vidraça para o vão)', pos: [86, 23.5, -10], target: [72, 21, 3] },
   { id: 'office', title: 'Diretoria', pos: [86, 23.5, 30], target: [74, 19, 16] },

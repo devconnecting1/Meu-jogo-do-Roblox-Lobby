@@ -71,6 +71,19 @@ const WING_X0 = WING_X1 - DIM.wing; // -151
 const OXW = WING_X0 - W; // -153: face externa da parede oeste
 const WC = DIM.wingCeiling;
 
+// Túnel de acesso (anexo a oeste, fechado): portal no fim do corredor de serviço ->
+// eclusa A (portão de emergência aberto) -> túnel -> eclusa B (mesmo portão, fechado).
+const PORTAL = 6; // meia-largura do portal e do túnel (vão de 12, igual ao corredor de serviço)
+const PORTAL_H = 12; // altura do portal e do túnel
+const CH = 14; // meia-largura das eclusas
+const CH_H = 16; // pé-direito das eclusas
+const GA0 = OXW - 10; // -163: face da parede do portão A (fundo da eclusa de entrada)
+const TUN0 = GA0 - W; // -165: começo do túnel
+const TUN1 = TUN0 - 40; // -205: fim do túnel
+const GB1 = TUN1 - W; // -207: face oeste da parede de entrada da eclusa B
+const GB0 = GB1 - 10; // -217: face do portão B (fechado, para uma atualização futura)
+const TX0 = GB0 - W; // -219: face externa do fundo do túnel
+
 export const LEVELS = Object.freeze({
   F2,
   TOP,
@@ -87,13 +100,16 @@ export const LEVELS = Object.freeze({
   WING: [WING_X0, WING_X1],
 });
 
-const HANG_LIGHT = { type: 'Point', range: 32, brightness: 1.2, color: C.neon };
+// Luz equilibrada (testado em tests/rojo.test.mjs): todas as luminárias entre 0,5 e 1,2 de brilho,
+// com Ambient/Exposure baixos no default.project.json, para nada estourar com gráficos baixos.
+const HANG_LIGHT = { type: 'Point', range: 28, brightness: 0.8, color: C.neon };
 // luminária de galpão presa ao teto: ilumina o vão de pé-direito duplo de cima para baixo
-const HIGH_BAY = { type: 'Surface', range: 52, brightness: 2.4, color: C.neon, angle: 120 };
-const GALLERY_LIGHT = { type: 'Surface', range: 34, brightness: 1.8, color: C.neon, angle: 120 };
+const HIGH_BAY = { type: 'Surface', range: 50, brightness: 0.9, color: C.neon, angle: 110 };
+const GALLERY_LIGHT = { type: 'Surface', range: 30, brightness: 0.8, color: C.neon, angle: 110 };
+const WARN_LIGHT = { type: 'Point', range: 14, brightness: 0.6, color: C.neonWarn };
 const FIXTURE_Y = ROOF - 1.4; // luminárias presas ao teto com haste curta (1,2)
 const UPPER_CEIL = TOP; // forro das salas do 2º andar (mesma altura do topo das celas de cima)
-const PANEL_LIGHT = { type: 'Surface', range: 18, brightness: 1.4, color: C.neon };
+const PANEL_LIGHT = { type: 'Surface', range: 17, brightness: 0.8, color: C.neon };
 
 /** Centro X da cela i (0..7). */
 export const cellCenterX = (i) => -ROW + 1 + DIM.cellW / 2 + i * PITCH;
@@ -138,6 +154,9 @@ export function clearanceZones() {
     // ala oeste
     { name: 'Vão hall → ala oeste', min: [WING_X1 - 1, 0.6, -5.5], max: [-IN_X + 0.5, 11, 5.5] },
     { name: 'Corredor de serviço', min: [WING_X0 + 0.5, 0.6, -5], max: [WING_X1 - 0.5, 8, 5] },
+    { name: 'Portal e eclusa de entrada (portão aberto)', min: [TUN0 - 1, 0.6, -5.5], max: [WING_X0 + 0.5, 11, 5.5] },
+    { name: 'Túnel de acesso', min: [TUN1 + 0.5, 0.6, -5], max: [TUN0 - 0.5, 8, 5] },
+    { name: 'Eclusa do fundo (até o portão fechado)', min: [GB0 + 1.8, 0.6, -5], max: [TUN1 + 0.5, 8, 5] },
     { name: 'Porta do refeitório', min: [-125.5, 0.6, 4], max: [-114.5, 11, 9] },
     { name: 'Corredor entre as mesas', min: [-150, 0.6, 25], max: [-90, 8, 35] },
     { name: 'Porta do almoxarifado', min: [-134.5, 0.6, -9], max: [-127.5, 11, -4] },
@@ -214,6 +233,10 @@ export function fallEdges() {
 
 export const ENVELOPE = Object.freeze({ min: [OXW, -1, -OZ], max: [OX, ROOF + 1, OZ] });
 export const INTERIOR = Object.freeze({ min: [WING_X0, 0, -IN_Z], max: [IN_X, ROOF, IN_Z] });
+/** Túnel de acesso: único anexo do prédio, também fechado (termina no portão B). */
+export const TUNNEL = Object.freeze({ portal: [-PORTAL, PORTAL], portalTop: PORTAL_H, gateA: GA0, gateB: GB0 });
+export const ANNEX = Object.freeze({ min: [TX0, -1, -CH - W], max: [WING_X0, CH_H + 1, CH + W] });
+export const ANNEX_INTERIOR = Object.freeze({ min: [GB0, 0, -CH], max: [WING_X0, CH_H, CH] });
 
 // ---------------------------------------------------------------------------
 // Peças compostas
@@ -343,6 +366,57 @@ function hangingLight(b, model, x, y, z, light = HANG_LIGHT) {
   }
 }
 
+/**
+ * Portão de emergência bipartido: duas folhas que correm em sentidos opostos num trilho
+ * superior e se encontram no meio do vão (fecham "dos dois lados ao mesmo tempo").
+ * Montado na face x = fx de uma parede, do lado s (+1: x > fx), cobrindo o vão |z| < PORTAL.
+ * As folhas são peças separadas ('Folha Esquerda'/'Folha Direita') para um script futuro
+ * animar o fechamento simultâneo; aqui ficam paradas, abertas (open) ou fechadas.
+ */
+function emergencyGate(b, model, fx, s, open, floorY = 0.1) {
+  const sp = (name, xa, xc, y0, y1, z0, z1, color, opts) => {
+    const [x0, x1] = [fx + s * xa, fx + s * xc].sort((p, q) => p - q);
+    b.span(model, name, [x0, y0, z0], [x1, y1, z1], color, opts);
+  };
+  const top = PORTAL_H + 0.2; // base do trilho (acima do vão)
+  const reach = CH - 0.6; // o trilho vai de coluna a coluna
+  const leaf = PORTAL + 0.4; // cada folha cobre metade do vão + 0,4 de encosto
+  const deco = { canCollide: false };
+  sp('Trilho Superior', 0, 1.3, top, top + 1.2, -reach, reach, C.steel, { surface: 'Inlet' });
+  sp('Guia do Piso', 0, 1.1, floorY, floorY + 0.25, -reach, reach, C.steel, { surface: 'Inlet' });
+  // faixa de alerta zebrada na frente do trilho
+  sp('Faixa de Alerta', 1.3, 1.4, top + 0.2, top + 1, -reach + 0.2, reach - 0.2, C.hazard, deco);
+  for (let z = -reach + 0.6; z + 1 <= reach - 0.2; z += 2.4) {
+    sp('Listra de Alerta', 1.4, 1.45, top + 0.2, top + 1, z, z + 1, C.steel, deco);
+  }
+  for (const z of [-1, 1]) {
+    const [z0, z1] = z < 0 ? [-CH, -reach] : [reach, CH];
+    sp('Coluna do Portão', 0, 1.4, floorY, top + 1.2, z0, z1, C.steel, { surface: 'Inlet' });
+    sp('Luz de Alerta', 0.3, 1.1, top + 1.2, top + 1.8, z0, z1, C.neonWarn, {
+      canCollide: false,
+      material: 'Neon',
+      light: z < 0 ? WARN_LIGHT : null,
+    });
+  }
+  const gap = PORTAL + 0.2;
+  const leaves = open
+    ? [
+        ['Folha Esquerda', -(gap + leaf), -gap],
+        ['Folha Direita', gap, gap + leaf],
+      ]
+    : [
+        ['Folha Esquerda', -leaf, 0],
+        ['Folha Direita', 0, leaf],
+      ];
+  for (const [n, z0, z1] of leaves) {
+    sp(n, 0.15, 0.75, floorY + 0.25, top, z0, z1, C.steel, { surface: 'Weld' });
+    sp('Faixa da Folha', 0.75, 0.9, floorY + 0.8, floorY + 1.6, z0 + 0.3, z1 - 0.3, C.hazard, deco);
+    for (const y of [3, 6.5, 10]) {
+      sp('Reforço', 0.75, 0.95, floorY + y, floorY + y + 0.6, z0 + 0.3, z1 - 0.3, C.steelLight, deco);
+    }
+  }
+}
+
 /** Painel embutido; ceilingY = face inferior do teto onde ele encosta. */
 function panelLight(b, model, x, ceilingY, z, w = 5, d = 1.4, light = true) {
   b.box(model, 'Moldura', [x, ceilingY - 0.05, z], [w + 0.4, 0.1, d + 0.4], C.steel, { canCollide: false });
@@ -457,7 +531,10 @@ export function buildPrison() {
   b.span(ENV, 'Parede Sul', [OXW, 0, -OZ], [OX, ROOF, -IN_Z], C.wall, wo);
   b.span(ENV, 'Parede Norte', [OXW, 0, IN_Z], [OX, ROOF, OZ], C.wall, wo);
   b.span(ENV, 'Parede Leste', [IN_X, 0, -IN_Z], [OX, ROOF, IN_Z], C.wall, wo);
-  b.span(ENV, 'Parede Oeste', [OXW, 0, -IN_Z], [WING_X0, ROOF, IN_Z], C.wall, wo);
+  // parede oeste com o portal do túnel de acesso (o único vão da envoltória; o túnel é fechado)
+  b.span(ENV, 'Parede Oeste S', [OXW, 0, -IN_Z], [WING_X0, ROOF, -PORTAL], C.wall, wo);
+  b.span(ENV, 'Parede Oeste N', [OXW, 0, PORTAL], [WING_X0, ROOF, IN_Z], C.wall, wo);
+  b.span(ENV, 'Parede Oeste Verga', [OXW, PORTAL_H, -PORTAL], [WING_X0, ROOF, PORTAL], C.wall, wo);
   b.span(ENV, 'Laje Teto', [OXW, ROOF, -OZ], [OX, ROOF + 1, OZ], C.ceiling, { group: 'Teto' });
 
   // Parede que separa o bloco de celas (hall) da ala oeste, com vão de 12 × 12
@@ -470,7 +547,8 @@ export function buildPrison() {
   const WB = 'Acabamento/Paredes';
   const band = { canCollide: false, group: 'Paredes' };
   const bands = [
-    ['Rodapé Alto', 0, 1.2, C.wainscot],
+    ['Rodapé Alto', 0, 3.5, C.wainscot, 'Inlet'],
+    ['Capa do Rodapé', 3.5, 3.8, C.wallTrim, null, 0.2],
     ['Faixa Térreo', 13.6, 14.2, C.wallTrim],
     ['Faixa 2º Andar', F2 + 13.6, F2 + 14.2, C.wallTrim],
   ];
@@ -478,7 +556,7 @@ export function buildPrison() {
     [-IN_X, 1],
     [IN_X, -1],
   ]) {
-    for (const [n, ya, yb, col] of bands) {
+    for (const [n, ya, yb, col, surface, t = 0.1] of bands) {
       // no lado do hall a parede tem o vão para a ala oeste (z -6..6, até 12 de altura)
       const zs =
         x < 0 && yb <= 12
@@ -487,7 +565,7 @@ export function buildPrison() {
               [6, IN_Z],
             ]
           : [[-IN_Z, IN_Z]];
-      for (const [z0, z1] of zs) b.span(WB, n, [x, ya, z0], [x + dir * 0.1, yb, z1], col, band);
+      for (const [z0, z1] of zs) b.span(WB, n, [x, ya, z0], [x + dir * t, yb, z1], col, { ...band, surface });
     }
   }
   for (const s of [-1, 1]) {
@@ -495,7 +573,9 @@ export function buildPrison() {
       [-IN_X, -ROW],
       [ROW, IN_X],
     ]) {
-      for (const [n, ya, yb, col] of bands) b.span(WB, n, [x0, ya, s * IN_Z], [x1, yb, s * (IN_Z - 0.1)], col, band);
+      for (const [n, ya, yb, col, surface, t = 0.1] of bands) {
+        b.span(WB, n, [x0, ya, s * IN_Z], [x1, yb, s * (IN_Z - t)], col, { ...band, surface });
+      }
     }
     b.span(WB, 'Faixa Alta', [-IN_X, ROOF - 3.4, s * IN_Z], [IN_X, ROOF - 2.8, s * (IN_Z - 0.1)], C.wallTrim, band);
   }
@@ -512,18 +592,36 @@ export function buildPrison() {
   for (const x of COLUMN_X) {
     for (const s of [-1, 1]) {
       b.box('Estrutura/Colunas', 'Coluna', [x, ROOF / 2, s * E], [COL, ROOF, COL], C.column);
-      b.box('Estrutura/Colunas', 'Base Coluna', [x, 0.45, s * E], [COL + 0.6, 0.9, COL + 0.6], C.columnBase);
+      b.box('Estrutura/Colunas', 'Base Coluna', [x, 0.45, s * E], [COL + 0.6, 0.9, COL + 0.6], C.columnBase, {
+        surface: 'Inlet',
+      });
+      // capitel clássico sob as vigas
+      b.box('Estrutura/Colunas', 'Capitel', [x, ROOF - 2.4, s * E], [COL + 0.6, 1.2, COL + 0.6], C.columnBase, {
+        surface: 'Inlet',
+      });
     }
   }
 
   // --- Pisos do térreo -----------------------------------------------------
   const P = 'Pisos';
-  b.span(P, 'Piso Átrio', [-ROW, 0, -(E - 2)], [STAIR_X1, 0.1, E - 2], C.floorAtrium, { studs: true });
+  // piso do átrio em xadrez clássico (11 × 4 placas de 11,5 × 11, studs)
+  const TILE_X = (STAIR_X1 + ROW) / 11;
+  const TILE_Z = (2 * (E - 2)) / 4;
+  for (let i = 0; i < 11; i++) {
+    for (let j = 0; j < 4; j++) {
+      const x0 = -ROW + i * TILE_X;
+      const z0 = -(E - 2) + j * TILE_Z;
+      const col = (i + j) % 2 ? C.floorAtriumDark : C.floorAtrium;
+      b.span(P, 'Piso Átrio', [x0, 0, z0], [x0 + TILE_X, 0.1, z0 + TILE_Z], col, { studs: true });
+    }
+  }
   // o piso começa atrás do fundo da escada (0,4), por dentro das paredes da sala: nenhuma face coplanar
   b.span(P, 'Piso Sala de Visitas', [STAIR_X1 + 0.4, 0, -E], [IN_X, 0.1, E], C.floorCorridor);
   for (const s of [-1, 1]) {
     const t = s < 0 ? 'Sul' : 'Norte';
-    b.span(P, `Corredor ${t}`, [-IN_X, 0, s * (E + 2)], [STAIR_X1, 0.1, s * (CELL_FRONT - 1)], C.floorCorridor);
+    b.span(P, `Corredor ${t}`, [-IN_X, 0, s * (E + 2)], [STAIR_X1, 0.1, s * (CELL_FRONT - 1)], C.floorCorridor, {
+      surface: 'Inlet',
+    });
     b.span(P, `Meio-fio ${t}`, [-ROW, 0, s * (CELL_FRONT - 1)], [ROW, 0.5, s * CELL_FRONT], C.curb, { studs: true });
   }
 
@@ -893,6 +991,75 @@ export function buildPrison() {
   b.span(EF, 'Armário', [WING_X1 - 0.6, 3, -40], [WING_X1, 9, -30], C.steelLight);
   for (const x of [-110, -96]) {
     for (const z of [-45, -25]) panelLight(b, 'Iluminação/Enfermaria', x, WC, z, 5, 1.4, z === -45);
+  }
+
+  // --- Túnel de acesso: portal -> eclusa A (portão aberto) -> túnel -> eclusa B (fechado) --
+  const TE = 'Túnel/Envoltória';
+  const tw = { group: 'Paredes' };
+  const tt = { group: 'Teto' };
+  b.span(TE, 'Laje do Túnel', [TX0, -1, -CH - W], [OXW, 0, CH + W], C.floor, { group: 'Piso' });
+  for (const [n, x0, x1] of [
+    ['A', TUN0, OXW],
+    ['B', TX0, TUN1],
+  ]) {
+    for (const s of [-1, 1]) {
+      b.span(TE, `Parede Eclusa ${n}`, [x0, 0, s * CH], [x1, CH_H, s * (CH + W)], C.tunnel, tw);
+    }
+    b.span(TE, `Teto Eclusa ${n}`, [x0, CH_H, -CH - W], [x1, CH_H + 1, CH + W], C.ceiling, tt);
+  }
+  // paredes de passagem entre eclusas e túnel (vão de 12 × 12)
+  for (const [n, x0, x1] of [
+    ['A', TUN0, GA0],
+    ['B', GB1, TUN1],
+  ]) {
+    for (const s of [-1, 1]) {
+      b.span(TE, `Parede do Portal ${n}`, [x0, 0, s * PORTAL], [x1, CH_H, s * CH], C.tunnel, tw);
+    }
+    b.span(TE, `Verga do Portal ${n}`, [x0, PORTAL_H, -PORTAL], [x1, CH_H, PORTAL], C.tunnel, tw);
+  }
+  b.span(TE, 'Parede do Fundo', [TX0, 0, -CH], [GB0, CH_H, CH], C.tunnel, tw);
+  for (const s of [-1, 1]) {
+    b.span(TE, 'Parede do Túnel', [TUN1, 0, s * PORTAL], [TUN0, PORTAL_H, s * (PORTAL + W)], C.tunnel, tw);
+  }
+  b.span(TE, 'Teto do Túnel', [TUN1, PORTAL_H, -PORTAL - W], [TUN0, PORTAL_H + 1, PORTAL + W], C.ceiling, tt);
+
+  const TP = 'Túnel/Pisos';
+  b.span(TP, 'Soleira', [OXW, 0, -PORTAL], [WING_X0, 0.1, PORTAL], C.steelLight, { surface: 'Inlet' });
+  b.span(TP, 'Piso Eclusa A', [GA0, 0, -CH], [OXW, 0.1, CH], C.floorCorridor, { surface: 'Inlet' });
+  b.span(TP, 'Piso do Túnel', [GB1, 0, -PORTAL], [GA0, 0.1, PORTAL], C.floorCorridor, { surface: 'Inlet' });
+  b.span(TP, 'Piso Eclusa B', [GB0, 0, -CH], [GB1, 0.1, CH], C.floorCorridor, { surface: 'Inlet' });
+  for (const z of [-3.2, 0, 3.2]) {
+    b.span(TP, 'Faixa Piso', [GB1, 0.1, z - 0.5], [GA0, 0.15, z + 0.5], C.wallTrim, { canCollide: false });
+  }
+
+  // estrutura do túnel: costelas de aço a cada 8 studs e rodapé com relevo
+  const TS = 'Túnel/Estrutura';
+  for (let x = TUN0 - 4; x > TUN1 + 1; x -= 8) {
+    for (const s of [-1, 1]) {
+      b.span(TS, 'Costela', [x - 0.3, 0.1, s * (PORTAL - 0.4)], [x + 0.3, PORTAL_H - 0.4, s * PORTAL], C.wallTrim, {
+        surface: 'Inlet',
+      });
+    }
+    b.span(TS, 'Costela Topo', [x - 0.3, PORTAL_H - 0.4, -PORTAL], [x + 0.3, PORTAL_H, PORTAL], C.wallTrim, {
+      surface: 'Inlet',
+    });
+  }
+  for (const s of [-1, 1]) {
+    b.span(TS, 'Rodapé', [TUN1, 0.1, s * (PORTAL - 0.1)], [TUN0, 3.5, s * PORTAL], C.wainscot, {
+      canCollide: false,
+      surface: 'Inlet',
+    });
+  }
+
+  // portões de emergência: o de entrada fica aberto; o do fundo é o mesmo portão, fechado
+  emergencyGate(b, 'Túnel/Portão A (aberto)', GA0, 1, true);
+  emergencyGate(b, 'Túnel/Portão B (fechado)', GB0, 1, false);
+
+  // luz do túnel e das eclusas (mesmo patamar das outras salas)
+  const TL = 'Túnel/Iluminação';
+  for (let x = TUN0 - 8; x > TUN1 + 1; x -= 8) panelLight(b, TL, x, PORTAL_H, 0, 5, 1.4, true);
+  for (const x of [(GA0 + OXW) / 2, (GB0 + GB1) / 2]) {
+    for (const z of [-8, 8]) panelLight(b, TL, x, CH_H, z, 5, 1.4, true);
   }
 
   return { parts: b.parts };

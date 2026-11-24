@@ -20,6 +20,7 @@ const ALLOWED_KEYS = [
   'shape',
   'material',
   'studs',
+  'surface',
   'group',
 ];
 
@@ -50,6 +51,21 @@ test('cores neutras (saturação HSV <= 0.3)', () => {
   for (const p of parts) {
     assert.ok(saturation(p.color) <= 0.3, `${p.model}/${p.name}: cor saturada ${p.color}`);
     if (p.light) assert.ok(saturation(p.light.color) <= 0.3, `${p.name}: luz saturada`);
+  }
+});
+
+test('relevo clássico (Inlet/Weld/Universal) só em peças opacas de Plastic', () => {
+  for (const p of parts.filter((x) => x.surface)) {
+    assert.ok(['Inlet', 'Weld', 'Universal'].includes(p.surface), `${p.name}: superfície ${p.surface}`);
+    assert.equal(p.material, 'Plastic', `${p.name}: relevo em ${p.material}`);
+    assert.equal(p.transparency, 0, `${p.name}: relevo em peça transparente`);
+  }
+});
+
+test('superfícies grandes não estouram: paredes, pisos e colunas em tons médios', async () => {
+  const { C } = await import('../src/palette.js');
+  for (const k of ['wall', 'cellWall', 'column', 'floor', 'floorAtrium', 'floorCorridor', 'cellFloor', 'tunnel']) {
+    assert.ok(Math.max(...C[k]) <= 215, `C.${k} = ${C[k]} (claro demais: estoura com gráficos baixos)`);
   }
 });
 

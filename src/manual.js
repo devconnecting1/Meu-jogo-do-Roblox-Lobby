@@ -33,6 +33,11 @@ export const PHASES = [
     title: 'Hall, salas, ala oeste (refeitório, almoxarifado, enfermaria) e sala de visitas',
     match: (p) => !isFixture(p) && /^(Hall|Salas|Ala Oeste|Átrio|Sala de Visitas)/.test(p.model),
   },
+  {
+    id: 'tunel',
+    title: 'Túnel de acesso e portões de emergência',
+    match: (p) => !isFixture(p) && p.model.startsWith('Túnel'),
+  },
   { id: 'acabamento', title: 'Acabamento das paredes', match: (p) => p.model.startsWith('Acabamento') },
   {
     id: 'teto',

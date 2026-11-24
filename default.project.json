@@ -14,11 +14,11 @@
         "Technology": { "Enum": 4 },
         "ClockTime": 0,
         "Brightness": 0,
-        "Ambient": [0.33, 0.33, 0.35],
-        "OutdoorAmbient": [0.18, 0.18, 0.2],
-        "EnvironmentDiffuseScale": 0.4,
-        "EnvironmentSpecularScale": 0.35,
-        "ExposureCompensation": 0.45,
+        "Ambient": [0.15, 0.15, 0.16],
+        "OutdoorAmbient": [0.08, 0.08, 0.09],
+        "EnvironmentDiffuseScale": 0.15,
+        "EnvironmentSpecularScale": 0.2,
+        "ExposureCompensation": 0,
         "ShadowSoftness": 0.3,
         "GlobalShadows": true
       },
@@ -26,7 +26,7 @@
         "$className": "ColorCorrectionEffect",
         "$properties": {
           "Brightness": 0,
-          "Contrast": 0.08,
+          "Contrast": 0.12,
           "Saturation": -0.12,
           "TintColor": [1, 0.985, 0.96]
         }
@@ -34,9 +34,9 @@
       "Brilho das Lampadas": {
         "$className": "BloomEffect",
         "$properties": {
-          "Intensity": 0.35,
-          "Size": 24,
-          "Threshold": 1.6
+          "Intensity": 0.18,
+          "Size": 18,
+          "Threshold": 2.2
         }
       }
     }

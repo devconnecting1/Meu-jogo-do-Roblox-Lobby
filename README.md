@@ -13,14 +13,15 @@ Prisão **fechada e espaçosa** de 2 andares, feita só com **Part clássico** e
 
 ## O que tem
 
-- **Envoltória fechada:** piso, teto e 4 paredes opacos. Não há janelas, portas nem exterior.
+- **Envoltória fechada:** piso, teto e 4 paredes opacos. Não há janelas para fora nem exterior. O único vão é o portal do **túnel de acesso**, que também é fechado.
+- **Túnel de acesso:** do fim do corredor de serviço, uma eclusa com **portão de emergência bipartido aberto** (duas folhas que se encontram no meio), um túnel de 40 studs com costelas de aço, e no fundo o **mesmo portão, fechado** (reservado para uma atualização futura).
 - **32 celas** em 2 alas × 2 andares. Cada uma tem fachada com janela de observação, porta de grade deslizante, cama, vaso, pia com espelho, mesa, banqueta, prateleira e luz embutida.
-- **Átrio de pé-direito duplo** com refeitório (mesas redondas), caixas, colunas no ritmo das celas e luminárias fluorescentes.
-- **2º andar** com galerias de guarda-corpo de vidro, ponte central e mezanino, com acesso por uma escada de degraus de 1 stud.
-- **Hall** com SpawnLocation e posto de guarda, **depósitos**, **sala de visitas** e **estoque** com estantes.
+- **Bloco de celas** com átrio de pé-direito duplo, piso em xadrez clássico com studs, colunas com base e capitel, e luminárias de galpão presas ao teto.
+- **Salas próprias:** hall com spawn e posto de guarda, sala dos guardas, rouparia, sala de visitas e estoque de uniformes sob o mezanino; no 2º andar, sala de controle, diretoria, arquivo, descanso, vestiário, biblioteca e sala de aula; na ala oeste, refeitório, almoxarifado e enfermaria.
+- **Acabamento clássico:** relevo das superfícies do Roblox (Inlet, Weld, Universal) em rodapés, colunas, pisos de corredor, túnel e portões, sempre em Parts.
 - **Escala ampla** (como na referência): celas de 14×16, corredores de 10, vão central de 48 e 27 studs do 2º andar ao teto.
 - **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado. O resumo é "N peças · N etapas · N pontos de conexão verificados", com imagens da montagem em estágios.
-- **Lighting:** tecnologia Future, sem sol (ambiente fechado), ambiente neutro, correção de cor sutil e bloom leve nas lâmpadas.
+- **Luz equilibrada:** tecnologia Future, sem sol, ambiente e exposição baixos, bloom leve e todas as luminárias no mesmo patamar de brilho (testado), para nenhuma sala estourar com gráficos baixos.
 
 ## Como funciona
 

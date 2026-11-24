@@ -3,18 +3,19 @@
 
 export const C = Object.freeze({
   // Envoltória e paredes
-  wall: [234, 231, 224], // reboco claro, levemente quente
+  wall: [206, 202, 193], // reboco claro, levemente quente (sem estourar com pouca qualidade gráfica)
   wallTrim: [168, 164, 156], // friso / faixa de parede
-  wainscot: [128, 126, 120], // rodapé alto
+  wainscot: [112, 110, 105], // rodapé alto (superfície Inlet)
   ceiling: [104, 106, 110], // teto de concreto
   beam: [126, 128, 132], // vigas
-  column: [200, 198, 192],
+  column: [184, 181, 174],
   columnBase: [120, 120, 122],
 
   // Pisos
   floor: [154, 154, 150], // laje de concreto
-  floorAtrium: [178, 178, 174], // piso do átrio (studs)
-  floorCorridor: [200, 198, 192],
+  floorAtrium: [166, 165, 160], // piso do átrio (studs), tom claro do xadrez
+  floorAtriumDark: [122, 122, 120], // tom escuro do xadrez
+  floorCorridor: [176, 174, 168],
   floorCatwalk: [156, 158, 160],
   curb: [86, 88, 92], // meio-fio / rodapé de vidro (studs)
 
@@ -26,9 +27,9 @@ export const C = Object.freeze({
 
   // Celas
   facade: [124, 128, 134],
-  cellWall: [238, 236, 230],
+  cellWall: [210, 207, 200],
   cellBack: [164, 168, 172],
-  cellFloor: [198, 196, 190],
+  cellFloor: [180, 178, 172],
   sheet: [226, 224, 218],
   blanket: [110, 114, 120],
   porcelain: [234, 234, 232],
@@ -39,8 +40,13 @@ export const C = Object.freeze({
   stair: [138, 136, 130],
   stairNose: [190, 182, 160],
 
+  // Túnel e portões de emergência
+  tunnel: [132, 132, 130], // concreto do túnel
+  hazard: [214, 198, 156], // faixa de alerta (amarelo-pedra, neutro)
+
   // Luz
   neon: [255, 246, 228], // branco quente das lâmpadas
+  neonWarn: [255, 230, 196], // lâmpada de alerta do portão
 });
 
 /** Saturação HSV (0..1) de uma cor [r,g,b]. */

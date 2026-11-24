@@ -32,8 +32,12 @@ test('propriedades Roblox corretas (material, shape, superfícies, ancorado)', (
     assert.equal(n.properties.Anchored, true);
     assert.equal(n.properties.Material.Enum, ENUM.Material[p.material]);
     assert.equal(n.properties.Shape.Enum, ENUM.PartType[p.shape]);
-    assert.equal(n.properties.TopSurface.Enum, p.studs ? 3 : 0);
+    const relief = ENUM.SurfaceType[p.surface ?? 'Smooth'];
+    assert.equal(n.properties.TopSurface.Enum, p.studs ? 3 : relief);
     assert.equal(n.properties.BottomSurface.Enum, 0);
+    for (const s of ['FrontSurface', 'BackSurface', 'LeftSurface', 'RightSurface']) {
+      assert.equal(n.properties[s].Enum, relief, `${p.name}: ${s}`);
+    }
     assert.equal(n.properties.CanCollide, p.canCollide);
     assert.deepEqual(n.properties.Size, p.size);
     assert.deepEqual(n.properties.CFrame.CFrame.position, p.position);
@@ -56,6 +60,23 @@ test('projeto: Lighting Future, ambiente noturno/fechado e efeitos sutis', () =>
   assert.equal(L.$properties.Brightness, 0, 'sem sol (ambiente fechado)');
   assert.equal(L['Correcao de Cor'].$className, 'ColorCorrectionEffect');
   assert.equal(L['Brilho das Lampadas'].$className, 'BloomEffect');
+});
+
+test('luz equilibrada: ambiente e exposição contidos, nada estoura mesmo com gráficos baixos', () => {
+  const P = project.tree.Lighting.$properties;
+  for (const k of ['Ambient', 'OutdoorAmbient']) {
+    for (const v of P[k]) assert.ok(v <= 0.2, `${k} = ${P[k]} (máximo 0,2)`);
+  }
+  assert.ok(P.ExposureCompensation <= 0.1, `ExposureCompensation = ${P.ExposureCompensation}`);
+  assert.ok(P.EnvironmentDiffuseScale <= 0.25, `EnvironmentDiffuseScale = ${P.EnvironmentDiffuseScale}`);
+  const bloom = project.tree.Lighting['Brilho das Lampadas'].$properties;
+  assert.ok(bloom.Intensity <= 0.25 && bloom.Threshold >= 1.8, 'bloom forte demais');
+  // todas as luminárias no mesmo patamar: nenhuma sala fica estourada nem escura
+  for (const p of parts.filter((x) => x.light)) {
+    const { brightness, range } = p.light;
+    assert.ok(brightness >= 0.5 && brightness <= 1.2, `${p.model}/${p.name}: brilho ${brightness}`);
+    assert.ok(range <= 52, `${p.model}/${p.name}: alcance ${range}`);
+  }
 });
 
 test('projeto: só Workspace + Lighting (sem scripts, UI ou NPCs)', () => {

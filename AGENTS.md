@@ -17,15 +17,15 @@ Escopo atual: **somente a prisão**. Não criar UI, NPC, script, sistema de jogo
 1. **Nada roda localmente.** Testes, build, capturas e publicação rodam no GitHub Actions (`.github/workflows/ci.yml`, `ubuntu-latest`, gratuito em repositório público). Para validar uma mudança: commit → push → ler os comentários que o CI posta no PR.
 2. **Fonte única:** o mapa vive em `src/prison.js`. Nunca edite o lugar no Roblox Studio, porque a próxima publicação sobrescreve tudo.
 3. **Part clássico:** `Part` (Block) e `SpawnLocation`. `Cylinder` é permitido só como tampo girado (mesas). Proibido: MeshPart, Union, Decal, Texture, SurfaceGui, BillboardGui, Humanoid e Script.
-4. **Materiais:** `Plastic` em tudo e `Neon` **apenas** em lâmpadas (sem colisão). Studs (`TopSurface = Studs`) só em pisos baixos; paredes lisas.
+4. **Materiais e relevo clássico:** `Plastic` em tudo e `Neon` **apenas** em lâmpadas (sem colisão). Studs (`TopSurface = Studs`) só em pisos baixos. O relevo clássico do Roblox (`surface: 'Inlet' | 'Weld' | 'Universal'`, superfícies da própria Part, nunca Texture/Decal) vai em rodapés, bases e capitéis de colunas, pisos de corredor, costelas do túnel e portões; paredes grandes ficam lisas para o detalhe ter contraste.
 5. **Cores neutras:** use só `src/palette.js`. Saturação HSV ≤ 0,3 (testado). Não espalhe RGB solto pelo layout.
-6. **Ambiente fechado:** piso, teto e 4 paredes opacos, sem janelas, portas ou claraboias para fora. Não existe exterior nem saída.
+6. **Ambiente fechado:** piso, teto e 4 paredes opacos, sem janelas, portas ou claraboias para fora. Não existe exterior nem saída. O **único vão** da envoltória é o portal 12×12 no fim do corredor de serviço (parede oeste), que leva ao **túnel de acesso** (anexo `Túnel/*`, também fechado): eclusa A com o portão de emergência **aberto** → túnel de 40 studs → eclusa B com o **mesmo portão, fechado** (reservado para uma atualização futura). Os portões são bipartidos: duas folhas (`Folha Esquerda`/`Folha Direita`) correm num trilho e se encontram no meio; não há script (regra 3 do escopo), então elas ficam paradas e nomeadas para um script futuro animar o fechamento simultâneo.
 7. **Tudo se sustenta:** nenhuma peça flutua, nenhuma face visível faz z-fighting, nenhuma peça bloqueia passagem, e toda borda com queda tem guarda-corpo. O **manual de montagem** (`src/manual.js`) precisa conseguir montar cada peça sobre algo já montado.
 8. **Nada apertado:** a escala segue a prisão de referência, com mínimos verificados em `tests/space.test.mjs`: cela de 14×16 com pé-direito de 16, corredor de 10, átrio de 48, 27 studs do 2º andar ao teto, escada de 14 e ponte de 10. **Corte em terraços:** a galeria do 2º andar fica em cima das celas do térreo e as celas de cima são recuadas. Nenhuma laje pode cobrir o corredor do térreo: corredor e átrio formam um vão aberto de 68 studs até o teto. Colunas a cada 30 studs e poucos móveis deixam o espaço respirar. Nunca reduza esses valores para "caber" algo; aumente o prédio.
 9. **Segredos:** a chave Open Cloud só existe no GitHub (Secrets/Variables). Nunca commitar chaves; o publicador mascara a chave no log.
 10. **Cada função tem sua sala:** o bloco de celas (átrio, corredores e galerias) não recebe móveis de outras funções. Refeitório, almoxarifado e enfermaria ficam na **ala oeste**, ligada ao hall por um vão de 12 studs e organizada em torno de um corredor de serviço com faixas no piso. Sala dos guardas e rouparia ficam nos cantos do hall; sala de visitas e estoque de uniformes ficam **fechados** sob o mezanino. No 2º andar não existe piso abandonado: o mezanino tem Sala de Controle (vidraça para o vão), Diretoria, Arquivo, Descanso e Vestiário, e os cantos oeste têm Biblioteca e Sala de Aula, cada uma com parede, porta, forro em y=33 e luz (testado em `tests/rooms.test.mjs`). Função nova = sala nova, com porta e zona livre.
 11. **Sem vãos sobrando:** todo espaço entre a última cela e uma parede vira sala ou é fechado por parede (`Parede Técnica`). Um buraco do tamanho de uma cela parece cela faltando.
-12. **Luz que faz sentido:** o vão de pé-direito duplo usa luminárias de galpão presas ao teto (`HIGH_BAY`, SurfaceLight 120°) entre as vigas, a galeria usa `GALLERY_LIGHT`, e cada sala fechada tem painéis no próprio forro (`panelLight`). Nada de pendente com haste longa no meio do vão.
+12. **Luz que faz sentido e equilibrada:** o vão de pé-direito duplo usa luminárias de galpão presas ao teto (`HIGH_BAY`, SurfaceLight 110°) entre as vigas, a galeria usa `GALLERY_LIGHT`, e cada sala fechada tem painéis no próprio forro (`panelLight`). Nada de pendente com haste longa no meio do vão. **Equilíbrio (testado):** toda luminária tem brilho entre 0,5 e 1,2 e alcance ≤ 52; `Ambient`/`OutdoorAmbient` ≤ 0,2, `ExposureCompensation` ≤ 0,1, bloom contido; paredes, pisos e colunas com canal de cor ≤ 215. Com gráficos baixos o Roblox ilumina quase só pelo ambiente, então reboco quase branco + ambiente alto estoura tudo.
 
 ## 3. Mapa do repositório
 
@@ -55,7 +55,7 @@ b.span('Área/Sub', 'Nome', [x0, y0, z0], [x1, y1, z1], C.cor, { canCollide, stu
 b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 ```
 
-- **Unidades:** studs. Y para cima. Interior: x −151…88 (ala oeste em x −151…−89, forro das salas em y=20), z −60…60, y 0…44. Térreo y=0; 2º andar y=17. Fachadas: térreo em |z|=34, celas de cima em |z|=44 (galeria entre 34 e 44). **Todas as medidas derivam de `DIM`** em `src/prison.js`: mude a escala lá, nunca com números soltos.
+- **Unidades:** studs. Y para cima. Interior: x −151…88 (ala oeste em x −151…−89, forro das salas em y=20), z −60…60, y 0…44. Túnel de acesso (anexo): x −219…−151, eclusas com |z| ≤ 14 e pé-direito 16, túnel com |z| ≤ 6 e 12 de altura. Térreo y=0; 2º andar y=17. Fachadas: térreo em |z|=34, celas de cima em |z|=44 (galeria entre 34 e 44). **Todas as medidas derivam de `DIM`** em `src/prison.js`: mude a escala lá, nunca com números soltos.
 - **Escala do jogador:** personagem de 5 studs. Pé-direito de 16 por andar, portas de 3,5×10, corredores de 10 e degraus de **até 1 stud** (piso de 1,25).
 - **Apoio:** toda peça precisa **encostar** em outra que já esteja ligada à `Laje Térreo`. Luminárias levam haste até o teto (`hangingLight`) ou encostam no teto (`panelLight`).
 - **Peça decorativa colada em superfície** (friso, faixa, placa): use `canCollide: false` e desloque-a para fora da face (por exemplo, `-0.08`), **nunca** no mesmo plano da face.
@@ -83,6 +83,8 @@ b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 | orçamento | mais de 5000 Parts ou mais de 120 luzes |
 | determinismo | resultado diferente entre duas montagens |
 | manual de montagem | peça que não se apoia em nada já montado, peça fora do manual, etapa com mais de 8 peças, fases fora de ordem |
+| luz equilibrada | luminária forte demais, ambiente/exposição altos, bloom exagerado, parede ou piso claro demais (estoura com gráficos baixos) |
+| túnel | portal fora do lugar, túnel sem fundo, portão B aberto ou diferente do A, folha do portão A dentro do vão |
 | zoneamento | refeitório, almoxarifado, enfermaria, guardas ou rouparia ausentes; mesas ou caixas dentro do bloco de celas; móveis no átrio |
 | espaço (anti-aperto) | cela, corredor, vão, pé-direito, escada, ponte ou porta abaixo do mínimo da referência; laje cobrindo o corredor do térreo; celas de cima sem recuo |
 | Rojo/projeto | enums errados, Lighting fora de Future, serviços extras (scripts/UI) |
@@ -98,6 +100,8 @@ Quando um teste falhar, a mensagem lista a peça (`Modelo/Nome @ [x, y, z]`). Co
 - **Sobreposição de colisão em passagens:** sempre confira `clearanceZones()` ao mover móveis.
 - **Fresta no canto de duas paredes:** se a parede frontal termina em z=12 e a lateral começa em x+0,6, sobra um furo de 0,6×0,6. Comece a lateral no mesmo x da frontal.
 - **SurfaceLight:** o ângulo vem de `light.angle` (padrão 90). No visualizador só átrio, hall e galerias recebem luz real; as salas usam o emissivo.
+- **Relevo no visualizador:** `viewer/main.js` desenha Inlet/Weld/Universal com texturas geradas em canvas (repetição de 1 ou 2 studs). A face de baixo fica lisa, como no `src/rojo.js`.
+- **Portão de emergência:** use `emergencyGate(b, modelo, faceX, lado, aberto)`; ele monta trilho, guia, colunas, faixa zebrada, luzes de alerta e as duas folhas. Folhas abertas ficam fora do vão (|z| ≥ 6,2).
 - **Peças giradas** ficam fora da checagem de z-fighting. Evite girar; só tampos cilíndricos.
 - **Open Cloud:** a API recusa `.rbxlx` feito à mão ("Invalid Content stream"). Publique sempre o `.rbxl` **binário do Rojo**.
 - **`Lighting.Technology`** não é alterável por script; vai no `default.project.json` (Future = 4). Se o Rojo mudar de versão, confira o `verify-place`.
