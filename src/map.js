@@ -358,7 +358,9 @@ export function createWorld(seed = SEED) {
   function planRoads(plots) {
     const gates = PLAZA.gates;
     const rects = plots.map((p) => plotRect(p, 3));
-    const order = plots.map((_, k) => k).sort((a, b) => Math.hypot(plots[a].x, plots[a].z) - Math.hypot(plots[b].x, plots[b].z));
+    const order = plots
+      .map((_, k) => k)
+      .sort((a, b) => Math.hypot(plots[a].x, plots[a].z) - Math.hypot(plots[b].x, plots[b].z));
     const legs = [];
     const connected = plots.map(() => false);
     let crossings = 0;
@@ -937,7 +939,15 @@ export function createWorld(seed = SEED) {
         [22, -24, 'moinho'],
       ];
       slots.forEach(([dx, dz, kind], k) => {
-        if (placeBuilding(`${V}/${kind === 'casa' ? 'Casa' : kind[0].toUpperCase() + kind.slice(1)} ${k + 1}`, kind, x + dx, z + dz, facing(dx, dz)))
+        if (
+          placeBuilding(
+            `${V}/${kind === 'casa' ? 'Casa' : kind[0].toUpperCase() + kind.slice(1)} ${k + 1}`,
+            kind,
+            x + dx,
+            z + dz,
+            facing(dx, dz),
+          )
+        )
           count++;
       });
       landmarks.villages.push([x, z, count]);
@@ -1141,7 +1151,8 @@ export function createWorld(seed = SEED) {
       }
     }
     const MAX_TREES = 480;
-    const chosen = spots.length > MAX_TREES ? spots.filter((_, k) => (k * MAX_TREES) % spots.length < MAX_TREES) : spots;
+    const chosen =
+      spots.length > MAX_TREES ? spots.filter((_, k) => (k * MAX_TREES) % spots.length < MAX_TREES) : spots;
     for (const [x, z, kind] of chosen) {
       plant(kind, x, land, z);
       blocked.push({ x0: x - 1.5, x1: x + 1.5, z0: z - 1.5, z1: z + 1.5 });
@@ -1204,7 +1215,6 @@ export function createWorld(seed = SEED) {
 
     return { parts: b.parts, landmarks };
   }
-
 
   const MAP_INFO = Object.freeze({
     plots: PLOTS.length,

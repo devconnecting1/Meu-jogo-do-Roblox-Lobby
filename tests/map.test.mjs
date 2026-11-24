@@ -67,8 +67,14 @@ test('o Lobby fica na grama, com a estátua e um único spawn sobre o piso', () 
   assert.ok(Math.abs(s.position[1] - s.size[1] / 2 - PLAZA.top) < 1e-6, 'spawn apoiado no piso do Lobby');
   assert.ok(Math.hypot(s.position[0], s.position[2]) < DIM.plazaHalf, 'spawn dentro do Lobby');
   const fonte = parts.filter((p) => p.model.startsWith('Lobby/Fonte'));
-  assert.ok(fonte.some((p) => p.name === 'Logo'), 'a estátua não ergue o logo do Roblox');
-  assert.ok(fonte.some((p) => p.name.startsWith('Água') && !p.canCollide), 'fonte sem água');
+  assert.ok(
+    fonte.some((p) => p.name === 'Logo'),
+    'a estátua não ergue o logo do Roblox',
+  );
+  assert.ok(
+    fonte.some((p) => p.name.startsWith('Água') && !p.canCollide),
+    'fonte sem água',
+  );
   assert.ok(count((p) => p.model === 'Lobby' && p.name === 'Estandarte') >= 4, 'Lobby sem estandartes');
 });
 
@@ -115,7 +121,15 @@ test('estradas só sobre a grama e pontes só onde há rio', () => {
 
 test('natureza variada: vários tipos de árvore, coqueiros na praia, montanhas altas e colinas', () => {
   const trunks = (m) => count((p) => p.name === 'Tronco' && p.model === `Vegetação/${m}`);
-  const kinds = ['Carvalhos', 'Pinheiros', 'Bétulas', 'Cerejeiras', 'Árvores Redondas', 'Bosque de Outono', 'Coqueiros'];
+  const kinds = [
+    'Carvalhos',
+    'Pinheiros',
+    'Bétulas',
+    'Cerejeiras',
+    'Árvores Redondas',
+    'Bosque de Outono',
+    'Coqueiros',
+  ];
   for (const k of kinds) assert.ok(trunks(k) >= 5, `só ${trunks(k)} árvores em ${k}`);
   assert.ok(count((p) => p.name === 'Tronco' && p.model.startsWith('Vegetação/')) >= 350, 'poucas árvores');
   assert.ok(landmarks.mountains.length >= 6, `só ${landmarks.mountains.length} montanhas`);
@@ -158,7 +172,11 @@ test('trilhas ligam cada lugar à malha de estradas (nada solto no meio do mato)
   }
   const lobby = find(net.findIndex((p) => p.name === 'Piso do Lobby'));
   const loose = net.filter((p, i) => p.model === 'Trilhas' && find(i) !== lobby);
-  assert.deepEqual(loose.map((p) => p.position.join(',')), [], 'trilhas soltas');
+  assert.deepEqual(
+    loose.map((p) => p.position.join(',')),
+    [],
+    'trilhas soltas',
+  );
   const places = ['villages', 'farms', 'mines', 'towers', 'camps'].reduce((n, k) => n + landmarks[k].length, 0);
   assert.equal(landmarks.trails, places, 'cada vila, campo, jazida, torre e acampamento tem a sua trilha');
 });
@@ -176,7 +194,11 @@ test('estradas não atravessam outros lotes', () => {
         return min[2] < q.z - h && max[2] > q.z + h && min[0] < q.x + h && max[0] > q.x - h;
       }),
     );
-    assert.deepEqual(crossed.map((q) => q.name), [], `Estrada @ [${p.position}] atravessa lote`);
+    assert.deepEqual(
+      crossed.map((q) => q.name),
+      [],
+      `Estrada @ [${p.position}] atravessa lote`,
+    );
   }
 });
 

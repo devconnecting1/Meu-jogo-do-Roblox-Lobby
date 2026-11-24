@@ -108,7 +108,11 @@ test('fonte: tem água sem colisão e transparente, e a mureta colide', () => {
 
 test('fonte: estátua R6 com braço levantado segurando o logo (4 barras giradas, sem colisão)', () => {
   const R6 = ['Perna Esquerda', 'Perna Direita', 'Tronco da Estátua', 'Braço Esquerdo', 'Braço Levantado'];
-  for (const name of [...R6, 'Cabeça da Estátua']) assert.ok(prop.some((p) => p.name === name), `falta ${name}`);
+  for (const name of [...R6, 'Cabeça da Estátua'])
+    assert.ok(
+      prop.some((p) => p.name === name),
+      `falta ${name}`,
+    );
   const logo = prop.filter((p) => p.name === 'Logo');
   assert.equal(logo.length, 4, 'o logo tem 4 barras');
   for (const p of logo) {
@@ -118,7 +122,10 @@ test('fonte: estátua R6 com braço levantado segurando o logo (4 barras giradas
   // a mão (topo do braço levantado) encosta na caixa envolvente de alguma barra do logo
   const arm = aabb(prop.find((p) => p.name === 'Braço Levantado'));
   const touches = (a, b) => [0, 1, 2].every((i) => a.min[i] <= b.max[i] + 0.01 && b.min[i] <= a.max[i] + 0.01);
-  assert.ok(logo.some((p) => touches(arm, aabb(p))), 'o logo não encosta na mão');
+  assert.ok(
+    logo.some((p) => touches(arm, aabb(p))),
+    'o logo não encosta na mão',
+  );
   // o braço levantado é uma caixa vertical acima do ombro (sem giro) e mais alto que o tronco
   const torso = aabb(prop.find((p) => p.name === 'Tronco da Estátua'));
   assert.ok(arm.max[1] > torso.max[1], 'braço levantado não passa do ombro');

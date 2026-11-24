@@ -336,9 +336,15 @@ function tenda(f, rand) {
   f.span('Lenha', [-0.2, 0.15, fv - 0.8], [0.2, 0.55, fv + 0.8], C.woodDark, deco);
   for (let k = 0; k < 6; k++) {
     const a = ((30 + 60 * k) * Math.PI) / 180;
-    f.box('Pedra da Fogueira', [1.3 * Math.cos(a), 0.2, fv + 1.3 * Math.sin(a)], [0.9, 0.6, 0.7], k % 2 ? C.rockDark : C.rock, {
-      rot: ['y', 20 + 15 * k],
-    });
+    f.box(
+      'Pedra da Fogueira',
+      [1.3 * Math.cos(a), 0.2, fv + 1.3 * Math.sin(a)],
+      [0.9, 0.6, 0.7],
+      k % 2 ? C.rockDark : C.rock,
+      {
+        rot: ['y', 20 + 15 * k],
+      },
+    );
   }
   // troncos para sentar em volta
   for (const su of [-1, 1]) f.span('Tronco de Sentar', [su * 2.4, -0.1, fv - 1.3], [su * 3.2, 0.7, fv + 1.3], C.trunk);

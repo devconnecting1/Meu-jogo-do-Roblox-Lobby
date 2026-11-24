@@ -42,7 +42,8 @@ const scripts = count(/<Item class="Script"/g);
 if (scripts !== 1) problems.push(`Scripts no lugar: ${scripts}, esperado 1 (EscolherMapa)`);
 if (!/<string name="Name">EscolherMapa<\/string>/.test(xml)) problems.push('Faltando o script EscolherMapa');
 const variants = VARIANT_SEEDS.filter((s) => xml.includes(`<string name="Name">Semente ${s}</string>`));
-if (variants.length !== VARIANT_SEEDS.length) problems.push(`Variantes no ServerStorage: ${variants.length}/${VARIANT_SEEDS.length}`);
+if (variants.length !== VARIANT_SEEDS.length)
+  problems.push(`Variantes no ServerStorage: ${variants.length}/${VARIANT_SEEDS.length}`);
 if (!/<token name="Technology">4<\/token>/.test(xml)) problems.push('Lighting.Technology não está em Future (4)');
 for (const c of ['ColorCorrectionEffect', 'BloomEffect']) {
   if (!xml.includes(`<Item class="${c}"`)) problems.push(`Faltando ${c} no Lighting`);

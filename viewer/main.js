@@ -177,7 +177,11 @@ const plot = [...PLOTS].sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.
 const VIEWS = [
   { id: 'overview', title: 'Visão geral do reino', ...OVERVIEW },
   { id: 'top', title: 'Mapa visto de cima (30 lotes, estradas, rio e lago)', pos: [0, 1300, 140], target: [0, 0, 0] },
-  { id: 'lobby', title: 'Lobby: fonte com a estátua clássica, mercado e colunas antigas', ...look(0, 0, 78, 48, 96, 10) },
+  {
+    id: 'lobby',
+    title: 'Lobby: fonte com a estátua clássica, mercado e colunas antigas',
+    ...look(0, 0, 78, 48, 96, 10),
+  },
   { id: 'market', title: 'Mercado do Lobby (altura do jogador)', pos: [0, 17, 40], target: [0, 13, 0] },
   { id: 'lobby-stairs', title: 'Escadaria de madeira do Lobby', pos: [74, 17, 26], target: [44, 8, 0] },
   {
@@ -221,7 +225,11 @@ if (landmarks.groves.autumn) {
 const tallest = [...landmarks.mountains].sort((p, q) => q[2] - p[2])[0];
 if (tallest) {
   const [x, z, peak, R] = tallest;
-  add({ id: 'mountain', title: 'Montanha com neve e pinheiros', ...look(x, z, R * 2.2, peak * 0.9, R * 2.2, peak * 0.4) });
+  add({
+    id: 'mountain',
+    title: 'Montanha com neve e pinheiros',
+    ...look(x, z, R * 2.2, peak * 0.9, R * 2.2, peak * 0.4),
+  });
 }
 if (landmarks.hills.length) {
   const [x, z, peak, R] = landmarks.hills[0];
@@ -253,7 +261,8 @@ if (landmarks.docks.length) {
   add({ id: 'dock', title: 'Cais e barco na praia', ...look(tx, tz, 34, 20, 34, 2) });
 }
 const palm = parts.find((p) => p.model === 'Vegetação/Coqueiros' && p.name === 'Tronco');
-if (palm) add({ id: 'beach', title: 'Praia com coqueiros', ...look(palm.position[0], palm.position[2], 36, 18, 36, 6) });
+if (palm)
+  add({ id: 'beach', title: 'Praia com coqueiros', ...look(palm.position[0], palm.position[2], 36, 18, 36, 6) });
 VIEWS.push(
   { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
   { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },

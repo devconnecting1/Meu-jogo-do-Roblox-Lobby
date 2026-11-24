@@ -7,7 +7,8 @@ import { findFloating, findZFighting, findClearanceViolations, findOutside } fro
 import { buildManual } from '../src/manual.js';
 import { stats } from '../src/builder.js';
 
-const report = (p, max = 25) => (p.length ? `\n${p.slice(0, max).join('\n')}${p.length > max ? `\n… +${p.length - max}` : ''}` : '');
+const report = (p, max = 25) =>
+  p.length ? `\n${p.slice(0, max).join('\n')}${p.length > max ? `\n… +${p.length - max}` : ''}` : '';
 
 test('as variantes são diferentes do mapa principal e entre si', () => {
   assert.ok(!VARIANT_SEEDS.includes(SEED), 'a semente principal não é variante');

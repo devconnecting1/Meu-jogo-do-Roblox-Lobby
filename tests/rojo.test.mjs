@@ -91,7 +91,16 @@ test('projeto: mapa principal no Workspace, variantes no ServerStorage e um úni
   assert.deepEqual(scripts, ['EscolherMapa']);
   assert.match(sss.EscolherMapa.$path, /\.server\.luau$/);
   const src = readFileSync(new URL(`../${sss.EscolherMapa.$path}`, import.meta.url), 'utf8');
-  for (const banned of ['Instance.new', 'Players', 'RemoteEvent', 'RemoteFunction', 'Gui', 'Humanoid', 'DataStore', 'HttpService']) {
+  for (const banned of [
+    'Instance.new',
+    'Players',
+    'RemoteEvent',
+    'RemoteFunction',
+    'Gui',
+    'Humanoid',
+    'DataStore',
+    'HttpService',
+  ]) {
     assert.ok(!src.includes(banned), `o script de sorteio não pode usar ${banned}`);
   }
   assert.ok(src.includes('ServerStorage') && src.includes('Mapas'), 'o script sorteia entre os mapas do ServerStorage');

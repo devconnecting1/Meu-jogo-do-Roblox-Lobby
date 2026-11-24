@@ -57,12 +57,7 @@ function problemas(kind, face, seed, origin = [0, 0, 0]) {
     if (!(p.transparency >= 0 && p.transparency <= 0.8)) out.push(`${tag} transparência: ${label(p)}`);
     if (p.size.some((s) => !(s >= 0.04))) out.push(`${tag} tamanho ${p.size}: ${label(p)}`);
     if (tilted(p) && p.canCollide) out.push(`${tag} inclinada com colisão: ${label(p)}`);
-    if (
-      min[0] < x - w / 2 - EPS ||
-      max[0] > x + w / 2 + EPS ||
-      min[2] < z - d / 2 - EPS ||
-      max[2] > z + d / 2 + EPS
-    )
+    if (min[0] < x - w / 2 - EPS || max[0] > x + w / 2 + EPS || min[2] < z - d / 2 - EPS || max[2] > z + d / 2 + EPS)
       out.push(`${tag} fora do terreno ${w}×${d}: ${label(p)}`);
     if (min[1] < y - 0.1 - EPS) out.push(`${tag} enterrada mais de 0,1: ${label(p)}`);
     if (max[1] > y + MAX_H[kind] + EPS) out.push(`${tag} mais alta que ${MAX_H[kind]}: ${label(p)}`);
