@@ -60,6 +60,7 @@ test('projeto: Lighting Future, ambiente noturno/fechado e efeitos sutis', () =>
   assert.equal(L.$properties.Brightness, 0, 'sem sol (ambiente fechado)');
   assert.equal(L['Correcao de Cor'].$className, 'ColorCorrectionEffect');
   assert.equal(L['Brilho das Lampadas'].$className, 'BloomEffect');
+  assert.equal(L['Poeira no Ar'].$className, 'Atmosphere');
 });
 
 test('luz equilibrada: ambiente e exposição contidos, nada estoura mesmo com gráficos baixos', () => {
@@ -79,8 +80,17 @@ test('luz equilibrada: ambiente e exposição contidos, nada estoura mesmo com g
   }
 });
 
-test('projeto: só Workspace + Lighting (sem scripts, UI ou NPCs)', () => {
+test('projeto: Workspace + Lighting + um único script de cintilação (sem UI, NPC ou gameplay)', () => {
   const services = Object.keys(project.tree).filter((k) => !k.startsWith('$'));
-  assert.deepEqual(services.sort(), ['Lighting', 'Workspace']);
+  assert.deepEqual(services.sort(), ['Lighting', 'StarterPlayer', 'Workspace']);
+  const sps = project.tree.StarterPlayer.StarterPlayerScripts;
+  const scripts = Object.keys(sps).filter((k) => !k.startsWith('$'));
+  assert.deepEqual(scripts, ['Cintilacao'], 'só o script de cintilação');
+  assert.match(sps.Cintilacao.$path, /\.client\.luau$/, 'roda no cliente (LocalScript)');
+  const src = readFileSync(new URL(`../${sps.Cintilacao.$path}`, import.meta.url), 'utf8');
+  assert.ok(src.includes('Luz Piscando'), 'o script anima só as luzes marcadas');
+  for (const banned of ['Instance.new', 'Humanoid', 'RemoteEvent', 'RemoteFunction', 'Gui', ':Destroy(', 'Players']) {
+    assert.ok(!src.includes(banned), `script de cintilação não pode usar ${banned}`);
+  }
   assert.equal(project.tree.Workspace['Prisão'].$path, 'build/Prisao.model.json');
 });

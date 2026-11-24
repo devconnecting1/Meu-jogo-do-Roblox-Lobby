@@ -11,32 +11,74 @@
     "Lighting": {
       "$className": "Lighting",
       "$properties": {
-        "Technology": { "Enum": 4 },
+        "Technology": {
+          "Enum": 4
+        },
         "ClockTime": 0,
         "Brightness": 0,
-        "Ambient": [0.15, 0.15, 0.16],
-        "OutdoorAmbient": [0.08, 0.08, 0.09],
-        "EnvironmentDiffuseScale": 0.15,
-        "EnvironmentSpecularScale": 0.2,
-        "ExposureCompensation": 0,
-        "ShadowSoftness": 0.3,
+        "Ambient": [
+          0.07,
+          0.075,
+          0.08
+        ],
+        "OutdoorAmbient": [
+          0.03,
+          0.035,
+          0.04
+        ],
+        "EnvironmentDiffuseScale": 0.1,
+        "EnvironmentSpecularScale": 0.15,
+        "ExposureCompensation": -0.1,
+        "ShadowSoftness": 0.2,
         "GlobalShadows": true
       },
       "Correcao de Cor": {
         "$className": "ColorCorrectionEffect",
         "$properties": {
-          "Brightness": 0,
-          "Contrast": 0.12,
-          "Saturation": -0.12,
-          "TintColor": [1, 0.985, 0.96]
+          "Brightness": -0.02,
+          "Contrast": 0.22,
+          "Saturation": -0.3,
+          "TintColor": [
+            0.9,
+            0.97,
+            0.96
+          ]
         }
       },
       "Brilho das Lampadas": {
         "$className": "BloomEffect",
         "$properties": {
-          "Intensity": 0.18,
-          "Size": 18,
-          "Threshold": 2.2
+          "Intensity": 0.2,
+          "Size": 20,
+          "Threshold": 2
+        }
+      },
+      "Poeira no Ar": {
+        "$className": "Atmosphere",
+        "$properties": {
+          "Density": 0.38,
+          "Offset": 0.1,
+          "Color": [
+            0.42,
+            0.47,
+            0.47
+          ],
+          "Decay": [
+            0.12,
+            0.14,
+            0.15
+          ],
+          "Glare": 0,
+          "Haze": 1.6
+        }
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "Cintilacao": {
+          "$path": "src/game/cintilacao.client.luau"
         }
       }
     }

@@ -44,8 +44,18 @@ export const C = Object.freeze({
   tunnel: [132, 132, 130], // concreto do túnel
   hazard: [214, 198, 156], // faixa de alerta (amarelo-pedra, neutro)
 
+  // Abandono: entulho, umidade, mofo e ferrugem (ainda neutros: saturação <= 0,3)
+  debris: [116, 113, 107],
+  debrisDark: [74, 73, 70],
+  grime: [66, 70, 68], // mancha de umidade
+  mold: [84, 94, 86], // mofo esverdeado
+  rust: [112, 92, 80], // ferrugem dessaturada
+  puddle: [40, 46, 46], // poça d'água parada
+  lampDead: [84, 86, 88], // lâmpada queimada (Plastic, sem luz)
+
   // Luz
   neon: [255, 246, 228], // branco quente das lâmpadas
+  neonCold: [214, 232, 226], // fluorescente velha, fria (clima de abandono)
   neonWarn: [255, 230, 196], // lâmpada de alerta do portão
 });
 

@@ -83,6 +83,10 @@ const TUN1 = TUN0 - 40; // -205: fim do túnel
 const GB1 = TUN1 - W; // -207: face oeste da parede de entrada da eclusa B
 const GB0 = GB1 - 10; // -217: face do portão B (fechado, para uma atualização futura)
 const TX0 = GB0 - W; // -219: face externa do fundo do túnel
+const RZ = CH + W + 14; // 30: fundo das salas laterais das eclusas (triagem, revista, máquinas, solitária)
+
+// Abandono: rombo na parede do bloco (lado do hall), aberto para o vão escuro sobre a ala oeste
+const BREACH = Object.freeze({ z: [18, 28], y: [24, 34] });
 
 export const LEVELS = Object.freeze({
   F2,
@@ -102,14 +106,16 @@ export const LEVELS = Object.freeze({
 
 // Luz equilibrada (testado em tests/rojo.test.mjs): todas as luminárias entre 0,5 e 1,2 de brilho,
 // com Ambient/Exposure baixos no default.project.json, para nada estourar com gráficos baixos.
-const HANG_LIGHT = { type: 'Point', range: 28, brightness: 0.8, color: C.neon };
+const HANG_LIGHT = { type: 'Point', range: 28, brightness: 0.8, color: C.neonCold };
 // luminária de galpão presa ao teto: ilumina o vão de pé-direito duplo de cima para baixo
-const HIGH_BAY = { type: 'Surface', range: 50, brightness: 0.9, color: C.neon, angle: 110 };
-const GALLERY_LIGHT = { type: 'Surface', range: 30, brightness: 0.8, color: C.neon, angle: 110 };
+const HIGH_BAY = { type: 'Surface', range: 50, brightness: 0.9, color: C.neonCold, angle: 110 };
+const GALLERY_LIGHT = { type: 'Surface', range: 30, brightness: 0.8, color: C.neonCold, angle: 110 };
 const WARN_LIGHT = { type: 'Point', range: 14, brightness: 0.6, color: C.neonWarn };
 const FIXTURE_Y = ROOF - 1.4; // luminárias presas ao teto com haste curta (1,2)
 const UPPER_CEIL = TOP; // forro das salas do 2º andar (mesma altura do topo das celas de cima)
-const PANEL_LIGHT = { type: 'Surface', range: 17, brightness: 0.8, color: C.neon };
+const PANEL_LIGHT = { type: 'Surface', range: 17, brightness: 0.8, color: C.neonCold };
+/** Estado de uma lâmpada: 'ok', 'dead' (queimada, sem luz) ou 'flicker' (pisca suave via script). */
+const withState = (light, state) => (light && state === 'flicker' ? { ...light, flicker: true } : light);
 
 /** Centro X da cela i (0..7). */
 export const cellCenterX = (i) => -ROW + 1 + DIM.cellW / 2 + i * PITCH;
@@ -156,6 +162,21 @@ export function clearanceZones() {
     { name: 'Corredor de serviço', min: [WING_X0 + 0.5, 0.6, -5], max: [WING_X1 - 0.5, 8, 5] },
     { name: 'Portal e eclusa de entrada (portão aberto)', min: [TUN0 - 1, 0.6, -5.5], max: [WING_X0 + 0.5, 11, 5.5] },
     { name: 'Túnel de acesso', min: [TUN1 + 0.5, 0.6, -5], max: [TUN0 - 0.5, 8, 5] },
+    ...[
+      ['Triagem', 1, -160, -154],
+      ['Revista', -1, -159.8, -156.2],
+      ['Casa de Máquinas', 1, -213.8, -210.2],
+      ['Solitária', -1, -213.8, -209],
+    ].flatMap(([n, s, x0, x1]) => {
+      const zz = (a, c) => (s < 0 ? [-c, -a] : [a, c]);
+      const door = n.startsWith('Casa') || n === 'Solitária' ? [-213.7, -210.3] : [-159.7, -156.3];
+      const [d0, d1] = zz(CH - 2, CH + W + 2);
+      const [r0, r1] = zz(CH + W + 0.5, 25);
+      return [
+        { name: `Porta da ${n}`, min: [door[0], 0.6, d0], max: [door[1], 9.6, d1] },
+        { name: `Entrada da ${n}`, min: [x0, 0.6, r0], max: [x1, 8, r1] },
+      ];
+    }),
     { name: 'Eclusa do fundo (até o portão fechado)', min: [GB0 + 1.8, 0.6, -5], max: [TUN1 + 0.5, 8, 5] },
     { name: 'Porta do refeitório', min: [-125.5, 0.6, 4], max: [-114.5, 11, 9] },
     { name: 'Corredor entre as mesas', min: [-150, 0.6, 25], max: [-90, 8, 35] },
@@ -235,8 +256,8 @@ export const ENVELOPE = Object.freeze({ min: [OXW, -1, -OZ], max: [OX, ROOF + 1,
 export const INTERIOR = Object.freeze({ min: [WING_X0, 0, -IN_Z], max: [IN_X, ROOF, IN_Z] });
 /** Túnel de acesso: único anexo do prédio, também fechado (termina no portão B). */
 export const TUNNEL = Object.freeze({ portal: [-PORTAL, PORTAL], portalTop: PORTAL_H, gateA: GA0, gateB: GB0 });
-export const ANNEX = Object.freeze({ min: [TX0, -1, -CH - W], max: [WING_X0, CH_H + 1, CH + W] });
-export const ANNEX_INTERIOR = Object.freeze({ min: [GB0, 0, -CH], max: [WING_X0, CH_H, CH] });
+export const ANNEX = Object.freeze({ min: [TX0, -1, -RZ - W], max: [WING_X0, CH_H + 1, RZ + W] });
+export const ANNEX_INTERIOR = Object.freeze({ min: [GB0, 0, -RZ], max: [WING_X0, CH_H, RZ] });
 
 // ---------------------------------------------------------------------------
 // Peças compostas
@@ -353,14 +374,15 @@ function wallX(b, model, x0, x1, z0, z1, h, openings = []) {
 }
 
 /** Luminária pendente: carcaça + 2 tubos Neon + hastes até o teto. */
-function hangingLight(b, model, x, y, z, light = HANG_LIGHT) {
+function hangingLight(b, model, x, y, z, light = HANG_LIGHT, state = 'ok') {
   const stem = ROOF - (y + 0.2);
+  const dead = state === 'dead';
   b.box(model, 'Carcaça', [x, y, z], [8, 0.4, 1.8], C.steel, { canCollide: false });
   for (const o of [-1.9, 1.9]) {
-    b.box(model, 'Tubo', [x + o, y - 0.3, z], [3.6, 0.25, 1.1], C.neon, {
+    b.box(model, 'Tubo', [x + o, y - 0.3, z], [3.6, 0.25, 1.1], dead ? C.lampDead : C.neonCold, {
       canCollide: false,
-      material: 'Neon',
-      light: o < 0 ? light : null,
+      material: dead ? 'Plastic' : 'Neon',
+      light: o < 0 && !dead ? withState(light, state) : null,
     });
     b.box(model, 'Haste', [x + o * 1.4, y + 0.2 + stem / 2, z], [0.3, stem, 0.3], C.steel, { canCollide: false });
   }
@@ -383,7 +405,7 @@ function emergencyGate(b, model, fx, s, open, floorY = 0.1) {
   const leaf = PORTAL + 0.4; // cada folha cobre metade do vão + 0,4 de encosto
   const deco = { canCollide: false };
   sp('Trilho Superior', 0, 1.3, top, top + 1.2, -reach, reach, C.steel, { surface: 'Inlet' });
-  sp('Guia do Piso', 0, 1.1, floorY, floorY + 0.25, -reach, reach, C.steel, { surface: 'Inlet' });
+  sp('Trilho do Piso', 0, 1.1, floorY, floorY + 0.25, -reach, reach, C.steel, { surface: 'Inlet' });
   // faixa de alerta zebrada na frente do trilho
   sp('Faixa de Alerta', 1.3, 1.4, top + 0.2, top + 1, -reach + 0.2, reach - 0.2, C.hazard, deco);
   for (let z = -reach + 0.6; z + 1 <= reach - 0.2; z += 2.4) {
@@ -419,12 +441,92 @@ function emergencyGate(b, model, fx, s, open, floorY = 0.1) {
 
 /** Painel embutido; ceilingY = face inferior do teto onde ele encosta. */
 function panelLight(b, model, x, ceilingY, z, w = 5, d = 1.4, light = true) {
+  // light: true (acesa), false (Neon sem luz própria), 'dead' (queimada) ou 'flicker' (pisca)
+  const dead = light === 'dead';
   b.box(model, 'Moldura', [x, ceilingY - 0.05, z], [w + 0.4, 0.1, d + 0.4], C.steel, { canCollide: false });
-  b.box(model, 'Painel', [x, ceilingY - 0.15, z], [w, 0.12, d], C.neon, {
+  b.box(model, 'Painel', [x, ceilingY - 0.15, z], [w, 0.12, d], dead ? C.lampDead : C.neonCold, {
     canCollide: false,
-    material: 'Neon',
-    light: light ? PANEL_LIGHT : null,
+    material: dead ? 'Plastic' : 'Neon',
+    light: light === true ? PANEL_LIGHT : light === 'flicker' ? withState(PANEL_LIGHT, 'flicker') : null,
   });
+}
+
+/** Gerador pseudoaleatório determinístico: a mesma montagem sai sempre igual. */
+function rng(seed) {
+  let s = seed >>> 0 || 1;
+  return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296;
+}
+
+/** Monte de entulho no piso: blocos soltos (sem colisão), girados só em Y. */
+function rubble(b, model, x, z, seed, { n = 7, spread = 2, floorY = 0, big = 1.4 } = {}) {
+  const r = rng(seed);
+  const cols = [C.debris, C.debrisDark, C.wall];
+  for (let k = 0; k < n; k++) {
+    const sx = 0.4 + r() * big;
+    const sy = 0.3 + r() * big * 0.6;
+    const sz = 0.4 + r() * big;
+    const px = x + (r() - 0.5) * spread * 2;
+    const pz = z + (r() - 0.5) * spread * 2;
+    const rot = Math.round(r() * 7) * 11.25;
+    b.box(model, 'Entulho', [px, floorY + sy / 2, pz], [sx, sy, sz], cols[k % 3], {
+      canCollide: false,
+      rotation: rot ? [0, rot, 0] : null,
+    });
+  }
+}
+
+/**
+ * Mancha colada numa parede (umidade, mofo, ferrugem): 3 retângulos sobrepostos da mesma cor.
+ * axis 'x': a parede é o plano x = at e a mancha cresce para dir; u = coordenada z. axis 'z': o contrário.
+ */
+function stain(b, model, axis, at, dir, u, y, w, h, color, seed) {
+  const r = rng(seed);
+  const [a, c] = [at, at + dir * 0.04].sort((p, q) => p - q);
+  for (let k = 0; k < 3; k++) {
+    const ww = w * (0.45 + r() * 0.55);
+    const hh = h * (0.5 + r() * 0.5);
+    const uu = u + (r() - 0.5) * (w - ww);
+    const yy = y + (r() - 0.5) * (h - hh);
+    const [u0, u1, y0, y1] = [uu - ww / 2, uu + ww / 2, yy - hh / 2, yy + hh / 2];
+    const lo = axis === 'x' ? [a, y0, u0] : [u0, y0, a];
+    const hi = axis === 'x' ? [c, y1, u1] : [u1, y1, c];
+    b.span(model, 'Mancha', lo, hi, color, { canCollide: false });
+  }
+}
+
+/** Coluna rachada: o meio perdeu o reboco, mostra o núcleo e os vergalhões, mas continua de pé. */
+function brokenColumn(b, x, z) {
+  const M = 'Estrutura/Colunas';
+  const h = COL / 2;
+  const [g0, g1] = [10, 13.6];
+  b.span(M, 'Coluna', [x - h, 0, z - h], [x + h, g0, z + h], C.column);
+  b.span(M, 'Coluna', [x - h, g1, z - h], [x + h, ROOF, z + h], C.column);
+  b.span(M, 'Núcleo Exposto', [x - 0.8, g0, z - 0.8], [x + 0.8, g1, z + 0.8], C.debrisDark);
+  for (const [dx, dz] of [
+    [-1, -1],
+    [-1, 1],
+    [1, -1],
+    [1, 1],
+  ]) {
+    b.span(M, 'Vergalhão', [x + dx * 1.1 - 0.1, g0, z + dz * 1.1 - 0.1], [x + dx * 1.1 + 0.1, g1, z + dz * 1.1 + 0.1], C.rust);
+  }
+  // pedaços que ainda seguram (presos embaixo e em cima)
+  b.span(M, 'Pedaço da Coluna', [x - h, g0, z - h], [x + 0.3, g0 + 1.4, z + h], C.column);
+  b.span(M, 'Pedaço da Coluna', [x + 0.2, g1 - 1, z - h], [x + h, g1, z + 0.4], C.column);
+}
+
+/** Poça d'água parada no piso (topo em floorY). */
+function puddle(b, model, x, z, w, d, floorY, seed) {
+  const r = rng(seed);
+  for (let k = 0; k < 2; k++) {
+    const ww = w * (0.6 + r() * 0.4);
+    const dd = d * (0.6 + r() * 0.4);
+    const px = x + (r() - 0.5) * (w - ww);
+    const pz = z + (r() - 0.5) * (d - dd);
+    b.span(model, 'Poça', [px - ww / 2, floorY, pz - dd / 2], [px + ww / 2, floorY + 0.06, pz + dd / 2], C.puddle, {
+      canCollide: false,
+    });
+  }
 }
 
 /** Guarda-corpo de vidro reto (em X ou em Z), apoiado em y. */
@@ -487,7 +589,9 @@ function cell(b, index, side, y0, number) {
   r('Revestimento E', -7, -6.8, 0, H, 0.6, D - 0.3, C.cellWall);
   r('Revestimento D', 6.8, 7, 0, H, 0.6, D - 0.3, C.cellWall);
   r('Parede Fundo', -7, 7, 0, H, D - 0.3, D, C.cellBack);
-  panelLight(b, model, cx, y0 + H, zAt(7), 3.4, 1.8);
+  // celas abandonadas: 1 em cada 3 com a lâmpada queimada, duas piscando
+  const lamp = number % 3 === 0 ? 'dead' : [7, 22].includes(number) ? 'flicker' : true;
+  panelLight(b, model, cx, y0 + H, zAt(7), 3.4, 1.8, lamp);
 
   // Cama
   r('Cama Base', -6.6, 0.4, 0.1, 1.4, 12.2, 15.6, C.steel);
@@ -540,7 +644,30 @@ export function buildPrison() {
   // Parede que separa o bloco de celas (hall) da ala oeste, com vão de 12 × 12
   const PB = 'Estrutura/Paredes';
   b.span(PB, 'Parede do Bloco S', [WING_X1, 0, -IN_Z], [-IN_X, ROOF, -6], C.wall, wo);
-  b.span(PB, 'Parede do Bloco N', [WING_X1, 0, 6], [-IN_X, ROOF, IN_Z], C.wall, wo);
+  // parede norte do bloco com um rombo (abandono): mostra o vão escuro sobre o forro da ala oeste
+  const [bz0, bz1] = BREACH.z;
+  const [by0, by1] = BREACH.y;
+  b.span(PB, 'Parede do Bloco N', [WING_X1, 0, 6], [-IN_X, by0, IN_Z], C.wall, wo);
+  b.span(PB, 'Parede do Bloco N Alta', [WING_X1, by1, 6], [-IN_X, ROOF, IN_Z], C.wall, wo);
+  b.span(PB, 'Parede do Bloco N Lado S', [WING_X1, by0, 6], [-IN_X, by1, bz0], C.wall, wo);
+  b.span(PB, 'Parede do Bloco N Lado N', [WING_X1, by0, bz1], [-IN_X, by1, IN_Z], C.wall, wo);
+  // bordas irregulares do rombo (pedaços de parede) e o miolo exposto
+  const RB = 'Ruínas/Rombo da Parede';
+  for (const [za, zb, ya, yb] of [
+    [bz0, bz0 + 2.5, by0, by0 + 1.6],
+    [bz0 + 4, bz0 + 6, by0, by0 + 0.9],
+    [bz1 - 2.5, bz1, by0, by0 + 2.2],
+    [bz0, bz0 + 1.8, by1 - 1.6, by1],
+    [bz0 + 5, bz0 + 8, by1 - 0.9, by1],
+    [bz0, bz0 + 1.2, by0 + 3, by0 + 6.5],
+    [bz1 - 1.4, bz1, by0 + 4, by0 + 7],
+  ]) {
+    b.span(RB, 'Pedaço de Parede', [WING_X1, ya, za], [-IN_X, yb, zb], C.wall);
+  }
+  b.span(RB, 'Miolo Exposto', [WING_X1 + 0.15, by0, bz0], [-IN_X - 0.15, by0 + 0.35, bz1], C.debrisDark);
+  for (const z of [bz0 + 3.2, bz0 + 7.4]) {
+    b.span(RB, 'Vergalhão', [WING_X1 + 0.4, by0, z], [WING_X1 + 0.6, by0 + 2.6, z + 0.2], C.rust);
+  }
   b.span(PB, 'Parede do Bloco Verga', [WING_X1, 12, -6], [-IN_X, ROOF, 6], C.wall, wo);
 
   // Faixas internas das paredes (decorativas, sem colisão)
@@ -558,13 +685,19 @@ export function buildPrison() {
   ]) {
     for (const [n, ya, yb, col, surface, t = 0.1] of bands) {
       // no lado do hall a parede tem o vão para a ala oeste (z -6..6, até 12 de altura)
+      const hitsBreach = x < 0 && ya < BREACH.y[1] && yb > BREACH.y[0];
       const zs =
         x < 0 && yb <= 12
           ? [
               [-IN_Z, -6],
               [6, IN_Z],
             ]
-          : [[-IN_Z, IN_Z]];
+          : hitsBreach
+            ? [
+                [-IN_Z, BREACH.z[0]],
+                [BREACH.z[1], IN_Z],
+              ]
+            : [[-IN_Z, IN_Z]];
       for (const [z0, z1] of zs) b.span(WB, n, [x, ya, z0], [x + dir * t, yb, z1], col, { ...band, surface });
     }
   }
@@ -591,7 +724,8 @@ export function buildPrison() {
   // --- Colunas (a cada 2 celas, soltas no vão) ------------------------------
   for (const x of COLUMN_X) {
     for (const s of [-1, 1]) {
-      b.box('Estrutura/Colunas', 'Coluna', [x, ROOF / 2, s * E], [COL, ROOF, COL], C.column);
+      if ((x === -30 && s < 0) || (x === 30 && s > 0)) brokenColumn(b, x, s * E);
+      else b.box('Estrutura/Colunas', 'Coluna', [x, ROOF / 2, s * E], [COL, ROOF, COL], C.column);
       b.box('Estrutura/Colunas', 'Base Coluna', [x, 0.45, s * E], [COL + 0.6, 0.9, COL + 0.6], C.columnBase, {
         surface: 'Inlet',
       });
@@ -677,7 +811,8 @@ export function buildPrison() {
     // Iluminação: pendentes sobre o corredor (vão aberto) e sobre a galeria
     for (let i = 0; i < DIM.cellsPerRow; i++) {
       const lx = cellCenterX(i);
-      hangingLight(b, `Iluminação/Galeria ${t}`, lx, FIXTURE_Y, side * (CELL_FRONT + 5), i % 2 ? null : GALLERY_LIGHT);
+      const state = (side > 0 && (i === 2 || i === 7)) || (side < 0 && i === 5) ? 'dead' : side < 0 && i === 4 ? 'flicker' : 'ok';
+      hangingLight(b, `Iluminação/Galeria ${t}`, lx, FIXTURE_Y, side * (CELL_FRONT + 5), i % 2 ? null : GALLERY_LIGHT, state);
     }
   }
 
@@ -725,7 +860,7 @@ export function buildPrison() {
   b.span(HL, 'Tampo Balcão', [-74.3, 3.5, 11.7], [-69.7, 3.8, 20.3], C.steelLight);
   b.span(HL, 'Vidro Balcão', [-69.9, 3.8, 12], [-69.8, 7.5, 20], C.glass, { transparency: 0.6 });
   b.span(HL, 'Painel Monitores', [-IN_X, 6, 13], [-IN_X + 0.3, 9.5, 19], C.steel, { canCollide: false });
-  for (const z of [-14, 14]) hangingLight(b, 'Iluminação/Hall', -74, FIXTURE_Y, z, HIGH_BAY);
+  for (const z of [-14, 14]) hangingLight(b, 'Iluminação/Hall', -74, FIXTURE_Y, z, HIGH_BAY, z < 0 ? 'flicker' : 'ok');
 
   // --- Salas do bloco (cantos oeste do térreo): guardas e rouparia ----------
   for (const s of [-1, 1]) {
@@ -766,7 +901,16 @@ export function buildPrison() {
   // --- Átrio: livre (refeitório e caixas ficam em salas próprias na ala oeste) -
   // grade de luminárias de galpão entre as vigas (cobre átrio e corredores do térreo)
   for (const x of [-45, -15, 15, 45]) {
-    for (const z of [-(E + 5), -12, 12, E + 5]) hangingLight(b, 'Iluminação/Átrio', x, FIXTURE_Y, z, HIGH_BAY);
+    for (const z of [-(E + 5), -12, 12, E + 5]) {
+      const k = `${x},${z}`;
+      if (k === '-45,12') continue; // esta caiu no chão (Ruínas/Átrio)
+      const state = ['-15,-29', '15,29', '45,-12', '-45,-29'].includes(k)
+        ? 'dead'
+        : ['-15,12', '45,12'].includes(k)
+          ? 'flicker'
+          : 'ok';
+      hangingLight(b, 'Iluminação/Átrio', x, FIXTURE_Y, z, HIGH_BAY, state);
+    }
   }
 
   // --- Sala de visitas (sob o mezanino) -------------------------------------
@@ -783,7 +927,7 @@ export function buildPrison() {
       b.box(V, 'Banqueta Assento', [x, 1.65, z], [1.4, 0.3, 1.4], C.wood);
     }
   }
-  for (const z of [-15, 0, 15]) panelLight(b, V, 77, F2 - 1, z);
+  for (const z of [-15, 0, 15]) panelLight(b, V, 77, F2 - 1, z, 5, 1.4, z === 15 ? 'dead' : true);
 
   // paredes da sala de visitas (porta em cada lado da escada) e do depósito de uniformes
   for (const s of [-1, 1]) {
@@ -932,7 +1076,9 @@ export function buildPrison() {
     [-135, -127, 12],
     [-109, -101, 12],
   ]);
-  for (const x of [-140, -120, -100]) panelLight(b, `Iluminação/Corredor de Serviço`, x, WC, 0);
+  for (const x of [-140, -120, -100]) {
+    panelLight(b, `Iluminação/Corredor de Serviço`, x, WC, 0, 5, 1.4, x === -120 ? 'dead' : true);
+  }
 
   // Refeitório (norte): balcão de servir, quadros de cardápio e mesas redondas
   b.span(RN, 'Piso Refeitório', [WING_X0, 0, 6.6], [WING_X1, 0.1, IN_Z], C.floorAtrium, { studs: true });
@@ -959,7 +1105,13 @@ export function buildPrison() {
         z,
         5,
         1.4,
-        z === 30 || (z === 14 && x === -127) || (z === 46 && x === -112),
+        z === 30 || (z === 14 && x === -127) || (z === 46 && x === -112)
+          ? x === -112 && z === 30
+            ? 'flicker'
+            : true
+          : x === -142 && z === 46
+            ? 'dead'
+            : false,
       );
     }
   }
@@ -972,7 +1124,10 @@ export function buildPrison() {
   crate(b, AX, -142.8, 0, -14);
   crate(b, AX, -144.9, 4, -14);
   for (const x of [-145, -124]) {
-    for (const z of [-44, -24]) panelLight(b, 'Iluminação/Almoxarifado', x, WC, z, 5, 1.4, z === -24);
+    for (const z of [-44, -24]) {
+      const lamp = z === -24 ? (x === -124 ? 'flicker' : true) : x === -124 ? 'dead' : false;
+      panelLight(b, 'Iluminação/Almoxarifado', x, WC, z, 5, 1.4, lamp);
+    }
   }
 
   // Enfermaria (sudeste da ala): leitos com divisórias, balcão e armário
@@ -990,21 +1145,24 @@ export function buildPrison() {
   b.span(EF, 'Tampo Balcão', [-100.3, 3.5, -14.3], [-91.7, 3.8, -10.7], C.steelLight);
   b.span(EF, 'Armário', [WING_X1 - 0.6, 3, -40], [WING_X1, 9, -30], C.steelLight);
   for (const x of [-110, -96]) {
-    for (const z of [-45, -25]) panelLight(b, 'Iluminação/Enfermaria', x, WC, z, 5, 1.4, z === -45);
+    for (const z of [-45, -25]) {
+      const lamp = z === -45 ? (x === -96 ? 'flicker' : true) : x === -110 ? 'dead' : false;
+      panelLight(b, 'Iluminação/Enfermaria', x, WC, z, 5, 1.4, lamp);
+    }
   }
 
   // --- Túnel de acesso: portal -> eclusa A (portão aberto) -> túnel -> eclusa B (fechado) --
   const TE = 'Túnel/Envoltória';
   const tw = { group: 'Paredes' };
   const tt = { group: 'Teto' };
-  b.span(TE, 'Laje do Túnel', [TX0, -1, -CH - W], [OXW, 0, CH + W], C.floor, { group: 'Piso' });
+  b.span(TE, 'Laje do Túnel', [TX0, -1, -RZ - W], [OXW, 0, RZ + W], C.floor, { group: 'Piso' });
   for (const [n, x0, x1] of [
     ['A', TUN0, OXW],
     ['B', TX0, TUN1],
   ]) {
-    for (const s of [-1, 1]) {
-      b.span(TE, `Parede Eclusa ${n}`, [x0, 0, s * CH], [x1, CH_H, s * (CH + W)], C.tunnel, tw);
-    }
+    // paredes laterais das eclusas, com a porta das salas laterais
+    const dx = n === 'A' ? GA0 + 3 : GB0 + 3;
+    for (const s of [-1, 1]) wallRun(b, TE, 'x', x0, x1, s * CH, s * (CH + W), 0, CH_H, [door(dx, dx + 4)]);
     b.span(TE, `Teto Eclusa ${n}`, [x0, CH_H, -CH - W], [x1, CH_H + 1, CH + W], C.ceiling, tt);
   }
   // paredes de passagem entre eclusas e túnel (vão de 12 × 12)
@@ -1057,10 +1215,144 @@ export function buildPrison() {
 
   // luz do túnel e das eclusas (mesmo patamar das outras salas)
   const TL = 'Túnel/Iluminação';
-  for (let x = TUN0 - 8; x > TUN1 + 1; x -= 8) panelLight(b, TL, x, PORTAL_H, 0, 5, 1.4, true);
+  for (let x = TUN0 - 8; x > TUN1 + 1; x -= 8) {
+    panelLight(b, TL, x, PORTAL_H, 0, 5, 1.4, x === TUN0 - 16 ? 'dead' : x === TUN0 - 32 ? 'flicker' : true);
+  }
   for (const x of [(GA0 + OXW) / 2, (GB0 + GB1) / 2]) {
     for (const z of [-8, 8]) panelLight(b, TL, x, CH_H, z, 5, 1.4, true);
   }
+
+  // --- Salas laterais das eclusas (o anexo continua fechado: |z| <= 32) ----------
+  for (const [n, x0, x1, ix0, ix1] of [
+    ['A', TUN0, OXW, GA0, OXW],
+    ['B', TX0, TUN1, GB0, GB1],
+  ]) {
+    for (const s of [-1, 1]) {
+      const zz = (a, c) => (s < 0 ? [-c, -a] : [a, c]);
+      const [z0, z1] = zz(CH + W, RZ);
+      b.span(TE, `Parede Externa ${n}`, [x0, 0, s * RZ], [x1, CH_H, s * (RZ + W)], C.tunnel, tw);
+      b.span(TE, `Parede Oeste da Sala ${n}`, [x0, 0, z0], [ix0, CH_H, z1], C.tunnel, tw);
+      if (n === 'B') b.span(TE, `Parede Leste da Sala ${n}`, [ix1, 0, z0], [x1, CH_H, z1], C.tunnel, tw);
+      b.span(TE, `Teto da Sala ${n}`, [x0, CH_H, s * (CH + W)], [x1, CH_H + 1, s * (RZ + W)], C.ceiling, tt);
+      b.span(TP, `Piso da Sala ${n}`, [ix0, 0, z0], [ix1, 0.1, z1], C.cellFloor, { surface: 'Inlet' });
+    }
+  }
+  // Triagem (entrada, norte): banco de espera, régua de altura, mesa e armários
+  const TR = 'Túnel/Triagem';
+  b.span(TR, 'Banco de Espera', [GA0, 0.1, 19], [GA0 + 1.6, 1.8, 28], C.woodDark);
+  b.span(TR, 'Régua de Altura', [GA0, 0.1, 17], [GA0 + 0.04, 8, 18], C.steelLight, { canCollide: false });
+  for (const y of [2, 4, 6, 8 - 0.2]) {
+    b.span(TR, 'Marca da Régua', [GA0 + 0.04, y - 0.1, 17], [GA0 + 0.08, y + 0.1, 18], C.steel, { canCollide: false });
+  }
+  b.span(TR, 'Mesa de Triagem', [-158, 2.5, 26], [-154, 2.8, 28.5], C.wood);
+  for (const lx of [-158, -154.4]) b.span(TR, 'Mesa Pé', [lx, 0.1, 26.2], [lx + 0.4, 2.5, 28.3], C.steel);
+  for (const ax of [GA0, GA0 + 2]) b.span(TR, 'Armário', [ax, 0.1, RZ - 1.6], [ax + 2, 7, RZ], C.steelLight);
+  panelLight(b, TR, -158, CH_H, 22, 5, 1.4, 'flicker');
+  // Revista (entrada, sul): pórtico detector de metais, mesa e banco
+  const RV = 'Túnel/Revista';
+  for (const px of [-160.5, -156.1]) b.span(RV, 'Pórtico Detector', [px, 0.1, -22.3], [px + 0.6, 8, -21.7], C.steelLight);
+  b.span(RV, 'Pórtico Detector Topo', [-160.5, 8, -22.4], [-155.5, 8.8, -21.6], C.steelLight);
+  b.span(RV, 'Marca de Pés', [-159, 0.1, -19.6], [-157, 0.12, -18.4], C.hazard, { canCollide: false });
+  b.span(RV, 'Mesa de Revista', [-158, 2.5, -29], [-154, 2.8, -26.5], C.steelLight);
+  for (const lx of [-158, -154.4]) b.span(RV, 'Mesa Pé', [lx, 0.1, -28.8], [lx + 0.4, 2.5, -26.7], C.steel);
+  b.span(RV, 'Banco', [GA0, 0.1, -28], [GA0 + 1.6, 1.8, -19], C.woodDark);
+  panelLight(b, RV, -158, CH_H, -23);
+  // Casa de Máquinas (fundo, norte): geradores parados, tanque enferrujado, canos e painel
+  const MQ = 'Túnel/Casa de Máquinas';
+  for (const gz of [18, 24]) {
+    b.span(MQ, 'Gerador', [GB0, 0.1, gz], [GB0 + 2.6, 4, gz + 4], C.steel, { surface: 'Weld' });
+    b.span(MQ, 'Tampa do Gerador', [GB0 + 0.2, 4, gz + 0.3], [GB0 + 2.4, 4.4, gz + 3.7], C.rust);
+    b.span(MQ, 'Escapamento', [GB0 + 0.8, 4.4, gz + 1.7], [GB0 + 1.4, CH_H, gz + 2.3], C.rust);
+  }
+  b.span(MQ, 'Tanque', [GB1 - 2.6, 0.1, 25], [GB1, 9, 29.6], C.rust, { surface: 'Inlet' });
+  for (const y of [2, 6]) b.span(MQ, 'Cinta do Tanque', [GB1 - 2.8, y, 24.8], [GB1, y + 0.5, 29.8], C.steel);
+  b.span(MQ, 'Painel de Controle', [-213, 3, RZ - 0.3], [-210, 7, RZ], C.steel);
+  for (const ix of [-212.4, -211.4]) {
+    b.span(MQ, 'Indicador Apagado', [ix, 5.6, RZ - 0.4], [ix + 0.5, 6.1, RZ - 0.3], C.lampDead, { canCollide: false });
+  }
+  for (const cz of [27.5, 28.6]) b.span(MQ, 'Cano', [GB0, 14, cz], [GB1 - 2.6, 14.6, cz + 0.6], C.rust);
+  panelLight(b, MQ, -212, CH_H, 22, 5, 1.4, 'flicker');
+  // Solitária (fundo, sul): cama de concreto, vaso no chão e marcas de dias riscadas na parede
+  const SO = 'Túnel/Solitária';
+  b.span(SO, 'Cama de Concreto', [GB0, 0.1, -29.6], [GB0 + 3, 1.8, -23], C.debris);
+  b.span(SO, 'Vaso no Chão', [-209.5, 0.1, -29], [-208.5, 0.14, -28], C.debrisDark, { canCollide: false });
+  for (let g = 0; g < 4; g++) {
+    for (let k = 0; k < 5; k++) {
+      const mx = -216 + g * 1.6 + k * 0.25;
+      b.span(SO, 'Marca Riscada', [mx, 4, -RZ], [mx + 0.08, 5.4, -RZ + 0.04], C.debrisDark, { canCollide: false });
+    }
+  }
+  panelLight(b, SO, -212, CH_H, -23, 5, 1.4, 'dead');
+  panelLight(b, SO, -212, CH_H, -27, 3, 1, 'flicker');
+
+  // --- Abandono: luminária caída, entulho, manchas, poças, forro furado, móveis tombados --
+  const RA = 'Ruínas/Átrio';
+  for (const o of [-1, 1]) {
+    b.box(RA, 'Haste Partida', [-45 + o * 2.66, ROOF - 0.8, 12], [0.3, 1.6, 0.3], C.steel, { canCollide: false });
+  }
+  b.box(RA, 'Luminária Caída', [-44, 0.3, 13], [8, 0.4, 1.8], C.steel, { canCollide: false, rotation: [0, 22.5, 0] });
+  rubble(b, RA, -42, 10.5, 11, { n: 6, spread: 2.2, floorY: 0.1, big: 0.6 });
+  // colunas rachadas: entulho caído na base
+  rubble(b, RA, -30, -21.2, 21, { n: 8, spread: 1.4 });
+  rubble(b, RA, 30, 21.2, 31, { n: 8, spread: 1.4 });
+  puddle(b, RA, -4, 8, 7, 4, 0.1, 41);
+  puddle(b, RA, 22, -14, 5, 3, 0.1, 42);
+  // rombo da parede do bloco: entulho no chão do hall, embaixo do buraco
+  rubble(b, RB, -84.5, 23, 51, { n: 10, spread: 1.6 });
+
+  // manchas de umidade e mofo nas paredes lisas do hall e das salas dos cantos
+  const RM = 'Ruínas/Manchas';
+  stain(b, RM, 'x', -IN_X, 1, -17, 18.5, 6, 7, C.grime, 61);
+  stain(b, RM, 'x', -IN_X, 1, 49, 7, 6, 4, C.mold, 62);
+  stain(b, RM, 'x', -IN_X, 1, -43, 8.5, 5, 4, C.grime, 63);
+  stain(b, RM, 'x', -IN_X, 1, -30, 22, 4, 10, C.grime, 64);
+  stain(b, RM, 'x', IN_X, -1, 40, 8, 6, 5, C.mold, 65);
+  // ala oeste: paredes do refeitório e do almoxarifado (envoltória por dentro)
+  stain(b, RM, 'z', IN_Z, -1, -147, 8, 5, 8, C.grime, 66);
+  stain(b, RM, 'z', IN_Z, -1, -95, 9, 5, 7, C.mold, 67);
+  stain(b, RM, 'z', -IN_Z, 1, -134, 12, 5, 6, C.grime, 68);
+  // túnel: escorrido entre as costelas
+  for (const [x, s, seed] of [
+    [TUN0 - 8, 1, 71],
+    [TUN0 - 24, -1, 72],
+    [TUN0 - 32, 1, 73],
+  ]) {
+    stain(b, 'Túnel/Ruínas', 'z', s * PORTAL, -s, x, 6.5, 4, 5, C.grime, seed);
+  }
+  stain(b, 'Túnel/Ruínas', 'z', -RZ, 1, -211, 9, 4, 5, C.mold, 74);
+
+  // forro furado na ala oeste: placa escura no forro + placa caída e entulho no chão
+  const RW = 'Ruínas/Ala Oeste';
+  for (const [x, z, floorY, seed] of [
+    [-134, 38, 0.1, 81],
+    [-134, -30, 0, 82],
+    [-104, -36, 0.1, 83],
+  ]) {
+    b.span(RW, 'Buraco no Forro', [x - 2, WC - 0.04, z - 1.6], [x + 2.2, WC, z + 1.4], C.debrisDark, {
+      canCollide: false,
+    });
+    b.box(RW, 'Placa de Forro Caída', [x + 0.6, floorY + 0.1, z + 0.4], [3, 0.2, 2.6], C.cellWall, {
+      canCollide: false,
+      rotation: [0, 33.75, 0],
+    });
+    rubble(b, RW, x - 1, z - 1, seed, { n: 5, spread: 1.2, floorY, big: 0.7 });
+  }
+  // banco tombado e caixa caída
+  b.box(RW, 'Banco Tombado', [-135, 1, 50], [7, 1.8, 0.5], C.steelLight, { canCollide: false, rotation: [0, 16.875, 0] });
+  b.box(RW, 'Caixa Caída', [-134.5, 1.5, -48], [3, 3, 3], C.wood, { canCollide: false, rotation: [0, 28.125, 0] });
+  puddle(b, RW, -116, 26, 6, 3, 0.1, 84);
+  puddle(b, RW, -100, -40, 4, 3, 0.1, 85);
+
+  // túnel: canos enferrujados presos nas costelas, poças e entulho junto às paredes
+  const RT = 'Túnel/Ruínas';
+  for (const s of [-1, 1]) {
+    b.span(RT, 'Cano', [TUN0 - 4.3 - 32, 9.4, s * (PORTAL - 1)], [TUN0 - 3.7, 10, s * (PORTAL - 0.4)], C.rust, {
+      canCollide: false,
+    });
+  }
+  puddle(b, RT, TUN0 - 20, 0, 9, 3.4, 0.1, 91);
+  rubble(b, RT, TUN0 - 28, 4.4, 92, { n: 5, spread: 0.9, floorY: 0.1, big: 0.8 });
+  puddle(b, RT, -212, 25, 3, 2.5, 0.1, 93);
 
   return { parts: b.parts };
 }

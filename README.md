@@ -23,6 +23,9 @@ Prisão **fechada e espaçosa** de 2 andares, feita só com **Part clássico** e
 - **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado. O resumo é "N peças · N etapas · N pontos de conexão verificados", com imagens da montagem em estágios.
 - **Luz equilibrada:** tecnologia Future, sem sol, ambiente e exposição baixos, bloom leve e todas as luminárias no mesmo patamar de brilho (testado), para nenhuma sala estourar com gráficos baixos.
 
+- **Abandono e terror:** fluorescentes frias, parte queimada e algumas piscando suave (único script do lugar, só visual), poeira no ar, colunas rachadas com vergalhão aparente, rombo numa parede interna, forro furado, entulho, manchas de mofo, poças e móveis tombados. Nada abre para o lado de fora.
+- **Salas do túnel:** triagem e revista na eclusa de entrada; casa de máquinas e solitária na eclusa do fundo.
+
 ## Como funciona
 
 ```

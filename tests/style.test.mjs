@@ -28,7 +28,12 @@ test('somente Part clássico (Block; Cylinder só girado como tampo) e SpawnLoca
   for (const p of parts) {
     assert.ok(['Part', 'SpawnLocation'].includes(p.className), `${p.name}: classe ${p.className}`);
     assert.ok(['Block', 'Cylinder'].includes(p.shape), `${p.name}: shape ${p.shape}`);
-    if (p.rotation) assert.equal(p.shape, 'Cylinder', `${p.name}: só cilindros podem ser girados`);
+    if (p.rotation && p.shape !== 'Cylinder') {
+      // ruínas (entulho, placas caídas) podem girar, mas só em torno de Y: continuam deitadas no piso
+      assert.ok(p.model.includes('Ruínas'), `${p.model}/${p.name}: só cilindros e ruínas podem ser girados`);
+      assert.ok(p.rotation[0] % 90 === 0 && p.rotation[2] % 90 === 0, `${p.name}: ruína girada fora de Y`);
+      assert.equal(p.canCollide, false, `${p.name}: ruína girada não pode colidir`);
+    }
   }
 });
 

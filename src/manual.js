@@ -44,6 +44,11 @@ export const PHASES = [
     title: 'Laje do teto e vigas',
     match: (p) => p.model.startsWith('Estrutura/Teto') || p.name === 'Laje Teto',
   },
+  {
+    id: 'ruinas',
+    title: 'Abandono: entulho, rachaduras, manchas e poças',
+    match: (p) => !isFixture(p) && p.model.includes('Ruínas'),
+  },
   { id: 'luz', title: 'Iluminação', match: () => true },
 ];
 

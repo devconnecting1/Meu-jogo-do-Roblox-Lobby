@@ -10,13 +10,13 @@ O mesmo arquivo gera:
 - o lugar do Roblox (`src/rojo.js` → Rojo → `.rbxl` → Open Cloud);
 - o visualizador 3D (`viewer/main.js`, Three.js) e as capturas do CI.
 
-Escopo atual: **somente a prisão**. Não criar UI, NPC, script, sistema de jogo, som ou exterior.
+Escopo atual: **somente a prisão**, abandonada e com clima de terror. Não criar UI, NPC, sistema de jogo, som ou exterior. Única exceção de script: `src/game/cintilacao.client.luau` (só faz as lâmpadas marcadas piscarem; regra 3).
 
 ## 2. Regras de ouro (não negociáveis)
 
 1. **Nada roda localmente.** Testes, build, capturas e publicação rodam no GitHub Actions (`.github/workflows/ci.yml`, `ubuntu-latest`, gratuito em repositório público). Para validar uma mudança: commit → push → ler os comentários que o CI posta no PR.
 2. **Fonte única:** o mapa vive em `src/prison.js`. Nunca edite o lugar no Roblox Studio, porque a próxima publicação sobrescreve tudo.
-3. **Part clássico:** `Part` (Block) e `SpawnLocation`. `Cylinder` é permitido só como tampo girado (mesas). Proibido: MeshPart, Union, Decal, Texture, SurfaceGui, BillboardGui, Humanoid e Script.
+3. **Part clássico:** `Part` (Block) e `SpawnLocation`. `Cylinder` é permitido só como tampo girado (mesas). Proibido: MeshPart, Union, Decal, Texture, SurfaceGui, BillboardGui, Humanoid e Script. **Única exceção:** o LocalScript `Cintilacao` (StarterPlayerScripts) que faz as luzes chamadas `Luz Piscando` oscilarem; ele não cria nem apaga instâncias e não tem gameplay (testado em `tests/rojo.test.mjs` e no `verify-place`).
 4. **Materiais e relevo clássico:** `Plastic` em tudo e `Neon` **apenas** em lâmpadas (sem colisão). Studs (`TopSurface = Studs`) só em pisos baixos. O relevo clássico do Roblox (`surface: 'Inlet' | 'Weld' | 'Universal'`, superfícies da própria Part, nunca Texture/Decal) vai em rodapés, bases e capitéis de colunas, pisos de corredor, costelas do túnel e portões; paredes grandes ficam lisas para o detalhe ter contraste.
 5. **Cores neutras:** use só `src/palette.js`. Saturação HSV ≤ 0,3 (testado). Não espalhe RGB solto pelo layout.
 6. **Ambiente fechado:** piso, teto e 4 paredes opacos, sem janelas, portas ou claraboias para fora. Não existe exterior nem saída. O **único vão** da envoltória é o portal 12×12 no fim do corredor de serviço (parede oeste), que leva ao **túnel de acesso** (anexo `Túnel/*`, também fechado): eclusa A com o portão de emergência **aberto** → túnel de 40 studs → eclusa B com o **mesmo portão, fechado** (reservado para uma atualização futura). Os portões são bipartidos: duas folhas (`Folha Esquerda`/`Folha Direita`) correm num trilho e se encontram no meio; não há script (regra 3 do escopo), então elas ficam paradas e nomeadas para um script futuro animar o fechamento simultâneo.
@@ -25,7 +25,8 @@ Escopo atual: **somente a prisão**. Não criar UI, NPC, script, sistema de jogo
 9. **Segredos:** a chave Open Cloud só existe no GitHub (Secrets/Variables). Nunca commitar chaves; o publicador mascara a chave no log.
 10. **Cada função tem sua sala:** o bloco de celas (átrio, corredores e galerias) não recebe móveis de outras funções. Refeitório, almoxarifado e enfermaria ficam na **ala oeste**, ligada ao hall por um vão de 12 studs e organizada em torno de um corredor de serviço com faixas no piso. Sala dos guardas e rouparia ficam nos cantos do hall; sala de visitas e estoque de uniformes ficam **fechados** sob o mezanino. No 2º andar não existe piso abandonado: o mezanino tem Sala de Controle (vidraça para o vão), Diretoria, Arquivo, Descanso e Vestiário, e os cantos oeste têm Biblioteca e Sala de Aula, cada uma com parede, porta, forro em y=33 e luz (testado em `tests/rooms.test.mjs`). Função nova = sala nova, com porta e zona livre.
 11. **Sem vãos sobrando:** todo espaço entre a última cela e uma parede vira sala ou é fechado por parede (`Parede Técnica`). Um buraco do tamanho de uma cela parece cela faltando.
-12. **Luz que faz sentido e equilibrada:** o vão de pé-direito duplo usa luminárias de galpão presas ao teto (`HIGH_BAY`, SurfaceLight 110°) entre as vigas, a galeria usa `GALLERY_LIGHT`, e cada sala fechada tem painéis no próprio forro (`panelLight`). Nada de pendente com haste longa no meio do vão. **Equilíbrio (testado):** toda luminária tem brilho entre 0,5 e 1,2 e alcance ≤ 52; `Ambient`/`OutdoorAmbient` ≤ 0,2, `ExposureCompensation` ≤ 0,1, bloom contido; paredes, pisos e colunas com canal de cor ≤ 215. Com gráficos baixos o Roblox ilumina quase só pelo ambiente, então reboco quase branco + ambiente alto estoura tudo.
+12. **Luz de terror, mas equilibrada:** o vão de pé-direito duplo usa luminárias de galpão presas ao teto (`HIGH_BAY`, SurfaceLight 110°) entre as vigas, a galeria usa `GALLERY_LIGHT`, e cada sala fechada tem painéis no próprio forro (`panelLight`). Nada de pendente com haste longa no meio do vão. **Equilíbrio (testado):** toda luminária tem brilho entre 0,5 e 1,2 e alcance ≤ 52; `Ambient`/`OutdoorAmbient` ≤ 0,2, `ExposureCompensation` ≤ 0,1, bloom contido; paredes, pisos e colunas com canal de cor ≤ 215. Com gráficos baixos o Roblox ilumina quase só pelo ambiente, então reboco quase branco + ambiente alto estoura tudo. **Clima de abandono:** fluorescente fria (`C.neonCold`), ambiente baixo (0,07), correção de cor dessaturada e esverdeada, `Atmosphere` (poeira no ar), 15% a 45% das lâmpadas queimadas (Plastic `C.lampDead`, sem luz) e 6 a 16 piscando (`flicker: true`). Toda sala fechada mantém pelo menos uma luz acesa (testado em `tests/abandono.test.mjs`).
+13. **Abandono que faz sentido:** estrago nunca abre a envoltória nem o túnel (nada do lado de fora aparece). Vale: colunas rachadas que continuam de pé (`brokenColumn`), rombo em parede **interna** (`BREACH`, para o vão escuro sobre a ala oeste), forro furado com placa caída, entulho (`rubble`), manchas de umidade/mofo (`stain`), poças (`puddle`), canos enferrujados e móveis tombados. Tudo isso fica em modelos `Ruínas/*` (ou `Túnel/Ruínas`), **sem colisão**, apoiado em algo e, se girado, só em torno de Y.
 
 ## 3. Mapa do repositório
 
@@ -83,6 +84,7 @@ b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 | orçamento | mais de 5000 Parts ou mais de 120 luzes |
 | determinismo | resultado diferente entre duas montagens |
 | manual de montagem | peça que não se apoia em nada já montado, peça fora do manual, etapa com mais de 8 peças, fases fora de ordem |
+| abandono | lâmpadas queimadas/piscando fora da faixa, sala fechada sem nenhuma luz, estrago na envoltória, ruína com colisão, sala nova do túnel sem porta ou luz |
 | luz equilibrada | luminária forte demais, ambiente/exposição altos, bloom exagerado, parede ou piso claro demais (estoura com gráficos baixos) |
 | túnel | portal fora do lugar, túnel sem fundo, portão B aberto ou diferente do A, folha do portão A dentro do vão |
 | zoneamento | refeitório, almoxarifado, enfermaria, guardas ou rouparia ausentes; mesas ou caixas dentro do bloco de celas; móveis no átrio |
@@ -101,6 +103,8 @@ Quando um teste falhar, a mensagem lista a peça (`Modelo/Nome @ [x, y, z]`). Co
 - **Fresta no canto de duas paredes:** se a parede frontal termina em z=12 e a lateral começa em x+0,6, sobra um furo de 0,6×0,6. Comece a lateral no mesmo x da frontal.
 - **SurfaceLight:** o ângulo vem de `light.angle` (padrão 90). No visualizador só átrio, hall e galerias recebem luz real; as salas usam o emissivo.
 - **Relevo no visualizador:** `viewer/main.js` desenha Inlet/Weld/Universal com texturas geradas em canvas (repetição de 1 ou 2 studs). A face de baixo fica lisa, como no `src/rojo.js`.
+- **Ruínas giradas:** só em modelos `Ruínas`, só em torno de Y e sem colisão (o teste de z-fighting ignora peças giradas; a checagem de apoio usa a caixa envolvente).
+- **Script de cintilação:** se precisar de mais luzes piscando, marque `flicker` pelo estado da lâmpada (`hangingLight(..., 'flicker')` ou `panelLight(..., 'flicker')`). O conversor nomeia a luz `Luz Piscando` e o script acha sozinho.
 - **Portão de emergência:** use `emergencyGate(b, modelo, faceX, lado, aberto)`; ele monta trilho, guia, colunas, faixa zebrada, luzes de alerta e as duas folhas. Folhas abertas ficam fora do vão (|z| ≥ 6,2).
 - **Peças giradas** ficam fora da checagem de z-fighting. Evite girar; só tampos cilíndricos.
 - **Open Cloud:** a API recusa `.rbxlx` feito à mão ("Invalid Content stream"). Publique sempre o `.rbxl` **binário do Rojo**.

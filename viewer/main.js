@@ -22,18 +22,20 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.95;
+renderer.toneMappingExposure = 0.85;
 app.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x121315);
+scene.background = new THREE.Color(0x0b0d0d);
+// poeira no ar (como o Atmosphere do Roblox); desligada na visão geral em corte
+const FOG = new THREE.FogExp2(0x101515, 0.009);
 
 const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.2, 1000);
 
-scene.add(new THREE.HemisphereLight(0xf4f1ea, 0x4a4845, 0.65));
-scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+scene.add(new THREE.HemisphereLight(0xcfe0dc, 0x262b2a, 0.34));
+scene.add(new THREE.AmbientLight(0xd8e6e2, 0.12));
 // "Luz de teto" difusa vinda de cima (o teto não projeta sombra no visualizador).
-const ceilingLight = new THREE.DirectionalLight(0xfff6e8, 1.15);
+const ceilingLight = new THREE.DirectionalLight(0xdfeeea, 0.55);
 ceilingLight.position.set(-2, 200, 70);
 ceilingLight.target.position.set(-32, 0, 0);
 scene.add(ceilingLight.target);
@@ -241,9 +243,12 @@ for (const list of buckets.values()) {
 }
 
 // Luzes reais só nas luminárias do teto (átrio, hall e galerias); o resto é ambiente + emissivo.
+// As marcadas com flicker piscam suave, como o LocalScript de cintilação faz no Roblox.
+const flickering = [];
 for (const p of parts) {
   if (!p.light || !/Iluminação\/(Átrio|Hall|Galeria)/.test(p.model)) continue;
   const l = new THREE.PointLight(srgb(p.light.color), 45, p.light.range * 1.2, 1.4);
+  if (p.light.flicker) flickering.push({ l, base: l.intensity, seed: flickering.length * 3.7 + 1 });
   l.position.set(p.position[0], p.position[1] - 1, p.position[2]);
   scene.add(l);
 }
@@ -285,6 +290,11 @@ const VIEWS = [
   { id: 'visits', title: 'Sala de visitas', pos: [68, 6.5, -22], target: [78, 3.5, 8] },
   { id: 'gate', title: 'Portal do túnel e portão de emergência (aberto)', pos: [-128, 7, -3], target: [-175, 6, 0] },
   { id: 'tunnel', title: 'Túnel de acesso até o portão fechado', pos: [-166, 6.5, 3.5], target: [-217, 5.5, 0] },
+  { id: 'breach', title: 'Rombo na parede do bloco e coluna rachada', pos: [-66, 9, -6], target: [-88, 22, 22] },
+  { id: 'column', title: 'Coluna rachada no átrio', pos: [-22, 8, -6], target: [-30, 11, -24] },
+  { id: 'intake', title: 'Triagem (sala lateral da eclusa de entrada)', pos: [-154, 7, 17], target: [-162, 3, 28] },
+  { id: 'machines', title: 'Casa de máquinas (fundo do túnel)', pos: [-208, 8, 17], target: [-216, 4, 27] },
+  { id: 'solitary', title: 'Solitária', pos: [-208, 7, -17], target: [-215, 3, -29] },
   { id: 'mezzanine', title: '2º andar: salas do mezanino', pos: [30, 27, -6], target: [80, 22, 4] },
   { id: 'control', title: 'Sala de controle (vidraça para o vão)', pos: [86, 23.5, -10], target: [72, 21, 3] },
   { id: 'office', title: 'Diretoria', pos: [86, 23.5, 30], target: [74, 19, 16] },
@@ -333,6 +343,7 @@ function setView(id) {
   orbit.target.fromArray(v.target);
   orbit.update();
   setCut(Boolean(v.cut));
+  scene.fog = v.cut ? null : FOG;
   setStep(v.step ? v.step * manual.steps.length : manual.steps.length);
   document.querySelectorAll('#views button').forEach((b) => b.classList.toggle('on', b.dataset.view === id));
 }
@@ -495,6 +506,12 @@ renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
   if (walking) stepWalk(dt);
   else orbit.update();
+  const t = clock.elapsedTime;
+  for (const f of flickering) {
+    const slow = Math.sin(t * 1.7 + f.seed) * 0.5 + Math.sin(t * 0.73 + f.seed * 2) * 0.5;
+    const dip = Math.sin(t * 11 + f.seed * 5) > 0.93 ? 0.25 : 1;
+    f.l.intensity = f.base * Math.min(1, Math.max(0.4, 0.72 + 0.28 * slow)) * dip;
+  }
   composer.render();
 });
 

@@ -16,7 +16,7 @@ const SIDES = ['BottomSurface', 'FrontSurface', 'BackSurface', 'LeftSurface', 'R
 function lightJson(light) {
   if (light.type === 'Surface') {
     return {
-      name: 'Luz',
+      name: light.flicker ? 'Luz Piscando' : 'Luz',
       className: 'SurfaceLight',
       properties: {
         Face: { Enum: ENUM.NormalId.Bottom },
@@ -29,7 +29,7 @@ function lightJson(light) {
     };
   }
   return {
-    name: 'Luz',
+    name: light.flicker ? 'Luz Piscando' : 'Luz',
     className: 'PointLight',
     properties: { Brightness: light.brightness, Range: light.range, Color: c3(light.color), Shadows: true },
   };

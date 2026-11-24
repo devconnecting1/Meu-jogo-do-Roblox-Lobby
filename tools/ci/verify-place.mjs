@@ -24,7 +24,6 @@ for (const banned of [
   'BillboardGui',
   'ScreenGui',
   'Script',
-  'LocalScript',
   'ModuleScript',
   'Humanoid',
   'MeshPart',
@@ -33,6 +32,10 @@ for (const banned of [
 ]) {
   if (xml.includes(`<Item class="${banned}"`)) problems.push(`Instância proibida no lugar: ${banned}`);
 }
+// única exceção de script: a cintilação das lâmpadas (LocalScript, só visual)
+const localScripts = count(/<Item class="LocalScript"/g);
+if (localScripts !== 1) problems.push(`LocalScripts no lugar: ${localScripts}, esperado 1 (Cintilacao)`);
+if (!/<Item class="Atmosphere"/.test(xml)) problems.push('Faltando Atmosphere (poeira no ar) no Lighting');
 if (!/<token name="Technology">4<\/token>/.test(xml)) problems.push('Lighting.Technology não está em Future (4)');
 for (const c of ['ColorCorrectionEffect', 'BloomEffect']) {
   if (!xml.includes(`<Item class="${c}"`)) problems.push(`Faltando ${c} no Lighting`);
