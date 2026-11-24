@@ -1165,11 +1165,39 @@ export function createWorld(seed = SEED) {
       const E = `${Fz}/Espantalho`;
       const ex = cx + 4;
       const ez = cz + 14;
-      b.span(E, 'Poste do Espantalho', [ex - 0.2, land + 0.22, ez - 0.2], [ex + 0.2, land + 6, ez + 0.2], C.woodDark, deco);
-      b.span(E, 'Braços do Espantalho', [ex - 2, land + 4.2, ez - 0.15], [ex + 2, land + 4.5, ez + 0.15], C.woodDark, deco);
-      b.span(E, 'Roupa do Espantalho', [ex - 0.8, land + 2.8, ez - 0.4], [ex + 0.8, land + 4.2, ez + 0.4], C.banner, deco);
+      b.span(
+        E,
+        'Poste do Espantalho',
+        [ex - 0.2, land + 0.22, ez - 0.2],
+        [ex + 0.2, land + 6, ez + 0.2],
+        C.woodDark,
+        deco,
+      );
+      b.span(
+        E,
+        'Braços do Espantalho',
+        [ex - 2, land + 4.2, ez - 0.15],
+        [ex + 2, land + 4.5, ez + 0.15],
+        C.woodDark,
+        deco,
+      );
+      b.span(
+        E,
+        'Roupa do Espantalho',
+        [ex - 0.8, land + 2.8, ez - 0.4],
+        [ex + 0.8, land + 4.2, ez + 0.4],
+        C.banner,
+        deco,
+      );
       b.span(E, 'Cabeça do Espantalho', [ex - 0.5, land + 6, ez - 0.5], [ex + 0.5, land + 7, ez + 0.5], C.hay, deco);
-      b.span(E, 'Chapéu do Espantalho', [ex - 0.9, land + 7, ez - 0.9], [ex + 0.9, land + 7.3, ez + 0.9], C.roofThatch, deco);
+      b.span(
+        E,
+        'Chapéu do Espantalho',
+        [ex - 0.9, land + 7, ez - 0.9],
+        [ex + 0.9, land + 7.3, ez + 0.9],
+        C.roofThatch,
+        deco,
+      );
       // sede da fazenda, de frente para os campos
       let count = 0;
       for (const [dx, dz, kind, name] of [
@@ -1209,7 +1237,18 @@ export function createWorld(seed = SEED) {
         if (!ok) continue;
         const M = `Relevo/${kind.name} ${String(kind.list.length + 1).padStart(2, '0')}`;
         const dry = biomeAt(x, z) === 'deserto';
-        const m = mountain(b, M, x, z, R, H, rand, !dry && kind.name === 'Montanha' && H >= 55, kind.name === 'Afloramento', dry);
+        const m = mountain(
+          b,
+          M,
+          x,
+          z,
+          R,
+          H,
+          rand,
+          !dry && kind.name === 'Montanha' && H >= 55,
+          kind.name === 'Afloramento',
+          dry,
+        );
         blocked.push(r);
         mountainSpots.push(...m.spots);
         kind.list.push([x, z, m.peak, R]);
