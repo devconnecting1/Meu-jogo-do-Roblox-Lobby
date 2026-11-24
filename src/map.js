@@ -723,7 +723,7 @@ export function buildMap() {
       b.span(M, 'Capitel', [x - 2, pt + 1 + h, z - 2], [x + 2, pt + 2 + h, z + 2], C.statue);
     } else {
       // o pedaço que caiu está no chão, ao lado (sem colisão)
-      const [px, pz] = Math.abs(x) > Math.abs(z) ? [x - Math.sign(x) * 4.5, z] : [x, z - Math.sign(z) * 4.5];
+      const [px, pz] = Math.abs(x) > Math.abs(z) ? [x, z - Math.sign(z) * 4.5] : [x - Math.sign(x) * 4.5, z];
       b.box(M, 'Pedaço da Coluna', [px, pt + 1, pz], [2.6, 3.4, 2.6], C.statue, { ...deco, rotation: [0, 30, 80] });
     }
   });
@@ -843,6 +843,8 @@ export function buildMap() {
         const xa = r.x0 - 0.4 - (n - k + 1) * 1.25;
         b.span(M, 'Degrau', [xa, land - 0.12, stair.z0], [xa + 1.25, y, stair.z1], C.plazaDark);
       }
+      // fecha a fresta de 0,4 entre o último degrau e a parede de rocha (embaixo da borda de grama)
+      b.span(M, 'Rocha', [r.x0 - 0.4, land + 2, stair.z0], [r.x0, top1, stair.z1], C.rock);
     }
     if (w >= 34 && d >= 34) {
       // segundo degrau, menor e deslocado (como os rochedos das referências)
