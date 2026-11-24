@@ -588,7 +588,7 @@ export function buildMap() {
   const rise = (pt - land) / DIM.lobbyRise;
   const run = DIM.lobbyRun;
   const len = DIM.lobbyRise * run;
-  const slope = Math.round((Math.atan(rise / run) * 180) / Math.PI * 100) / 100;
+  const slope = Math.round(((Math.atan(rise / run) * 180) / Math.PI) * 100) / 100;
   const railY = (t) => pt + 3 - (t / run) * rise; // altura do corrimão a t studs da borda
   for (const [sx, sz, side] of [
     [1, 0, 'Leste'],
@@ -609,7 +609,8 @@ export function buildMap() {
       put(t0, t0 + run, -5, 5, land - 0.12, land + k * rise, 'Degrau do Lobby', C.wood);
     }
     for (const w of [-5.6, 5.6]) {
-      for (const t of [0.6, len / 2, len - 0.6]) put(t - 0.3, t + 0.3, w - 0.3, w + 0.3, land - 0.1, railY(t), 'Poste', C.woodDark);
+      for (const t of [0.6, len / 2, len - 0.6])
+        put(t - 0.3, t + 0.3, w - 0.3, w + 0.3, land - 0.1, railY(t), 'Poste', C.woodDark);
       const [mx, mz] = at(len / 2, w);
       const L = Math.hypot(len - 1.2, railY(0.6) - railY(len - 0.6)) + 0.6;
       b.box(M, 'Corrimão', [mx, railY(len / 2), mz], sx ? [L, 0.4, 0.4] : [0.4, 0.4, L], C.wood, {
