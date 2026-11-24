@@ -20,7 +20,7 @@ function lightJson(light) {
       className: 'SurfaceLight',
       properties: {
         Face: { Enum: ENUM.NormalId.Bottom },
-        Angle: 90,
+        Angle: light.angle ?? 90,
         Brightness: light.brightness,
         Range: light.range,
         Color: c3(light.color),

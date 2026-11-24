@@ -13,12 +13,16 @@ const isFixture = (p) => p.material === 'Neon' || FIXTURE_NAMES.has(p.name) || p
 /** Fases na ordem real de obra. A primeira regra que casar define a fase. */
 export const PHASES = [
   { id: 'base', title: 'Laje do térreo', match: (p) => p.name === 'Laje Térreo' },
-  { id: 'paredes', title: 'Paredes externas', match: (p) => p.model === 'Envoltória' && p.name.startsWith('Parede') },
+  {
+    id: 'paredes',
+    title: 'Paredes externas e parede do bloco',
+    match: (p) => (p.model === 'Envoltória' && p.name.startsWith('Parede')) || p.model === 'Estrutura/Paredes',
+  },
   { id: 'colunas', title: 'Colunas', match: (p) => p.model.startsWith('Estrutura/Colunas') },
   {
     id: 'lajes',
     title: 'Lajes do 2º andar, ponte e mezanino',
-    match: (p) => ['Laje', 'Laje Ponte', 'Laje Mezanino'].includes(p.name),
+    match: (p) => ['Laje', 'Laje Ponte', 'Laje Mezanino', 'Laje Ala'].includes(p.name),
   },
   { id: 'pisos', title: 'Pisos e meio-fios', match: (p) => p.model === 'Pisos' },
   { id: 'escada', title: 'Escada', match: (p) => p.model === 'Escada' },
@@ -26,8 +30,8 @@ export const PHASES = [
   { id: 'galerias', title: 'Galerias e guarda-corpos', match: (p) => p.model.startsWith('Galerias') },
   {
     id: 'ambientes',
-    title: 'Hall, depósitos, refeitório e sala de visitas',
-    match: (p) => !isFixture(p) && /^(Hall|Depósitos|Átrio|Sala de Visitas)/.test(p.model),
+    title: 'Hall, salas, ala oeste (refeitório, almoxarifado, enfermaria) e sala de visitas',
+    match: (p) => !isFixture(p) && /^(Hall|Salas|Ala Oeste|Átrio|Sala de Visitas)/.test(p.model),
   },
   { id: 'acabamento', title: 'Acabamento das paredes', match: (p) => p.model.startsWith('Acabamento') },
   {
