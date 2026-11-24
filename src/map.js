@@ -537,13 +537,7 @@ export function createWorld(seed = SEED) {
       const top = y + h;
       const lastLayers = k >= nL - 2;
       const capColor =
-        snowy && lastLayers
-          ? C.snow
-          : !rocky && k < Math.ceil(nL * 0.6)
-            ? C.grass
-            : k % 2
-              ? C.rockDark
-              : C.rock;
+        snowy && lastLayers ? C.snow : !rocky && k < Math.ceil(nL * 0.6) ? C.grass : k % 2 ? C.rockDark : C.rock;
       for (const r of boxes) {
         b.span(model, 'Rocha', [r.x0, y, r.z0], [r.x1, top - 0.8, r.z1], k % 2 ? C.rockDark : C.rock);
         b.span(model, snowy && lastLayers ? 'Neve' : 'Topo', [r.x0, top - 0.8, r.z0], [r.x1, top, r.z1], capColor);
@@ -949,9 +943,21 @@ export function createWorld(seed = SEED) {
       if (!canPlace('poco', x, z, 's', true) || !ends.some(([ex, ez]) => addTrail(ex, ez, area))) continue;
       const V = `Vila/Vila ${landmarks.villages.length + 1}`;
       const street = rectTW(-VL, VL, -3, 3);
-      b.span(`${V}/Rua`, 'Rua da Vila', [street.x0, land - 0.04, street.z0], [street.x1, land + 0.24, street.z1], C.plazaDark);
+      b.span(
+        `${V}/Rua`,
+        'Rua da Vila',
+        [street.x0, land - 0.04, street.z0],
+        [street.x1, land + 0.24, street.z1],
+        C.plazaDark,
+      );
       const square = rectTW(-9, 9, -9, 9);
-      b.span(`${V}/Praça`, 'Praça da Vila', [square.x0, land - 0.05, square.z0], [square.x1, land + 0.27, square.z1], C.plaza);
+      b.span(
+        `${V}/Praça`,
+        'Praça da Vila',
+        [square.x0, land - 0.05, square.z0],
+        [square.x1, land + 0.27, square.z1],
+        C.plaza,
+      );
       trailLegs.push([world(-VL, 0), world(VL, 0)]); // outras trilhas podem ligar na rua
       trailRects.push(street, square);
       placeBuilding(`${V}/Poço`, 'poco', x, z, 's', true);
@@ -1002,7 +1008,13 @@ export function createWorld(seed = SEED) {
       const side = rectTW(-3, 3, 9, 52);
       b.span(`${V}/Rua`, 'Rua da Vila', [side.x0, land - 0.04, side.z0], [side.x1, land + 0.24, side.z1], C.plazaDark);
       const court = rectTW(-8, 8, 46, 62);
-      b.span(`${V}/Largo`, 'Largo da Vila', [court.x0, land - 0.05, court.z0], [court.x1, land + 0.27, court.z1], C.plaza);
+      b.span(
+        `${V}/Largo`,
+        'Largo da Vila',
+        [court.x0, land - 0.05, court.z0],
+        [court.x1, land + 0.27, court.z1],
+        C.plaza,
+      );
       trailLegs.push([world(0, 9), world(0, 54)]);
       trailRects.push(side, court);
       const towardT = (dir) => (alongX ? (dir > 0 ? 'e' : 'w') : dir > 0 ? 's' : 'n');
@@ -1312,7 +1324,10 @@ export function createWorld(seed = SEED) {
       if (tufts < 900 && (pebbles >= 260 || rand() < 0.78)) {
         const h = 1 + rand() * 1.4;
         const col = rand() < 0.5 ? C.grassDark : C.leafDark;
-        b.box('Vegetação/Mato', 'Mato', [x, land - 0.05 + h / 2, z], [0.5, h, 1.6], col, { ...deco, rotation: [0, rot, 0] });
+        b.box('Vegetação/Mato', 'Mato', [x, land - 0.05 + h / 2, z], [0.5, h, 1.6], col, {
+          ...deco,
+          rotation: [0, rot, 0],
+        });
         b.box('Vegetação/Mato', 'Mato', [x, land - 0.05 + h * 0.4, z], [1.6, h * 0.8, 0.5], C.bush, {
           ...deco,
           rotation: [0, rot + 30, 0],
@@ -1320,10 +1335,17 @@ export function createWorld(seed = SEED) {
         tufts++;
       } else {
         const sz = 0.8 + rand() * 1.2;
-        b.box('Relevo/Pedrinhas', 'Pedrinha', [x, land + sz * 0.25, z], [sz, sz * 0.7, sz * 0.9], rand() < 0.5 ? C.rock : C.stoneOre, {
-          ...deco,
-          rotation: [Math.round((rand() - 0.5) * 20), rot, Math.round((rand() - 0.5) * 20)],
-        });
+        b.box(
+          'Relevo/Pedrinhas',
+          'Pedrinha',
+          [x, land + sz * 0.25, z],
+          [sz, sz * 0.7, sz * 0.9],
+          rand() < 0.5 ? C.rock : C.stoneOre,
+          {
+            ...deco,
+            rotation: [Math.round((rand() - 0.5) * 20), rot, Math.round((rand() - 0.5) * 20)],
+          },
+        );
         pebbles++;
       }
     }
