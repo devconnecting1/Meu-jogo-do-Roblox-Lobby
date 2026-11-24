@@ -10,15 +10,19 @@
     },
     {
       "id": "atrium",
-      "title": "Átrio com refeitório"
+      "title": "Átrio e vão de pé-direito duplo"
     },
     {
       "id": "corridor",
-      "title": "Corredor das celas (térreo)"
+      "title": "Corredor das celas (térreo, aberto até o teto)"
     },
     {
       "id": "upper",
-      "title": "Galeria do 2º andar"
+      "title": "Galeria do 2º andar (sobre as celas do térreo)"
+    },
+    {
+      "id": "gallery-view",
+      "title": "Vista da galeria para o vão"
     },
     {
       "id": "cells",
@@ -54,27 +58,27 @@
     }
   ],
   "stats": {
-    "total": 2532,
-    "lights": 79,
+    "total": 2381,
+    "lights": 73,
     "groups": {
       "Piso": 1,
       "Paredes": 24,
-      "Teto": 13,
-      "Estrutura": 40,
+      "Teto": 8,
+      "Estrutura": 20,
       "Pisos": 6,
       "Celas": 1650,
-      "Galerias": 106,
-      "Iluminação": 192,
+      "Galerias": 46,
+      "Iluminação": 170,
       "Escada": 40,
       "Hall": 6,
       "Depósitos": 312,
-      "Átrio": 101,
+      "Átrio": 57,
       "Sala de Visitas": 41
     }
   },
   "manual": {
-    "parts": 2532,
-    "steps": 496,
-    "connections": 8120
+    "parts": 2381,
+    "steps": 478,
+    "connections": 7645
   }
 }
