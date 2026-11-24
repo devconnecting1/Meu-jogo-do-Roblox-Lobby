@@ -25,7 +25,7 @@ A prisão antiga (projeto anterior) está guardada no branch `arquivo/prisao`. E
 7. **Tudo se sustenta:** nenhuma peça flutua (cadeia de contato até o `Mar`), nenhuma face visível faz z-fighting e nenhuma peça com colisão invade as zonas livres (`clearanceZones()`): área dos castelos, estradas, pontes, caminhos da praça e spawn. O **manual de montagem** (`src/manual.js`) precisa montar cada peça sobre algo já montado.
 8. **Lotes:** 30 fundações de 32×32 sobre a grama, a pelo menos 84 studs uma da outra (120 quando cabe), 110 da praça e do lago e 52 do rio, espalhadas pelos quatro quadrantes. **Toda** fundação liga na praça por estrada (testado). Lote que não dá para ligar é trocado de lugar automaticamente (`planKingdom`).
 9. **Estradas e pontes:** estradas de 8 studs, só sobre a grama, em trechos retos (L ou Z). Sobre o rio vira ponte de madeira (até 50 studs) com vigas, postes e corrimão; o guarda-corpo é interrompido onde outra estrada cruza. Curva de estrada nunca fica em cima da água.
-10. **Cada coisa no seu lugar:** praça no centro (estátua do rei, mercado com 4 barracas, caixotes, canteiros de flores e colunas antigas, com 4 caminhos livres até as saídas); planaltos, florestas, campos, jazidas e cais ficam longe dos lotes e das estradas. Decoração (copa, galho, arbusto, pedra, flor, trigo, bandeira, toldo) não colide.
+10. **Cada coisa no seu lugar:** o **Lobby** fica no centro: plataforma elevada de 88×88, 6 studs acima da grama, com mureta na borda e **4 escadarias de madeira** (6 degraus de 1 stud, postes e corrimão) que descem até o começo das estradas. Em cima: estátua do rei, mercado com 4 barracas de toldo listrado, caixotes, canteiros de flores, colunas antigas e o spawn, com 4 caminhos livres até as escadarias. Estrada nunca entra no quadrado do Lobby + escadarias (`LOBBY_GUARD`); planaltos, florestas, campos, jazidas e cais ficam longe dos lotes e das estradas. Decoração (copa, galho, arbusto, pedra, flor, trigo, bandeira, toldo) não colide.
 11. **Peça girada:** pode girar em Y e ainda colidir (piso octogonal, pedestal, caixote torto). Inclinada em X ou Z **nunca colide** (pedras, galhos, pedaço de coluna). O teste de z-fighting ignora peças giradas; o de apoio usa a caixa envolvente.
 12. **Luz de dia equilibrada:** Lighting Future, `ClockTime` de dia, `Brightness` 1 a 3, ambiente ≤ 0,6, correção de cor sem saturar, bloom leve e `Atmosphere` "Neblina Leve" (o horizonte some suave).
 13. **Segredos:** a chave Open Cloud só existe no GitHub (Secrets/Variables). Nunca commitar chaves; o publicador mascara a chave no log.
@@ -60,7 +60,7 @@ b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 - **Unidades:** studs, Y para cima. Ilha em x,z ∈ [−600, 600] (grade de 16), mar até ±800. Grama no topo y = 4, areia y = 3, água y = 2,6, mar y = 0. **Medidas saem de `DIM`**: mude a escala lá, nunca com números soltos.
 - **Escala do jogador:** personagem de 5 studs, degraus de até 1 stud (escadas dos planaltos), estradas de 8, caminhos da praça de 8.
 - **Apoio:** toda peça precisa **encostar** em outra já ligada ao `Mar`. Peças baixas entram 0,1 na grama (ex.: fundação começa em y = 3,9).
-- **Base de peça deitada:** cada tipo tem sua altura de base para não empatar (fundação 3,9; praça 3,95; terra arada 3,92; degrau 3,88; estrada 4,0).
+- **Base de peça deitada:** cada tipo tem sua altura de base para não empatar (fundação e Lobby 3,9; terra arada 3,92; degraus 3,88; estrada 4,0).
 - **Nova área transitável:** adicione uma zona em `clearanceZones()`.
 - **Nova decoração:** sorteie com `rand()` (nunca `Math.random`), respeite `free()`, `awayFromPlots()`, `distToRoads()` e `allGrass()`, e registre o retângulo em `blocked`.
 - **Nova cor:** adicione em `src/palette.js` (saturação ≤ 0,55) e reutilize.
@@ -76,7 +76,7 @@ b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 | terreno | grama, areia, rio e lago faltando ou na altura errada; água com colisão |
 | lotes | menos de 30, nomes repetidos, perto demais, fora da grama, um quadrante vazio |
 | estradas | lote sem caminho até a praça, estrada fora da grama, ponte fora do rio |
-| praça / mercado | sem estátua, spawn fora do piso, barraca incompleta, sem caixotes, canteiros ou colunas |
+| Lobby | sem estátua, spawn fora do piso, escadaria com degrau > 1 stud ou que não chega ao piso, sem corrimão ou mureta, barraca incompleta, sem caixotes, canteiros ou colunas |
 | escadarias | degrau maior que 1,1 stud ou escada que não chega ao topo |
 | decoração | poucas árvores, sem outono, planaltos, pedras, campos, jazidas ou cais |
 | estilo | classe, shape, material, Neon sem luz, campos desconhecidos (UI/NPC/script), cor fora da paleta, studs fora do lugar |
@@ -105,6 +105,7 @@ Cada item já derrubou o CI uma vez (a maioria no projeto da prisão; continuam 
 | "Neon sem luz é lâmpada falsa" | peça brilhando sem emitir luz | lâmpada apagada é `Plastic` |
 | Prettier | linhas longas escritas à mão | nunca formate à mão: incorpore `autoformat/pr-N` |
 | capturas canceladas | push novo enquanto o job `render` ainda roda (o CI cancela o anterior) | espere "📸 Como ficou" antes do próximo push, a não ser que haja teste vermelho para corrigir |
+| "só 0 planaltos com escada" | o retângulo do próprio planalto entrou em `blocked` antes de testar a escada, então `free(escada)` sempre falhava | registre em `blocked` só **depois** de montar tudo que encosta na peça (escada, rampa, cais) |
 | captura com a vista anterior | o SwiftShader demora a desenhar muitas malhas | tudo instanciado no visualizador; o CI espera 2 quadros antes de capturar |
 
 - **Z-fighting:** duas peças com faces coplanares e cores diferentes. Desloque a decorativa (0,05 a 0,1), deixe uma por dentro da outra, ou use a mesma cor.

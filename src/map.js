@@ -34,7 +34,9 @@ export const DIM = Object.freeze({
   plotSize: 32, // fundação 32×32
   plotSpacing: 120, // distância desejada entre centros de lotes
   minPlotSpacing: 84, // nunca mais perto que isso
-  plazaHalf: 44, // praça octogonal (quadrado 88 + quadrado girado 45°), com mercado
+  plazaHalf: 44, // Lobby: plataforma elevada de 88×88 no centro do mapa, com mercado
+  lobbyRise: 6, // a plataforma fica 6 studs acima da grama (6 degraus de 1 stud)
+  lobbyRun: 1.25, // profundidade de cada degrau das escadarias
   road: 8, // largura das estradas
   maxBridge: 50, // ponte mais longa (studs sobre a água)
 });
@@ -170,18 +172,21 @@ export function allGrass(x0, x1, z0, z1, step = 4) {
 // ---------------------------------------------------------------------------
 // Praça central
 // ---------------------------------------------------------------------------
-const PLAZA_REACH = DIM.plazaHalf * Math.SQRT2; // ~62: alcance do octógono
+// O Lobby é a praça central: plataforma elevada com escadarias de madeira nas 4 saídas.
+const PLAZA_REACH = DIM.plazaHalf * Math.SQRT2; // ~62: raio que cobre a plataforma
+const LOBBY_GUARD = DIM.plazaHalf + DIM.lobbyRise * DIM.lobbyRun; // plataforma + escadarias
 export const PLAZA = Object.freeze({
   x: 0,
   z: 0,
-  top: DIM.land + 0.45,
+  top: DIM.land + DIM.lobbyRise,
   reach: PLAZA_REACH,
-  // saídas da praça: as estradas começam aqui
+  guard: LOBBY_GUARD,
+  // pé de cada escadaria: as estradas começam aqui
   gates: Object.freeze([
-    [PLAZA_REACH + 1, 0],
-    [-(PLAZA_REACH + 1), 0],
-    [0, PLAZA_REACH + 1],
-    [0, -(PLAZA_REACH + 1)],
+    [LOBBY_GUARD + 4, 0],
+    [-(LOBBY_GUARD + 4), 0],
+    [0, LOBBY_GUARD + 4],
+    [0, -(LOBBY_GUARD + 4)],
   ]),
 });
 
@@ -258,7 +263,7 @@ function legWater(a, b) {
       const t = terrainAt(px, pz);
       if (t === T.RIVER) wet = true;
       else if (t !== T.GRASS) return null;
-      if (Math.hypot(px - PLAZA.x, pz - PLAZA.z) < PLAZA_REACH + 0.5) return null;
+      if (Math.abs(px) < LOBBY_GUARD && Math.abs(pz) < LOBBY_GUARD) return null; // nunca por dentro do Lobby
     }
     run = wet ? run + 2 : 0;
     total += wet ? 2 : 0;
@@ -446,11 +451,11 @@ export function clearanceZones() {
   // caminhos da praça: da estátua até cada saída
   const y0 = PLAZA.top + 1.05;
   const y1 = PLAZA.top + 8;
-  const r = PLAZA_REACH;
-  zones.push({ name: 'Caminho Leste da Praça', min: [10, y0, -4], max: [r, y1, 4] });
-  zones.push({ name: 'Caminho Oeste da Praça', min: [-r, y0, -4], max: [-10, y1, 4] });
-  zones.push({ name: 'Caminho Sul da Praça', min: [-4, y0, 10], max: [4, y1, r] });
-  zones.push({ name: 'Caminho Norte da Praça', min: [-4, y0, -r], max: [4, y1, -10] });
+  const r = DIM.plazaHalf - 1;
+  zones.push({ name: 'Caminho Leste do Lobby', min: [10, y0, -4], max: [r, y1, 4] });
+  zones.push({ name: 'Caminho Oeste do Lobby', min: [-r, y0, -4], max: [-10, y1, 4] });
+  zones.push({ name: 'Caminho Sul do Lobby', min: [-4, y0, 10], max: [4, y1, r] });
+  zones.push({ name: 'Caminho Norte do Lobby', min: [-4, y0, -r], max: [4, y1, -10] });
   return zones;
 }
 
@@ -565,14 +570,54 @@ export function buildMap() {
     }
   }
 
-  // --- Praça do Reino -------------------------------------------------------
-  const PR = 'Praça do Reino';
+  // --- Lobby: plataforma elevada no centro, como nas referências ------------
+  const PR = 'Lobby';
   const ph = DIM.plazaHalf;
   const pt = PLAZA.top;
-  const floorC = [0, (land - 0.05 + pt) / 2, 0];
-  const floorS = [ph * 2, pt - land + 0.05, ph * 2];
-  b.box(PR, 'Piso da Praça', floorC, floorS, C.plaza, { studs: true });
-  b.box(PR, 'Piso da Praça', floorC, floorS, C.plaza, { studs: true, rotation: [0, 45, 0] });
+  b.span(PR, 'Base do Lobby', [-ph, land - 0.1, -ph], [ph, pt - 0.5, ph], C.plazaDark);
+  b.span(PR, 'Piso do Lobby', [-ph, pt - 0.5, -ph], [ph, pt, ph], C.plaza);
+  // mureta na borda (a plataforma tem 6 studs de queda), aberta nas 4 escadarias
+  const wall = (x0, z0, x1, z1) => b.span(`${PR}/Mureta`, 'Mureta', [x0, pt, z0], [x1, pt + 1.5, z1], C.statue);
+  for (const s of [-1, 1]) {
+    wall(-ph, s * (ph - 1), -5, s * ph);
+    wall(5, s * (ph - 1), ph, s * ph);
+    wall(s * (ph - 1), -(ph - 1), s * ph, -5);
+    wall(s * (ph - 1), 5, s * ph, ph - 1);
+  }
+  // escadarias de madeira nas 4 saídas: 6 degraus de 1 stud, com postes e corrimão inclinado
+  const rise = (pt - land) / DIM.lobbyRise;
+  const run = DIM.lobbyRun;
+  const len = DIM.lobbyRise * run;
+  const slope = Math.round((Math.atan(rise / run) * 180) / Math.PI * 100) / 100;
+  const railY = (t) => pt + 3 - (t / run) * rise; // altura do corrimão a t studs da borda
+  for (const [sx, sz, side] of [
+    [1, 0, 'Leste'],
+    [-1, 0, 'Oeste'],
+    [0, 1, 'Sul'],
+    [0, -1, 'Norte'],
+  ]) {
+    const M = `${PR}/Escadaria ${side}`;
+    // t: distância para fora a partir da borda da plataforma; w: lateral
+    const at = (t, w) => (sx ? [sx * (ph + t), w] : [w, sz * (ph + t)]);
+    const put = (t0, t1, w0, w1, y0, y1, nm, col) => {
+      const [ax, az] = at(t0, w0);
+      const [cx, cz] = at(t1, w1);
+      b.span(M, nm, [ax, y0, az], [cx, y1, cz], col);
+    };
+    for (let k = 1; k <= DIM.lobbyRise; k++) {
+      const t0 = (DIM.lobbyRise - k) * run;
+      put(t0, t0 + run, -5, 5, land - 0.12, land + k * rise, 'Degrau do Lobby', C.wood);
+    }
+    for (const w of [-5.6, 5.6]) {
+      for (const t of [0.6, len / 2, len - 0.6]) put(t - 0.3, t + 0.3, w - 0.3, w + 0.3, land - 0.1, railY(t), 'Poste', C.woodDark);
+      const [mx, mz] = at(len / 2, w);
+      const L = Math.hypot(len - 1.2, railY(0.6) - railY(len - 0.6)) + 0.6;
+      b.box(M, 'Corrimão', [mx, railY(len / 2), mz], sx ? [L, 0.4, 0.4] : [0.4, 0.4, L], C.wood, {
+        ...deco,
+        rotation: sx ? [0, 0, -sx * slope] : [sz * slope, 0, 0],
+      });
+    }
+  }
   b.box(PR, 'Mosaico', [0, pt + 0.05, 0], [30, 0.1, 30], C.plazaDark);
   b.box(PR, 'Mosaico', [0, pt + 0.05, 0], [30, 0.1, 30], C.plazaDark, { ...deco, rotation: [0, 45, 0] });
   const pd = pt + 0.1;
@@ -772,7 +817,6 @@ export function buildMap() {
       free(r, 12);
     if (!ok) continue;
     const M = `Relevo/Planalto ${String(landmarks.mesas.length + 1).padStart(2, '0')}`;
-    blocked.push({ x0: r.x0 - 2, x1: r.x1 + 2, z0: r.z0 - 2, z1: r.z1 + 2 });
     b.span(M, 'Base de Rocha', [r.x0 - 1.5, land - 0.1, r.z0 - 1.5], [r.x1 + 1.5, land + 2, r.z1 + 1.5], C.rockDark);
     const top1 = land + 2 + 8 + Math.round(rand() * 10);
     b.span(M, 'Rocha', [r.x0, land + 2, r.z0], [r.x1, top1, r.z1], C.rock);
@@ -817,6 +861,8 @@ export function buildMap() {
       area = [ox, ox + w2, oz, oz + d2];
       top += h2 + 0.8;
     }
+    // o próprio planalto só entra em "blocked" depois da escada (senão a escada colide com ele mesmo)
+    blocked.push({ x0: r.x0 - 2, x1: r.x1 + 2, z0: r.z0 - 2, z1: r.z1 + 2 });
     mesaTops.push({ area, top, arrival: stairOk ? [r.x0, zc] : null });
     landmarks.mesas.push([x, z, top, stairOk]);
   }

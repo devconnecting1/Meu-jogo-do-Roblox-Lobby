@@ -6,7 +6,7 @@ Mapa base de um jogo de estratégia no estilo **Lords Mobile**, feito só com **
 
 | | |
 |---|---|
-| ![Praça](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/plaza.png) | ![Mercado](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/market.png) |
+| ![Lobby](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/lobby.png) | ![Mercado](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/market.png) |
 | ![Ponte](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/bridge.png) | ![Planalto](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/mesa.png) |
 
 *As imagens são geradas pelo CI a cada push na `main`. Em PRs, elas aparecem no comentário "📸 Como ficou".*
@@ -15,8 +15,8 @@ Mapa base de um jogo de estratégia no estilo **Lords Mobile**, feito só com **
 
 - **Ilha de 1200×1200 studs** cercada de mar, com praia, lago e um rio que corta o oeste até o mar.
 - **30 lotes de castelo** (20 para jogadores e 10 para bots), espalhados pelo mapa com folga entre eles. Cada lote tem fundação de 32×32 com studs, meio-fio, marcos nos cantos e bandeira. O jogo vai sortear depois quem fica em cada lote.
-- **Praça do Reino** no centro, estilo lobby: piso octogonal de studs, estátua do rei com coroa, espada e escudo, mercado com 4 barracas de toldo listrado, caixotes, canteiros de flores, colunas antigas (algumas partidas) e o spawn.
-- **Estradas de pedra** ligando todos os lotes à praça e **pontes de madeira** com guarda-corpo sobre o rio.
+- **Lobby** no centro, como nas referências: plataforma elevada de studs com mureta e 4 escadarias de madeira com corrimão, estátua do rei com coroa, espada e escudo, mercado com 4 barracas de toldo listrado, caixotes, canteiros de flores, colunas antigas (algumas partidas) e o spawn.
+- **Estradas de pedra** ligando todos os lotes ao Lobby e **pontes de madeira** com guarda-corpo sobre o rio.
 - **Natureza:** florestas verdes e bosques de outono com árvores de copa em camadas, arbustos, pedras e **planaltos de rocha** com topo de grama e escadaria de pedra para subir.
 - **Recursos** (futuros pontos de coleta): campos de trigo cercados, jazidas de ouro e pedreiras.
 - **Costa:** cais de madeira com barco amarrado.

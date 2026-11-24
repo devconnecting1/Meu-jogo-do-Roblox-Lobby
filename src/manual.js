@@ -11,7 +11,7 @@ const MAX_PER_STEP = 8;
 export const PHASES = [
   { id: 'base', title: 'Mar (base de tudo)', match: (p) => p.name === 'Mar' },
   { id: 'terreno', title: 'Terreno: terra, grama, areia, rio e lago', match: (p) => p.model === 'Terreno' },
-  { id: 'praca', title: 'Praça do Reino e estátua do rei', match: (p) => p.model === 'Praça do Reino' },
+  { id: 'lobby', title: 'Lobby: plataforma, escadarias, estátua e mercado', match: (p) => p.model.startsWith('Lobby') },
   { id: 'estradas', title: 'Estradas de pedra', match: (p) => p.model === 'Estradas' },
   { id: 'pontes', title: 'Pontes de madeira', match: (p) => p.model.startsWith('Pontes') },
   { id: 'lotes', title: 'Lotes dos castelos (30)', match: (p) => p.model.startsWith('Lotes') },

@@ -172,8 +172,9 @@ const plot = [...PLOTS].sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.
 const VIEWS = [
   { id: 'overview', title: 'Visão geral do reino', ...OVERVIEW },
   { id: 'top', title: 'Mapa visto de cima (30 lotes, estradas, rio e lago)', pos: [0, 1300, 140], target: [0, 0, 0] },
-  { id: 'plaza', title: 'Praça do Reino: estátua do rei, mercado e colunas antigas', ...look(0, 0, 78, 42, 96, 6) },
-  { id: 'market', title: 'Mercado da praça (altura do jogador)', pos: [0, 11, 56], target: [0, 7, 0] },
+  { id: 'lobby', title: 'Lobby: estátua do rei, mercado e colunas antigas', ...look(0, 0, 78, 48, 96, 10) },
+  { id: 'market', title: 'Mercado do Lobby (altura do jogador)', pos: [0, 17, 40], target: [0, 13, 0] },
+  { id: 'lobby-stairs', title: 'Escadaria de madeira do Lobby', pos: [74, 17, 26], target: [44, 8, 0] },
   { id: 'plot', title: `${plot.name}: fundação do castelo`, ...look(plot.x, plot.z, 52, 34, 62, 5) },
   {
     id: 'plots',

@@ -57,27 +57,27 @@ test('cada fundação fica inteira sobre a grama (com folga em volta)', () => {
   }
 });
 
-test('a praça fica na grama, com a estátua e um único spawn sobre o piso', () => {
+test('o Lobby fica na grama, com a estátua e um único spawn sobre o piso', () => {
   for (let x = -PLAZA.reach; x <= PLAZA.reach; x += 4) {
     for (let z = -PLAZA.reach; z <= PLAZA.reach; z += 4) assert.equal(terrainAt(x, z), T.GRASS, `praça (${x}, ${z})`);
   }
   const spawns = parts.filter((p) => p.className === 'SpawnLocation');
   assert.equal(spawns.length, 1);
   const s = spawns[0];
-  assert.ok(Math.abs(s.position[1] - s.size[1] / 2 - PLAZA.top) < 1e-6, 'spawn apoiado no piso da praça');
-  assert.ok(Math.hypot(s.position[0], s.position[2]) < DIM.plazaHalf, 'spawn dentro da praça');
+  assert.ok(Math.abs(s.position[1] - s.size[1] / 2 - PLAZA.top) < 1e-6, 'spawn apoiado no piso do Lobby');
+  assert.ok(Math.hypot(s.position[0], s.position[2]) < DIM.plazaHalf, 'spawn dentro do Lobby');
   for (const n of ['Pedestal', 'Estátua', 'Coroa', 'Espada', 'Escudo', 'Estandarte']) {
-    assert.ok(count((p) => p.model === 'Praça do Reino' && p.name === n) > 0, `praça sem "${n}"`);
+    assert.ok(count((p) => p.model === 'Lobby' && p.name === n) > 0, `Lobby sem "${n}"`);
   }
 });
 
-test('estradas ligam todos os lotes à praça (malha contínua de estrada e ponte)', () => {
+test('estradas ligam todos os lotes ao Lobby (malha contínua de estrada, ponte e escadaria)', () => {
   const net = parts.filter(
     (p) =>
       p.model === 'Estradas' ||
       (p.model.startsWith('Pontes/') && p.name === 'Tabuleiro') ||
       (p.model.startsWith('Lotes/') && p.name === 'Fundação') ||
-      p.name === 'Piso da Praça',
+      ['Base do Lobby', 'Piso do Lobby', 'Degrau do Lobby'].includes(p.name),
   );
   const bx = net.map(aabb);
   const parent = net.map((_, i) => i);
@@ -86,9 +86,9 @@ test('estradas ligam todos os lotes à praça (malha contínua de estrada e pont
   for (let i = 0; i < net.length; i++) {
     for (let j = i + 1; j < net.length; j++) if (touch(bx[i], bx[j])) parent[find(i)] = find(j);
   }
-  const plaza = find(net.findIndex((p) => p.name === 'Piso da Praça'));
+  const plaza = find(net.findIndex((p) => p.name === 'Piso do Lobby'));
   const lost = net.filter((p, i) => p.name === 'Fundação' && find(i) !== plaza).map((p) => p.model);
-  assert.deepEqual(lost, [], `lotes sem estrada até a praça: ${lost.join(', ')}`);
+  assert.deepEqual(lost, [], `lotes sem estrada até o Lobby: ${lost.join(', ')}`);
 });
 
 test('estradas só sobre a grama e pontes só onde há rio', () => {
@@ -125,14 +125,31 @@ test('decoração variada: florestas, outono, planaltos, pedras, recursos e cais
   assert.ok(landmarks.docks.length >= 1, 'nenhum cais na praia');
 });
 
-test('praça viva como um lobby: mercado com toldos, caixotes, canteiros e colunas antigas', () => {
+test('Lobby elevado: 4 escadarias de degraus de 1 stud até o piso, com mureta na borda', () => {
+  const top = (p) => p.position[1] + p.size[1] / 2;
+  for (const side of ['Leste', 'Oeste', 'Sul', 'Norte']) {
+    const m = `Lobby/Escadaria ${side}`;
+    const steps = parts.filter((p) => p.model === m && p.name === 'Degrau do Lobby').sort((a, b) => top(a) - top(b));
+    assert.equal(steps.length, DIM.lobbyRise, `${m}: ${steps.length} degraus`);
+    let prev = DIM.land;
+    for (const s of steps) {
+      assert.ok(top(s) - prev <= 1 + 1e-9, `${m}: degrau sobe ${(top(s) - prev).toFixed(2)} studs`);
+      prev = top(s);
+    }
+    assert.equal(prev, PLAZA.top, `${m}: a escada não chega ao piso do Lobby`);
+    assert.equal(parts.filter((p) => p.model === m && p.name === 'Corrimão').length, 2, `${m}: sem corrimão`);
+  }
+  assert.ok(count((p) => p.name === 'Mureta') >= 8, 'mureta na borda do Lobby');
+});
+
+test('Lobby vivo como nas referências: mercado com toldos, caixotes, canteiros e colunas antigas', () => {
   const models = (prefix) => new Set(parts.filter((p) => p.model.startsWith(prefix)).map((p) => p.model)).size;
-  assert.equal(models('Praça do Reino/Barraca '), 4, 'mercado com 4 barracas');
-  assert.ok(models('Praça do Reino/Caixotes ') >= 4, 'caixotes do mercado');
-  assert.ok(models('Praça do Reino/Canteiro ') >= 4, 'canteiros de flores');
-  assert.ok(models('Praça do Reino/Coluna Antiga ') >= 6, 'colunas antigas');
+  assert.equal(models('Lobby/Barraca '), 4, 'mercado com 4 barracas');
+  assert.ok(models('Lobby/Caixotes ') >= 4, 'caixotes do mercado');
+  assert.ok(models('Lobby/Canteiro ') >= 4, 'canteiros de flores');
+  assert.ok(models('Lobby/Coluna Antiga ') >= 6, 'colunas antigas');
   for (let n = 1; n <= 4; n++) {
-    const names = new Set(parts.filter((p) => p.model === `Praça do Reino/Barraca ${n}`).map((p) => p.name));
+    const names = new Set(parts.filter((p) => p.model === `Lobby/Barraca ${n}`).map((p) => p.name));
     for (const k of ['Balcão', 'Tampo do Balcão', 'Poste da Barraca', 'Toldo', 'Franja']) {
       assert.ok(names.has(k), `Barraca ${n} sem "${k}"`);
     }
