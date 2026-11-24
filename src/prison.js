@@ -7,7 +7,15 @@
 //   * tests/*.test.mjs — regras de construção (apoio, colisão, z-fighting, estilo, espaço).
 //
 // Regras (ver AGENTS.md): Part clássico, Plastic + Neon (só lâmpadas), studs só em pisos,
-// cores neutras, sem UI/NPC/scripts, ambiente 100% fechado e ESPAÇOSO (escala da referência).
+// cores neutras, sem UI/NPC/scripts, ambiente 100% fechado e ESPAÇOSO.
+//
+// Corte em "terraços" (como a prisão de referência): a galeria do 2º andar fica EM CIMA
+// das celas do térreo e as celas de cima são recuadas. Assim o corredor do térreo e o átrio
+// formam um único vão aberto até o teto — nada de laje cobrindo o corredor.
+//
+//   z:  0 ........ 24 ......... 34 .......... 44 ............ 50 ...... 60
+//       átrio      | corredor   | cela térreo (16 de fundo)  |
+//                  | (aberto)   | galeria 2º  | cela de cima (16 de fundo)
 //
 // Unidades: studs. Eixos do Roblox (Y para cima). Todas as medidas derivam de DIM.
 
@@ -19,13 +27,14 @@ export const DIM = Object.freeze({
   cellD: 16, // profundidade da cela
   cellH: 16, // pé-direito da cela (andar)
   cellsPerRow: 8,
-  corridor: 10, // largura do corredor/galeria diante das celas
-  voidHalf: 24, // metade da largura do vão central (átrio de pé-direito duplo)
+  corridor: 10, // corredor do térreo diante das celas (aberto até o teto)
+  walkway: 10, // galeria do 2º andar, apoiada sobre as celas do térreo
+  voidHalf: 24, // metade da largura do átrio (linha das colunas)
   hall: 27.5, // profundidade do hall oeste
-  east: 27.5, // profundidade da área leste (escada + mezanino)
   slab: 1,
   upperClear: 10, // folga entre o topo das celas de cima e o teto
   wall: 2,
+  columnEvery: 30, // colunas a cada 2 celas (deixa o átrio respirar)
   stairHalf: 7, // escada com 14 de largura
   stairRun: 1.25, // piso de cada degrau
   bridgeHalf: 5, // ponte com 10 de largura
@@ -36,9 +45,11 @@ export const DIM = Object.freeze({
 // ---------------------------------------------------------------------------
 const PITCH = DIM.cellW + 1; // 15
 const ROW = (DIM.cellsPerRow * PITCH + 1) / 2; // 60.5 -> fila de celas em x -60.5..60.5
-const E = DIM.voidHalf; // 24 -> borda do vão
-const CELL_FRONT = E + DIM.corridor; // 34
-const IN_Z = CELL_FRONT + DIM.cellD; // 50
+const E = DIM.voidHalf; // 24 -> linha das colunas
+const CELL_FRONT = E + DIM.corridor; // 34 -> fachada das celas do térreo = borda da galeria
+const UPPER_FRONT = CELL_FRONT + DIM.walkway; // 44 -> fachada das celas de cima
+const IN_Z = UPPER_FRONT + DIM.cellD; // 60
+const GROUND_BACK = CELL_FRONT + DIM.cellD; // 50 -> fundo das celas do térreo
 const IN_X = ROW + DIM.hall; // 88
 const F2 = DIM.cellH + DIM.slab; // 17 -> piso do 2º andar
 const TOP = F2 + DIM.cellH; // 33 -> topo das celas de cima
@@ -46,21 +57,37 @@ const ROOF = TOP + DIM.slab + DIM.upperClear; // 44 -> face inferior do teto
 const STAIR_X1 = ROW + 5.5; // 66 -> início do mezanino
 const STAIR_X0 = STAIR_X1 - F2 * DIM.stairRun; // 44.75
 const SH = DIM.stairHalf;
-const BRIDGE_X = -22.5; // centro da ponte (entre as colunas -30 e -15)
+const BRIDGE_X = -15; // centro da ponte (entre as colunas -30 e 0)
 const BRIDGE = [BRIDGE_X - DIM.bridgeHalf, BRIDGE_X + DIM.bridgeHalf];
 const COL = 3; // seção das colunas
-const COLUMN_X = [-75, ...Array.from({ length: 9 }, (_, i) => -ROW + 0.5 + i * PITCH)];
+const COLUMN_X = [-60, -30, 0, 30, 60];
 const W = DIM.wall;
 const OX = IN_X + W;
 const OZ = IN_Z + W;
+const HANG_Y = 30; // altura das luminárias pendentes do vão
 
-export const LEVELS = Object.freeze({ F2, TOP, ROOF, IN_X, IN_Z, CELL_FRONT, EDGE: E, STAIR_X0, STAIR_X1, ROW });
+export const LEVELS = Object.freeze({
+  F2,
+  TOP,
+  ROOF,
+  IN_X,
+  IN_Z,
+  CELL_FRONT,
+  UPPER_FRONT,
+  EDGE: E,
+  STAIR_X0,
+  STAIR_X1,
+  ROW,
+  BRIDGE,
+});
 
-const HANG_LIGHT = { type: 'Point', range: 28, brightness: 1.15, color: C.neon };
+const HANG_LIGHT = { type: 'Point', range: 32, brightness: 1.2, color: C.neon };
 const PANEL_LIGHT = { type: 'Surface', range: 18, brightness: 1.4, color: C.neon };
 
 /** Centro X da cela i (0..7). */
 export const cellCenterX = (i) => -ROW + 1 + DIM.cellW / 2 + i * PITCH;
+/** Fachada (|z|) das celas de um andar. */
+export const cellFront = (y0) => (y0 === 0 ? CELL_FRONT : UPPER_FRONT);
 
 // ---------------------------------------------------------------------------
 // Zonas que o jogador atravessa: nenhuma Part com colisão pode invadi-las.
@@ -70,16 +97,25 @@ export function clearanceZones() {
   const zr = (s, a, b) => (s < 0 ? [-b, -a] : [a, b]);
   for (const s of [-1, 1]) {
     const t = s < 0 ? 'Sul' : 'Norte';
-    const [g0, g1] = zr(s, E + 1.9, CELL_FRONT - 1);
+    const [g0, g1] = zr(s, E + 2, CELL_FRONT - 1);
+    const [w0, w1] = zr(s, CELL_FRONT + 0.6, UPPER_FRONT - 1);
+    const [d0, d1] = zr(s, E + 2, CELL_FRONT - 0.5);
     zones.push(
       { name: `Corredor térreo ${t}`, min: [-IN_X + 0.5, 0.6, g0], max: [STAIR_X1 - 0.5, 8, g1] },
-      { name: `Galeria 2º andar ${t}`, min: [-IN_X + 0.5, F2 + 0.6, g0], max: [STAIR_X1 - 0.5, F2 + 7, g1] },
+      { name: `Galeria 2º andar ${t}`, min: [-IN_X + 0.5, F2 + 0.6, w0], max: [STAIR_X1 - 0.5, F2 + 7, w1] },
+      // pé-direito duplo: nada colide sobre o corredor do térreo (só a ponte o atravessa)
+      { name: `Pé-direito duplo ${t} (oeste)`, min: [-ROW, 0.6, d0], max: [BRIDGE[0] - 0.5, ROOF - 6, d1] },
+      { name: `Pé-direito duplo ${t} (leste)`, min: [BRIDGE[1] + 0.5, 0.6, d0], max: [ROW, ROOF - 6, d1] },
     );
   }
   zones.push(
     { name: 'Hall', min: [-IN_X + 0.5, 1.05, -8], max: [-ROW - 1.5, 9, 8] },
     { name: 'Eixo central do átrio', min: [-ROW, 0.6, -3.5], max: [STAIR_X0 - 2, 8, 3.5] },
-    { name: 'Ponte', min: [BRIDGE[0] + 0.5, F2 + 0.2, -E + 0.6], max: [BRIDGE[1] - 0.5, F2 + 7, E - 0.6] },
+    {
+      name: 'Ponte',
+      min: [BRIDGE[0] + 0.5, F2 + 0.2, -CELL_FRONT + 0.6],
+      max: [BRIDGE[1] - 0.5, F2 + 7, CELL_FRONT - 0.6],
+    },
     { name: 'Patamar do mezanino', min: [STAIR_X1 + 0.5, F2 + 0.2, -SH + 0.2], max: [IN_X - 0.5, F2 + 7, SH - 0.2] },
     { name: 'Passagem sob o mezanino', min: [STAIR_X1 + 0.5, 0.6, -E + 1], max: [STAIR_X1 + 5.5, 8, E - 1] },
   );
@@ -94,9 +130,10 @@ export function clearanceZones() {
   let n = 1;
   for (const side of [-1, 1]) {
     for (const y0 of [0, F2]) {
+      const front = cellFront(y0);
       for (let i = 0; i < DIM.cellsPerRow; i++) {
         const cx = cellCenterX(i);
-        const z = (d) => side * (CELL_FRONT + d);
+        const z = (d) => side * (front + d);
         const id = String(n++).padStart(2, '0');
         zones.push({
           name: `Porta da cela ${id}`,
@@ -117,11 +154,19 @@ export function clearanceZones() {
 /** Bordas com queda: amostradas no teste para garantir guarda-corpo contínuo. */
 export function fallEdges() {
   return [
-    { name: 'Borda galeria Sul', axis: 'x', at: -E, from: -IN_X, to: STAIR_X1, y: F2, openings: [BRIDGE] },
-    { name: 'Borda galeria Norte', axis: 'x', at: E, from: -IN_X, to: STAIR_X1, y: F2, openings: [BRIDGE] },
-    { name: 'Borda do mezanino', axis: 'z', at: STAIR_X1, from: -E, to: E, y: F2, openings: [[-SH, SH]] },
-    { name: 'Ponte lado oeste', axis: 'z', at: BRIDGE[0], from: -E, to: E, y: F2, openings: [] },
-    { name: 'Ponte lado leste', axis: 'z', at: BRIDGE[1], from: -E, to: E, y: F2, openings: [] },
+    { name: 'Borda galeria Sul', axis: 'x', at: -CELL_FRONT, from: -IN_X, to: STAIR_X1, y: F2, openings: [BRIDGE] },
+    { name: 'Borda galeria Norte', axis: 'x', at: CELL_FRONT, from: -IN_X, to: STAIR_X1, y: F2, openings: [BRIDGE] },
+    {
+      name: 'Borda do mezanino',
+      axis: 'z',
+      at: STAIR_X1,
+      from: -CELL_FRONT,
+      to: CELL_FRONT,
+      y: F2,
+      openings: [[-SH, SH]],
+    },
+    { name: 'Ponte lado oeste', axis: 'z', at: BRIDGE[0], from: -CELL_FRONT, to: CELL_FRONT, y: F2, openings: [] },
+    { name: 'Ponte lado leste', axis: 'z', at: BRIDGE[1], from: -CELL_FRONT, to: CELL_FRONT, y: F2, openings: [] },
   ];
 }
 
@@ -198,7 +243,7 @@ function cell(b, index, side, y0, number) {
   const id = String(number).padStart(2, '0');
   const model = `Celas/Cela ${id}`;
   const cx = cellCenterX(index);
-  const front = side * CELL_FRONT;
+  const front = side * cellFront(y0);
   const zAt = (d) => front + side * d; // d: 0 = fachada, 16 = fundo; negativo = corredor
   const r = (name, lx0, lx1, ya, yb, d0, d1, color, opts) =>
     b.span(model, name, [cx + lx0, y0 + ya, zAt(d0)], [cx + lx1, y0 + yb, zAt(d1)], color, opts);
@@ -237,7 +282,8 @@ function cell(b, index, side, y0, number) {
   for (const bx of [6.3, 6.8, 7.3]) r('Porta Barra', bx - 0.1, bx + 0.1, 0.8, 9.7, -0.3, -0.05, C.steel, deco);
 
   // Interior
-  r('Piso', -7, 7, 0, 0.1, 0.6, D, C.cellFloor);
+  // o piso termina na face da parede do fundo (atrás das celas do térreo há um vão de serviço)
+  r('Piso', -7, 7, 0, 0.1, 0.6, D - 0.3, C.cellFloor);
   r('Revestimento E', -7, -6.8, 0, H, 0.6, D - 0.3, C.cellWall);
   r('Revestimento D', 6.8, 7, 0, H, 0.6, D - 0.3, C.cellWall);
   r('Parede Fundo', -7, 7, 0, H, D - 0.3, D, C.cellBack);
@@ -320,7 +366,7 @@ export function buildPrison() {
   for (const z of [-E, E])
     b.span(T, 'Viga Longitudinal', [-IN_X, ROOF - 1.8, z - 0.7], [IN_X, ROOF, z + 0.7], C.beam, tg);
 
-  // --- Colunas ---------------------------------------------------------------
+  // --- Colunas (a cada 2 celas, soltas no vão) ------------------------------
   for (const x of COLUMN_X) {
     for (const s of [-1, 1]) {
       b.box('Estrutura/Colunas', 'Coluna', [x, ROOF / 2, s * E], [COL, ROOF, COL], C.column);
@@ -338,18 +384,20 @@ export function buildPrison() {
     b.span(P, `Meio-fio ${t}`, [-ROW, 0, s * (CELL_FRONT - 1)], [ROW, 0.5, s * CELL_FRONT], C.curb, { studs: true });
   }
 
-  // --- Blocos de celas -------------------------------------------------------
+  // --- Blocos de celas (de cima recuadas) ------------------------------------
   let number = 1;
   for (const side of [-1, 1]) {
     const t = side < 0 ? 'Sul' : 'Norte';
     const A = `Celas/Ala ${t}`;
-    const zf = side * CELL_FRONT;
-    const zDiv = side * (CELL_FRONT + 0.6);
-    const zBack = side * IN_Z;
     for (const y0 of [0, F2]) {
+      const front = cellFront(y0);
+      const zf = side * front;
+      const zDiv = side * (front + 0.6);
       for (let i = 0; i <= DIM.cellsPerRow; i++) {
         const wx = -ROW + i * PITCH;
-        b.span(A, 'Divisória', [wx, y0, zDiv], [wx + 1, y0 + H, zBack], C.facade);
+        // no térreo as divisórias das pontas vão até a parede e fecham o vão de serviço atrás das celas
+        const end = y0 === 0 && (i === 0 || i === DIM.cellsPerRow) ? IN_Z : y0 === 0 ? GROUND_BACK : IN_Z;
+        b.span(A, 'Divisória', [wx, y0, zDiv], [wx + 1, y0 + H, side * end], C.facade);
       }
       // Fecho da fachada sobre a última divisória
       const wl = ROW - 1;
@@ -360,68 +408,61 @@ export function buildPrison() {
       });
       for (let i = 0; i < DIM.cellsPerRow; i++) cell(b, i, side, y0, number++);
     }
-    b.span(A, 'Laje Superior', [-ROW, TOP, zf], [ROW, TOP + 1, zBack], C.cellWall);
+    b.span(A, 'Laje Superior', [-ROW, TOP, side * UPPER_FRONT], [ROW, TOP + 1, side * IN_Z], C.cellWall);
 
-    // Laje do 2º andar + acabamentos da galeria
+    // Laje do 2º andar: começa na fachada do térreo (não cobre o corredor)
     const G = `Galerias/Galeria ${t}`;
-    const zEdge = side * E;
-    b.span(G, 'Laje', [-IN_X, F2 - 1, zEdge], [STAIR_X1, F2, zBack], C.cellWall);
-    b.span(G, 'Piso Galeria', [-IN_X, F2, zEdge], [STAIR_X1, F2 + 0.1, side * (CELL_FRONT - 1)], C.floorCatwalk);
-    b.span(G, 'Faixa Piso', [-IN_X, F2 + 0.1, side * (E + 2.4)], [STAIR_X1, F2 + 0.15, side * (E + 3)], C.wallTrim, {
-      canCollide: false,
+    const zEdge = side * CELL_FRONT;
+    b.span(G, 'Laje', [-IN_X, F2 - 1, zEdge], [STAIR_X1, F2, side * IN_Z], C.cellWall);
+    b.span(G, 'Piso Galeria', [-IN_X, F2, zEdge], [STAIR_X1, F2 + 0.1, side * (UPPER_FRONT - 1)], C.floorCatwalk);
+    b.span(
+      G,
+      'Faixa Piso',
+      [-IN_X, F2 + 0.1, side * (CELL_FRONT + 2.4)],
+      [STAIR_X1, F2 + 0.15, side * (CELL_FRONT + 3)],
+      C.wallTrim,
+      { canCollide: false },
+    );
+    b.span(G, 'Meio-fio', [-ROW, F2, side * (UPPER_FRONT - 1)], [ROW, F2 + 0.5, side * UPPER_FRONT], C.curb, {
+      studs: true,
     });
-    b.span(G, 'Meio-fio', [-ROW, F2, side * (CELL_FRONT - 1)], [ROW, F2 + 0.5, zf], C.curb, { studs: true });
     for (const [x0, x1] of [
       [-IN_X, BRIDGE[0]],
       [BRIDGE[1], STAIR_X1],
     ]) {
-      b.span(G, 'Testeira', [x0, F2 - 1.4, zEdge - side * 0.4], [x1, F2, zEdge], C.wallTrim);
+      b.span(G, 'Testeira', [x0, F2 - 1, zEdge - side * 0.4], [x1, F2, zEdge], C.wallTrim);
+      glassRail(b, G, 'x', zEdge, x0, x1, F2);
     }
-    // Guarda-corpo entre colunas (vão da ponte livre)
-    const stops = [-IN_X, ...COLUMN_X.flatMap((x) => [x - COL / 2, x + COL / 2]), STAIR_X1];
-    for (let i = 0; i < stops.length; i += 2) {
-      const a = stops[i];
-      const c = stops[i + 1];
-      const segs =
-        a < BRIDGE[1] && c > BRIDGE[0]
-          ? [
-              [a, BRIDGE[0]],
-              [BRIDGE[1], c],
-            ]
-          : [[a, c]];
-      for (const [p0, p1] of segs) if (p1 - p0 > 0.05) glassRail(b, G, 'x', zEdge, p0, p1, F2);
-    }
-    // Iluminação dos corredores e galerias
+    // Iluminação: pendentes sobre o corredor (vão aberto) e sobre a galeria
     for (let i = 0; i < DIM.cellsPerRow; i++) {
       const lx = cellCenterX(i);
-      panelLight(b, `Iluminação/Corredor ${t}`, lx, F2 - 1, side * (E + 5), 6, 1.4, i % 2 === 0);
-      hangingLight(b, `Iluminação/Galeria ${t}`, lx, ROOF - 5, side * (E + 5));
+      if (i % 2 === 0) hangingLight(b, `Iluminação/Corredor ${t}`, lx, HANG_Y, side * (E + 5));
+      hangingLight(b, `Iluminação/Galeria ${t}`, lx, ROOF - 5, side * (CELL_FRONT + 5));
     }
   }
 
   // --- Ponte central ---------------------------------------------------------
   const BR = 'Galerias/Ponte';
-  b.span(BR, 'Laje Ponte', [BRIDGE[0], F2 - 1, -E], [BRIDGE[1], F2, E], C.cellWall);
-  b.span(BR, 'Piso Ponte', [BRIDGE[0], F2, -E], [BRIDGE[1], F2 + 0.1, E], C.floorCatwalk);
-  b.span(BR, 'Testeira O', [BRIDGE[0] - 0.4, F2 - 1.4, -E], [BRIDGE[0], F2, E], C.wallTrim);
-  b.span(BR, 'Testeira L', [BRIDGE[1], F2 - 1.4, -E], [BRIDGE[1] + 0.4, F2, E], C.wallTrim);
-  glassRail(b, BR, 'z', BRIDGE[0], -E, E, F2);
-  glassRail(b, BR, 'z', BRIDGE[1], -E, E, F2);
+  b.span(BR, 'Laje Ponte', [BRIDGE[0], F2 - 1, -CELL_FRONT], [BRIDGE[1], F2, CELL_FRONT], C.cellWall);
+  b.span(BR, 'Piso Ponte', [BRIDGE[0], F2, -CELL_FRONT], [BRIDGE[1], F2 + 0.1, CELL_FRONT], C.floorCatwalk);
+  b.span(BR, 'Testeira O', [BRIDGE[0] - 0.4, F2 - 1, -CELL_FRONT], [BRIDGE[0], F2, CELL_FRONT], C.wallTrim);
+  b.span(BR, 'Testeira L', [BRIDGE[1], F2 - 1, -CELL_FRONT], [BRIDGE[1] + 0.4, F2, CELL_FRONT], C.wallTrim);
+  glassRail(b, BR, 'z', BRIDGE[0], -CELL_FRONT, CELL_FRONT, F2);
+  glassRail(b, BR, 'z', BRIDGE[1], -CELL_FRONT, CELL_FRONT, F2);
 
   // --- Mezanino leste + escada ---------------------------------------------
   const M = 'Galerias/Mezanino';
   b.span(M, 'Laje Mezanino', [STAIR_X1, F2 - 1, -IN_Z], [IN_X, F2, IN_Z], C.cellWall);
-  b.span(M, 'Patamar', [STAIR_X1, F2, -E], [IN_X, F2 + 0.1, E], C.floorAtrium, { studs: true });
-  b.span(M, 'Piso Mezanino S', [STAIR_X1, F2, -IN_Z], [IN_X, F2 + 0.1, -E], C.floorCatwalk);
-  b.span(M, 'Piso Mezanino N', [STAIR_X1, F2, E], [IN_X, F2 + 0.1, IN_Z], C.floorCatwalk);
+  b.span(M, 'Patamar', [STAIR_X1, F2, -CELL_FRONT], [IN_X, F2 + 0.1, CELL_FRONT], C.floorAtrium, { studs: true });
+  b.span(M, 'Piso Mezanino S', [STAIR_X1, F2, -IN_Z], [IN_X, F2 + 0.1, -CELL_FRONT], C.floorCatwalk);
+  b.span(M, 'Piso Mezanino N', [STAIR_X1, F2, CELL_FRONT], [IN_X, F2 + 0.1, IN_Z], C.floorCatwalk);
   for (const [z0, z1] of [
-    [-E, -SH - 0.8],
-    [SH + 0.8, E],
+    [-CELL_FRONT, -SH - 0.8],
+    [SH + 0.8, CELL_FRONT],
   ]) {
-    b.span(M, 'Testeira', [STAIR_X1 - 0.4, F2 - 1.4, z0], [STAIR_X1, F2, z1], C.wallTrim);
+    b.span(M, 'Testeira', [STAIR_X1 - 0.4, F2 - 1, z0], [STAIR_X1, F2, z1], C.wallTrim);
+    glassRail(b, M, 'z', STAIR_X1, z0, z1, F2);
   }
-  glassRail(b, M, 'z', STAIR_X1, -E, -SH - 0.8, F2);
-  glassRail(b, M, 'z', STAIR_X1, SH + 0.8, E, F2);
 
   const S = 'Escada';
   for (let k = 0; k < F2; k++) {
@@ -444,7 +485,7 @@ export function buildPrison() {
   b.span(HL, 'Tampo Balcão', [-74.3, 3.5, 11.7], [-69.7, 3.8, 20.3], C.steelLight);
   b.span(HL, 'Vidro Balcão', [-69.9, 3.8, 12], [-69.8, 7.5, 20], C.glass, { transparency: 0.6 });
   b.span(HL, 'Painel Monitores', [-IN_X, 6, 13], [-IN_X + 0.3, 9.5, 19], C.steel, { canCollide: false });
-  for (const z of [-12, 12]) hangingLight(b, 'Iluminação/Hall', -71, ROOF - 7, z);
+  for (const z of [-12, 12]) hangingLight(b, 'Iluminação/Hall', -71, HANG_Y, z);
 
   // --- Depósitos fechados (cantos oeste do térreo) ---------------------------
   for (const s of [-1, 1]) {
@@ -464,26 +505,27 @@ export function buildPrison() {
     b.span(D, 'Caixilho D', [-66.2, 3, zf0], [-66, 11, zf1], C.steel);
     b.span(D, 'Caixilho Topo', [-84, 10.8, zf0], [-66, 11, zf1], C.steel);
     b.span(D, 'Caixilho Base', [-84, 3, zf0], [-66, 3.2, zf1], C.steel);
-    crate(b, D, -84, 0, s * 40);
-    crate(b, D, -84, 4, s * 40);
-    crate(b, D, -78.5, 0, s * 39);
-    rack(b, D, -74, s * 46.5, 14, 3.5, 11);
-    panelLight(b, D, -74, F2 - 1, s * 41);
+    crate(b, D, -84, 0, s * 42);
+    crate(b, D, -84, 4, s * 42);
+    crate(b, D, -78.5, 0, s * 41);
+    rack(b, D, -74, s * 55, 14, 3.5, 11);
+    panelLight(b, D, -74, F2 - 1, s * 47);
   }
 
-  // --- Átrio: refeitório e caixas --------------------------------------------
+  // --- Átrio: poucos móveis, muito espaço -------------------------------------
   const R = 'Átrio/Refeitório';
-  for (const tx of [-50, -36, -10]) {
-    for (const tz of [-11, 11]) {
-      b.box(R, 'Mesa Tampo', [tx, 3.2, tz], [0.4, 8, 8], C.porcelain, { shape: 'Cylinder', rotation: [0, 0, 90] });
-      b.box(R, 'Mesa Pé', [tx, 1.6, tz], [1.2, 3, 1.2], C.steel);
-      b.box(R, 'Mesa Base', [tx, 0.25, tz], [3.4, 0.3, 3.4], C.steel);
-      for (const s of [-1, 1]) {
-        b.box(R, 'Banco', [tx, 1.8, tz + s * 5.4], [7, 0.5, 1.8], C.steelLight);
-        b.box(R, 'Banco Encosto', [tx, 2.95, tz + s * 6.3], [7, 1.8, 0.4], C.steel);
-        b.box(R, 'Banco Pé', [tx - 2.6, 0.85, tz + s * 5.4], [0.7, 1.5, 1.4], C.steel);
-        b.box(R, 'Banco Pé', [tx + 2.6, 0.85, tz + s * 5.4], [0.7, 1.5, 1.4], C.steel);
-      }
+  for (const [tx, tz] of [
+    [-42, -12],
+    [-8, 12],
+  ]) {
+    b.box(R, 'Mesa Tampo', [tx, 3.2, tz], [0.4, 8, 8], C.porcelain, { shape: 'Cylinder', rotation: [0, 0, 90] });
+    b.box(R, 'Mesa Pé', [tx, 1.6, tz], [1.2, 3, 1.2], C.steel);
+    b.box(R, 'Mesa Base', [tx, 0.25, tz], [3.4, 0.3, 3.4], C.steel);
+    for (const s of [-1, 1]) {
+      b.box(R, 'Banco', [tx, 1.8, tz + s * 5.4], [7, 0.5, 1.8], C.steelLight);
+      b.box(R, 'Banco Encosto', [tx, 2.95, tz + s * 6.3], [7, 1.8, 0.4], C.steel);
+      b.box(R, 'Banco Pé', [tx - 2.6, 0.85, tz + s * 5.4], [0.7, 1.5, 1.4], C.steel);
+      b.box(R, 'Banco Pé', [tx + 2.6, 0.85, tz + s * 5.4], [0.7, 1.5, 1.4], C.steel);
     }
   }
   const K = 'Átrio/Caixas';
@@ -492,8 +534,8 @@ export function buildPrison() {
   crate(b, K, 14.1, 4.1, -15);
   crate(b, K, 30, 0.1, 15);
   crate(b, K, 30, 0.1, 10.5, 3);
-  for (let i = 0; i < 7; i++) {
-    for (const z of [-11, 11]) hangingLight(b, 'Iluminação/Átrio', cellCenterX(i), ROOF - 7, z);
+  for (let i = 0; i < DIM.cellsPerRow; i += 2) {
+    for (const z of [-10, 10]) hangingLight(b, 'Iluminação/Átrio', cellCenterX(i), HANG_Y, z);
   }
 
   // --- Sala de visitas (sob o mezanino) -------------------------------------
@@ -515,9 +557,9 @@ export function buildPrison() {
   // --- Estoque sob o mezanino (estantes) ------------------------------------
   for (const s of [-1, 1]) {
     const D = `Depósitos/Estoque ${s < 0 ? 'Sul' : 'Norte'}`;
-    for (const z of [29, 36.5, 44]) rack(b, D, 77, s * z);
-    panelLight(b, D, 77, F2 - 1, s * 32.75);
-    panelLight(b, D, 77, F2 - 1, s * 40.25, 5, 1.4, false);
+    for (const z of [30, 40, 50]) rack(b, D, 77, s * z);
+    panelLight(b, D, 77, F2 - 1, s * 35);
+    panelLight(b, D, 77, F2 - 1, s * 45, 5, 1.4, false);
   }
 
   return { parts: b.parts };

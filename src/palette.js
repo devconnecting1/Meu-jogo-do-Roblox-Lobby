@@ -3,32 +3,32 @@
 
 export const C = Object.freeze({
   // Envoltória e paredes
-  wall: [212, 208, 200], // reboco claro, levemente quente
-  wallTrim: [150, 147, 140], // friso / faixa de parede
-  wainscot: [112, 110, 106], // rodapé alto
-  ceiling: [70, 72, 76], // teto de concreto escuro
-  beam: [92, 94, 98], // vigas
-  column: [172, 170, 164],
-  columnBase: [96, 96, 98],
+  wall: [234, 231, 224], // reboco claro, levemente quente
+  wallTrim: [168, 164, 156], // friso / faixa de parede
+  wainscot: [128, 126, 120], // rodapé alto
+  ceiling: [104, 106, 110], // teto de concreto
+  beam: [126, 128, 132], // vigas
+  column: [200, 198, 192],
+  columnBase: [120, 120, 122],
 
   // Pisos
-  floor: [128, 128, 126], // laje de concreto
-  floorAtrium: [146, 146, 142], // piso do átrio (studs)
-  floorCorridor: [166, 164, 158],
-  floorCatwalk: [118, 120, 122],
-  curb: [66, 68, 72], // meio-fio / rodapé de vidro (studs)
+  floor: [154, 154, 150], // laje de concreto
+  floorAtrium: [178, 178, 174], // piso do átrio (studs)
+  floorCorridor: [200, 198, 192],
+  floorCatwalk: [156, 158, 160],
+  curb: [86, 88, 92], // meio-fio / rodapé de vidro (studs)
 
   // Metal e vidro
   steel: [58, 60, 64],
-  steelLight: [140, 142, 146],
+  steelLight: [162, 164, 168],
   glass: [196, 206, 212],
   mirror: [186, 192, 196],
 
   // Celas
-  facade: [104, 108, 114],
-  cellWall: [224, 222, 216],
-  cellBack: [140, 144, 148],
-  cellFloor: [176, 174, 168],
+  facade: [124, 128, 134],
+  cellWall: [238, 236, 230],
+  cellBack: [164, 168, 172],
+  cellFloor: [198, 196, 190],
   sheet: [226, 224, 218],
   blanket: [110, 114, 120],
   porcelain: [234, 234, 232],

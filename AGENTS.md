@@ -21,7 +21,7 @@ Escopo atual: **somente a prisão**. Não criar UI, NPC, script, sistema de jogo
 5. **Cores neutras:** use só `src/palette.js`. Saturação HSV ≤ 0,3 (testado). Não espalhe RGB solto pelo layout.
 6. **Ambiente fechado:** piso, teto e 4 paredes opacos, sem janelas, portas ou claraboias para fora. Não existe exterior nem saída.
 7. **Tudo se sustenta:** nenhuma peça flutua, nenhuma face visível faz z-fighting, nenhuma peça bloqueia passagem, e toda borda com queda tem guarda-corpo. O **manual de montagem** (`src/manual.js`) precisa conseguir montar cada peça sobre algo já montado.
-8. **Nada apertado:** a escala segue a prisão de referência, com mínimos verificados em `tests/space.test.mjs`: cela de 14×16 com pé-direito de 16, corredor de 10, vão central de 48, 27 studs do 2º andar ao teto, escada de 14 e ponte de 10. Nunca reduza esses valores para "caber" algo; aumente o prédio.
+8. **Nada apertado:** a escala segue a prisão de referência, com mínimos verificados em `tests/space.test.mjs`: cela de 14×16 com pé-direito de 16, corredor de 10, átrio de 48, 27 studs do 2º andar ao teto, escada de 14 e ponte de 10. **Corte em terraços:** a galeria do 2º andar fica em cima das celas do térreo e as celas de cima são recuadas. Nenhuma laje pode cobrir o corredor do térreo: corredor e átrio formam um vão aberto de 68 studs até o teto. Colunas a cada 30 studs e poucos móveis deixam o espaço respirar. Nunca reduza esses valores para "caber" algo; aumente o prédio.
 9. **Segredos:** a chave Open Cloud só existe no GitHub (Secrets/Variables). Nunca commitar chaves; o publicador mascara a chave no log.
 
 ## 3. Mapa do repositório
@@ -52,7 +52,7 @@ b.span('Área/Sub', 'Nome', [x0, y0, z0], [x1, y1, z1], C.cor, { canCollide, stu
 b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 ```
 
-- **Unidades:** studs. Y para cima. Interior: x −88…88, z −50…50, y 0…44. Térreo y=0; 2º andar y=17. **Todas as medidas derivam de `DIM`** em `src/prison.js`: mude a escala lá, nunca com números soltos.
+- **Unidades:** studs. Y para cima. Interior: x −88…88, z −60…60, y 0…44. Térreo y=0; 2º andar y=17. Fachadas: térreo em |z|=34, celas de cima em |z|=44 (galeria entre 34 e 44). **Todas as medidas derivam de `DIM`** em `src/prison.js`: mude a escala lá, nunca com números soltos.
 - **Escala do jogador:** personagem de 5 studs. Pé-direito de 16 por andar, portas de 3,5×10, corredores de 10 e degraus de **até 1 stud** (piso de 1,25).
 - **Apoio:** toda peça precisa **encostar** em outra que já esteja ligada à `Laje Térreo`. Luminárias levam haste até o teto (`hangingLight`) ou encostam no teto (`panelLight`).
 - **Peça decorativa colada em superfície** (friso, faixa, placa): use `canCollide: false` e desloque-a para fora da face (por exemplo, `-0.08`), **nunca** no mesmo plano da face.
@@ -79,7 +79,7 @@ b.box('Área/Sub', 'Nome', [cx, cy, cz], [sx, sy, sz], C.cor);
 | orçamento | mais de 5000 Parts ou mais de 120 luzes |
 | determinismo | resultado diferente entre duas montagens |
 | manual de montagem | peça que não se apoia em nada já montado, peça fora do manual, etapa com mais de 8 peças, fases fora de ordem |
-| espaço (anti-aperto) | cela, corredor, vão, pé-direito, escada, ponte ou porta abaixo do mínimo da referência |
+| espaço (anti-aperto) | cela, corredor, vão, pé-direito, escada, ponte ou porta abaixo do mínimo da referência; laje cobrindo o corredor do térreo; celas de cima sem recuo |
 | Rojo/projeto | enums errados, Lighting fora de Future, serviços extras (scripts/UI) |
 | `verify-place` (CI) | o `.rbxl` real com contagem errada, instância proibida ou material inesperado |
 
