@@ -128,6 +128,7 @@ Cada item já derrubou o CI uma vez (a maioria no projeto da prisão; continuam 
 | z-fighting Estaca da Cerca × Cerca (quintais) | poste e trilho da cerca em cores diferentes com faces no mesmo plano | cerca do quintal toda na mesma madeira (`C.wood`); detalhe de outra cor sempre afastado 0,1 |
 | "trilhas soltas" perto das vilas | trilhas dos campos ligam na rua da vila, e o teste não contava a rua como parte da malha | a rua, a praça e o largo da vila fazem parte da malha (ligam na estrada pela trilha da vila) |
 | z-fighting Estrada × Fundação (semente 7) | a estrada correu colada no lote e as duas bordas caíram no mesmo inteiro | fundação 0,05 maior que o meio-fio (borda nunca inteira); bordas de peças deitadas: inteiro só nas estradas |
+| z-fighting Grama/Areia do Deserto × Montanha/Afloramento/Terra Arada (sementes 7, 101, 2027, 77777) | colunas do relevo e bordas dos campos em coordenada inteira, no mesmo plano da junta das faixas do terreno (múltiplos de 8), com alturas que se cruzam (3,9 a 4,0) | grade do `mountain()` deslocada 0,25; terra arada 0,15 para dentro do retângulo do campo |
 | orçamento divergente (10000 × 16000) | o limite de Parts estava repetido em vários testes | um só lugar: `DIM.maxParts` (18000), lido por todos os testes e pelo fuzz |
 | captura com a vista anterior | o SwiftShader demora a desenhar muitas malhas | tudo instanciado no visualizador; o CI espera 2 quadros antes de capturar |
 

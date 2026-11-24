@@ -553,8 +553,10 @@ export function createWorld(seed = SEED) {
       return Math.min(1.25, h * (0.7 + ridges)) * H * Math.min(1, fade * 3);
     };
     const n = Math.ceil((2 * R) / cell);
-    const gx0 = Math.round(cx - (n * cell) / 2);
-    const gz0 = Math.round(cz - (n * cell) / 2);
+    // grade deslocada 0,25: as laterais das colunas nunca caem num inteiro (junta das faixas do
+    // terreno a cada 16 studs, bordas de campos e estradas)
+    const gx0 = Math.round(cx - (n * cell) / 2) + 0.25;
+    const gz0 = Math.round(cz - (n * cell) / 2) + 0.25;
     const grid = [];
     for (let j = 0; j < n; j++) {
       grid.push([]);
@@ -1106,7 +1108,8 @@ export function createWorld(seed = SEED) {
     ];
     const field = (F, r, crop) => {
       const [name, color, h] = crop;
-      b.span(F, 'Terra Arada', [r.x0, land - 0.08, r.z0], [r.x1, land + 0.22, r.z1], C.soil);
+      // 0,15 para dentro: a borda da terra arada nunca cai num inteiro (junta das faixas do terreno)
+      b.span(F, 'Terra Arada', [r.x0 + 0.15, land - 0.08, r.z0 + 0.15], [r.x1 - 0.15, land + 0.22, r.z1 - 0.15], C.soil);
       for (let k = 0; k < 5; k++) {
         const zz = r.z0 + 2.4 + k * 4.3;
         b.span(F, name, [r.x0 + 1, land + 0.22, zz], [r.x1 - 1, land + 0.22 + h, zz + 1.4], color, deco);
@@ -1231,7 +1234,7 @@ export function createWorld(seed = SEED) {
       blocked.push(r);
       const F = `Recursos/Campo de Trigo ${landmarks.farms.length + 1}`;
       landmarks.farms.push([x, z]);
-      b.span(F, 'Terra Arada', [r.x0, land - 0.08, r.z0], [r.x1, land + 0.22, r.z1], C.soil);
+      b.span(F, 'Terra Arada', [r.x0 + 0.15, land - 0.08, r.z0 + 0.15], [r.x1 - 0.15, land + 0.22, r.z1 - 0.15], C.soil);
       for (let k = 0; k < 5; k++) {
         const zz = r.z0 + 2.4 + k * 4.3;
         b.span(F, 'Trigo', [r.x0 + 1, land + 0.22, zz], [r.x1 - 1, land + 1.6, zz + 1.4], C.wheat, deco);
