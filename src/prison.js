@@ -1268,7 +1268,7 @@ export function buildPrison() {
   for (const px of [-160.5, -156.1])
     b.span(RV, 'Pórtico Detector', [px, 0.1, -22.3], [px + 0.6, 8, -21.7], C.steelLight);
   b.span(RV, 'Pórtico Detector Topo', [-160.5, 8, -22.4], [-155.5, 8.8, -21.6], C.steelLight);
-  b.span(RV, 'Marca de Pés', [-159, 0.1, -19.6], [-157, 0.12, -18.4], C.hazard, { canCollide: false });
+  b.span(RV, 'Marca de Pés', [-159, 0.1, -19.6], [-157, 0.15, -18.4], C.hazard, { canCollide: false });
   b.span(RV, 'Mesa de Revista', [-158, 2.5, -29], [-154, 2.8, -26.5], C.steelLight);
   for (const lx of [-158, -154.4]) b.span(RV, 'Mesa Pé', [lx, 0.1, -28.8], [lx + 0.4, 2.5, -26.7], C.steel);
   b.span(RV, 'Banco', [GA0, 0.1, -28], [GA0 + 1.6, 1.8, -19], C.woodDark);
