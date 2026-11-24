@@ -26,7 +26,7 @@
     },
     {
       "id": "plot",
-      "title": "Lote 05: fundação do castelo"
+      "title": "Lote 27: fundação do castelo"
     },
     {
       "id": "plots",
@@ -67,6 +67,10 @@
     {
       "id": "village-walk",
       "title": "Rua da vila (altura do jogador)"
+    },
+    {
+      "id": "farmland",
+      "title": "Região de fazenda: campos, espantalho e sede"
     },
     {
       "id": "tower",
@@ -138,28 +142,29 @@
     }
   ],
   "stats": {
-    "total": 15326,
+    "total": 20473,
     "lights": 0,
     "groups": {
       "Mar": 1,
-      "Terreno": 498,
+      "Terreno": 606,
       "Lobby": 326,
-      "Estradas": 45,
+      "Estradas": 44,
       "Pontes": 29,
       "Lotes": 330,
-      "Trilhas": 28,
-      "Vila": 761,
-      "Vegetação": 11206,
-      "Relevo": 1663,
-      "Recursos": 152,
+      "Trilhas": 44,
+      "Vila": 732,
+      "Vegetação": 13024,
+      "Fazendas": 489,
+      "Relevo": 4445,
+      "Recursos": 116,
       "Costa": 45,
       "Torres de Vigia": 170,
       "Acampamentos": 72
     }
   },
   "manual": {
-    "parts": 15326,
-    "steps": 2379,
-    "connections": 37686
+    "parts": 20473,
+    "steps": 2959,
+    "connections": 61618
   }
 }
