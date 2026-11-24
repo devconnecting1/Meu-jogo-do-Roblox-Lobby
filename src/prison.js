@@ -85,6 +85,10 @@ const GB0 = GB1 - 10; // -217: face do portão B (fechado, para uma atualizaçã
 const TX0 = GB0 - W; // -219: face externa do fundo do túnel
 const RZ = CH + W + 14; // 30: fundo das salas laterais das eclusas (triagem, revista, máquinas, solitária)
 
+// Abandono: celas destruídas (porta arrancada, janela estilhaçada, parede do fundo furada) e celas trancadas
+export const WRECKED_CELLS = Object.freeze([4, 13, 20, 29]);
+export const CLOSED_CELLS = Object.freeze([2, 11, 18, 23, 26, 31]);
+
 // Abandono: rombo na parede do bloco (lado do hall), aberto para o vão escuro sobre a ala oeste
 const BREACH = Object.freeze({ z: [18, 28], y: [24, 34] });
 
@@ -113,7 +117,7 @@ const GALLERY_LIGHT = { type: 'Surface', range: 30, brightness: 0.8, color: C.ne
 const WARN_LIGHT = { type: 'Point', range: 14, brightness: 0.6, color: C.neonWarn };
 const FIXTURE_Y = ROOF - 1.4; // luminárias presas ao teto com haste curta (1,2)
 const UPPER_CEIL = TOP; // forro das salas do 2º andar (mesma altura do topo das celas de cima)
-const PANEL_LIGHT = { type: 'Surface', range: 17, brightness: 0.8, color: C.neonCold };
+const PANEL_LIGHT = { type: 'Surface', range: 18, brightness: 1, color: C.neonCold };
 /** Estado de uma lâmpada: 'ok', 'dead' (queimada, sem luz) ou 'flicker' (pisca suave via script). */
 const withState = (light, state) => (light && state === 'flicker' ? { ...light, flicker: true } : light);
 
@@ -216,7 +220,9 @@ export function clearanceZones() {
       for (let i = 0; i < DIM.cellsPerRow; i++) {
         const cx = cellCenterX(i);
         const z = (d) => side * (front + d);
-        const id = String(n++).padStart(2, '0');
+        const num = n++;
+        const id = String(num).padStart(2, '0');
+        if (CLOSED_CELLS.includes(num)) continue; // cela trancada: a porta fechada barra a passagem de propósito
         zones.push({
           name: `Porta da cela ${id}`,
           min: [cx + 2.3, y0 + 0.6, Math.min(z(-1), z(1.6))],
@@ -373,17 +379,20 @@ function wallX(b, model, x0, x1, z0, z1, h, openings = []) {
   if (cur < x1) b.span(model, 'Parede', [cur, 0, z0], [x1, h, z1], C.wall);
 }
 
-/** Luminária pendente: carcaça + 2 tubos Neon + hastes até o teto. */
+/**
+ * Luminária pendente: carcaça + UM tubo + hastes até o teto. Regra (testada): só brilha (Neon) o tubo
+ * que emite luz de verdade; lâmpada sem luz é queimada (Plastic escuro), nunca um Neon "de enfeite".
+ */
 function hangingLight(b, model, x, y, z, light = HANG_LIGHT, state = 'ok') {
   const stem = ROOF - (y + 0.2);
-  const dead = state === 'dead';
+  const dead = state === 'dead' || !light;
   b.box(model, 'Carcaça', [x, y, z], [8, 0.4, 1.8], C.steel, { canCollide: false });
+  b.box(model, 'Tubo', [x, y - 0.3, z], [7.6, 0.25, 1.1], dead ? C.lampDead : C.neonCold, {
+    canCollide: false,
+    material: dead ? 'Plastic' : 'Neon',
+    light: dead ? null : withState(light, state),
+  });
   for (const o of [-1.9, 1.9]) {
-    b.box(model, 'Tubo', [x + o, y - 0.3, z], [3.6, 0.25, 1.1], dead ? C.lampDead : C.neonCold, {
-      canCollide: false,
-      material: dead ? 'Plastic' : 'Neon',
-      light: o < 0 && !dead ? withState(light, state) : null,
-    });
     b.box(model, 'Haste', [x + o * 1.4, y + 0.2 + stem / 2, z], [0.3, stem, 0.3], C.steel, { canCollide: false });
   }
 }
@@ -414,9 +423,10 @@ function emergencyGate(b, model, fx, s, open, floorY = 0.1) {
   for (const z of [-1, 1]) {
     const [z0, z1] = z < 0 ? [-CH, -reach] : [reach, CH];
     sp('Coluna do Portão', 0, 1.4, floorY, top + 1.2, z0, z1, C.steel, { surface: 'Inlet' });
-    sp('Luz de Alerta', 0.3, 1.1, top + 1.2, top + 1.8, z0, z1, C.neonWarn, {
+    // uma luz de alerta acesa; a outra está quebrada (sem luz, então sem brilho)
+    sp('Luz de Alerta', 0.3, 1.1, top + 1.2, top + 1.8, z0, z1, z < 0 ? C.neonWarn : C.lampDead, {
       canCollide: false,
-      material: 'Neon',
+      material: z < 0 ? 'Neon' : 'Plastic',
       light: z < 0 ? WARN_LIGHT : null,
     });
   }
@@ -441,8 +451,8 @@ function emergencyGate(b, model, fx, s, open, floorY = 0.1) {
 
 /** Painel embutido; ceilingY = face inferior do teto onde ele encosta. */
 function panelLight(b, model, x, ceilingY, z, w = 5, d = 1.4, light = true) {
-  // light: true (acesa), false (Neon sem luz própria), 'dead' (queimada) ou 'flicker' (pisca)
-  const dead = light === 'dead';
+  // light: true (acesa), 'flicker' (pisca) ou false/'dead' (apagada: Plastic escuro, sem brilho falso)
+  const dead = light === 'dead' || light === false;
   b.box(model, 'Moldura', [x, ceilingY - 0.05, z], [w + 0.4, 0.1, d + 0.4], C.steel, { canCollide: false });
   b.box(model, 'Painel', [x, ceilingY - 0.15, z], [w, 0.12, d], dead ? C.lampDead : C.neonCold, {
     canCollide: false,
@@ -521,6 +531,48 @@ function brokenColumn(b, x, z) {
   b.span(M, 'Pedaço da Coluna', [x + 0.2, g1 - 1, z - h], [x + h, g1, z + 0.4], C.column);
 }
 
+/**
+ * Coluna desabada: a parte de cima quebrou e caiu. Fica o toco com vergalhões para cima, o topo
+ * partido preso no capitel/viga, e o fuste caído no chão em 3 pedaços ao longo da linha das colunas.
+ */
+function collapsedColumn(b, x, z) {
+  const M = 'Estrutura/Colunas';
+  const h = COL / 2;
+  const [cut0, cut1] = [6.5, 35];
+  b.span(M, 'Toco da Coluna', [x - h, 0, z - h], [x + h, cut0, z + h], C.column);
+  b.span(M, 'Pedaço da Coluna', [x - h, cut0, z - h], [x + 0.2, cut0 + 1.4, z + 0.6], C.column);
+  b.span(M, 'Pedaço da Coluna', [x + 0.5, cut0, z - 0.4], [x + h, cut0 + 0.6, z + h], C.column);
+  b.span(M, 'Coluna Partida (topo)', [x - h, cut1, z - h], [x + h, ROOF, z + h], C.column);
+  b.span(M, 'Pedaço da Coluna', [x - h, cut1 - 1.1, z - h], [x + 0.4, cut1, z + h], C.column);
+  b.span(M, 'Pedaço da Coluna', [x + 0.6, cut1 - 0.7, z - h], [x + h, cut1, z + 0.3], C.column);
+  for (const [dx, dz] of [
+    [-1, -1],
+    [-1, 1],
+    [1, -1],
+    [1, 1],
+  ]) {
+    const [vx, vz] = [x + dx * 1.1, z + dz * 1.1];
+    b.span(M, 'Vergalhão', [vx - 0.1, cut0, vz - 0.1], [vx + 0.1, cut0 + 3.2, vz + 0.1], C.rust);
+    b.span(M, 'Vergalhão', [vx - 0.1, cut1 - 2.6, vz - 0.1], [vx + 0.1, cut1, vz + 0.1], C.rust);
+  }
+  // o fuste caído: dois pedaços inteiros (com colisão, fora das passagens) e um torto no meio
+  const R = 'Ruínas/Coluna Caída';
+  b.span(R, 'Coluna Caída', [x + 2.4, 0, z - h], [x + 12.4, COL, z + h], C.column);
+  b.box(R, 'Coluna Caída', [x + 17.5, COL / 2, z], [9.5, COL, COL], C.column, {
+    canCollide: false,
+    rotation: [0, 9, 0],
+  });
+  b.span(R, 'Coluna Caída', [x + 23, 0, z - h + 0.1], [x + 27.6, COL, z + h - 0.1], C.column);
+  for (const [rx, rz, seed] of [
+    [x + 1.5, z - 2.6, 201],
+    [x + 13.5, z - 2.8, 202],
+    [x + 21, z + 2.6, 203],
+    [x, z + 3, 204],
+  ]) {
+    rubble(b, R, rx, rz, seed, { n: 8, spread: 1.4, big: 1.6 });
+  }
+}
+
 /** Poça d'água parada no piso (topo em floorY). */
 function puddle(b, model, x, z, w, d, floorY, seed) {
   const r = rng(seed);
@@ -570,7 +622,23 @@ function cell(b, index, side, y0, number) {
   r('Friso', -8, 7, 14.3, 14.7, -0.08, 0, C.wallTrim, deco);
 
   // Janela de observação (showcase)
-  r('Vidro Janela', -6, 1, 3, 11, 0.2, 0.4, C.glass, { transparency: 0.7 });
+  const wrecked = WRECKED_CELLS.includes(number);
+  const closed = CLOSED_CELLS.includes(number);
+  if (wrecked) {
+    // vidro estilhaçado: sobraram cacos presos nos cantos, o resto está no chão
+    r('Vidro Janela', -6, -4.4, 3, 5.6, 0.2, 0.4, C.glass, { transparency: 0.7 });
+    r('Vidro Janela', -0.6, 1, 7.4, 11, 0.2, 0.4, C.glass, { transparency: 0.7 });
+    for (const [a, c, d0] of [
+      [-5.6, -4.6, 1.2],
+      [-3.2, -2.1, 2.4],
+      [-1.4, -0.6, 1.6],
+      [-4.4, -3.6, -1.6],
+    ]) {
+      r('Caco de Vidro', a, c, 0.1, 0.15, d0, d0 + 0.7, C.glass, { canCollide: false, transparency: 0.5 });
+    }
+  } else {
+    r('Vidro Janela', -6, 1, 3, 11, 0.2, 0.4, C.glass, { transparency: 0.7 });
+  }
   r('Caixilho E', -6, -5.8, 3, 11, -0.05, 0.65, C.steel);
   r('Caixilho D', 0.8, 1, 3, 11, -0.05, 0.65, C.steel);
   r('Caixilho Topo', -6, 1, 10.8, 11, -0.05, 0.65, C.steel);
@@ -582,29 +650,67 @@ function cell(b, index, side, y0, number) {
   r('Batente D', 5.3, 5.5, 0, 10, -0.05, 0.65, C.steel);
   r('Batente Topo', 2, 5.5, 9.8, 10, -0.05, 0.65, C.steel);
   r('Trilho', 2, 8, 10, 10.3, -0.5, 0, C.steel);
-  r('Porta Topo', 5.6, 8, 9.7, 10, -0.35, 0, C.steel, deco);
-  r('Porta Base', 5.6, 8, 0.5, 0.8, -0.35, 0, C.steel, deco);
-  r('Porta Montante E', 5.6, 5.85, 0.5, 10, -0.35, 0, C.steel, deco);
-  r('Porta Montante D', 7.75, 8, 0.5, 10, -0.35, 0, C.steel, deco);
-  r('Porta Travessa', 5.6, 8, 5, 5.3, -0.35, 0, C.steel, deco);
-  for (const bx of [6.3, 6.8, 7.3]) r('Porta Barra', bx - 0.1, bx + 0.1, 0.8, 9.7, -0.3, -0.05, C.steel, deco);
+  if (wrecked) {
+    // porta arrancada do trilho, caída no chão do corredor (deitada: a altura vira comprimento em x)
+    const lay = (name, a, c, ya, yb) => r(name, 2 + (ya - 0.5), 2 + (yb - 0.5), 0.1, 0.4, -1 - (c - 5.6), -1 - (a - 5.6), C.steel, deco);
+    lay('Porta Topo', 5.6, 8, 9.7, 10);
+    lay('Porta Base', 5.6, 8, 0.5, 0.8);
+    lay('Porta Montante E', 5.6, 5.85, 0.5, 10);
+    lay('Porta Montante D', 7.75, 8, 0.5, 10);
+    lay('Porta Travessa', 5.6, 8, 5, 5.3);
+    for (const bx of [6.3, 6.8, 7.3]) lay('Porta Barra', bx - 0.1, bx + 0.1, 0.8, 9.7);
+  } else if (closed) {
+    // cela trancada: a grade fechada cobre todo o vão da porta (com colisão) e tem cadeado
+    r('Porta Topo', 2.2, 5.3, 9.7, 10, -0.35, 0, C.steel);
+    r('Porta Base', 2.2, 5.3, 0.5, 0.8, -0.35, 0, C.steel);
+    r('Porta Montante E', 2.2, 2.45, 0.5, 10, -0.35, 0, C.steel);
+    r('Porta Montante D', 5.05, 5.3, 0.5, 10, -0.35, 0, C.steel);
+    r('Porta Travessa', 2.2, 5.3, 5, 5.3, -0.35, 0, C.steel);
+    for (const bx of [2.95, 3.5, 4.05, 4.55]) r('Porta Barra', bx - 0.1, bx + 0.1, 0.8, 9.7, -0.3, -0.05, C.steel);
+    r('Cadeado', 4.7, 5.3, 4.4, 5.1, -0.6, -0.35, C.steelLight);
+  } else {
+    r('Porta Topo', 5.6, 8, 9.7, 10, -0.35, 0, C.steel, deco);
+    r('Porta Base', 5.6, 8, 0.5, 0.8, -0.35, 0, C.steel, deco);
+    r('Porta Montante E', 5.6, 5.85, 0.5, 10, -0.35, 0, C.steel, deco);
+    r('Porta Montante D', 7.75, 8, 0.5, 10, -0.35, 0, C.steel, deco);
+    r('Porta Travessa', 5.6, 8, 5, 5.3, -0.35, 0, C.steel, deco);
+    for (const bx of [6.3, 6.8, 7.3]) r('Porta Barra', bx - 0.1, bx + 0.1, 0.8, 9.7, -0.3, -0.05, C.steel, deco);
+  }
 
   // Interior
   // o piso termina na face da parede do fundo (atrás das celas do térreo há um vão de serviço)
   r('Piso', -7, 7, 0, 0.1, 0.6, D - 0.3, C.cellFloor);
   r('Revestimento E', -7, -6.8, 0, H, 0.6, D - 0.3, C.cellWall);
   r('Revestimento D', 6.8, 7, 0, H, 0.6, D - 0.3, C.cellWall);
-  r('Parede Fundo', -7, 7, 0, H, D - 0.3, D, C.cellBack);
+  if (wrecked && y0 === 0) {
+    // parede do fundo furada: aparece o vão de serviço escuro atrás das celas (interno, fechado)
+    r('Parede Fundo', -7, 7, 0, 2.5, D - 0.3, D, C.cellBack);
+    r('Parede Fundo', -7, 7, 9, H, D - 0.3, D, C.cellBack);
+    r('Parede Fundo', -7, -4, 2.5, 9, D - 0.3, D, C.cellBack);
+    r('Parede Fundo', 0, 7, 2.5, 9, D - 0.3, D, C.cellBack);
+    r('Pedaço de Parede', -4, -3, 2.5, 4, D - 0.3, D, C.cellBack);
+    r('Pedaço de Parede', -1.2, 0, 7.2, 9, D - 0.3, D, C.cellBack);
+  } else {
+    r('Parede Fundo', -7, 7, 0, H, D - 0.3, D, C.cellBack);
+  }
   // celas abandonadas: 1 em cada 3 com a lâmpada queimada, duas piscando
-  const lamp = number % 3 === 0 ? 'dead' : [7, 22].includes(number) ? 'flicker' : true;
+  const lamp = wrecked || number % 3 === 0 ? 'dead' : [7, 22].includes(number) ? 'flicker' : true;
   panelLight(b, model, cx, y0 + H, zAt(7), 3.4, 1.8, lamp);
 
   // Cama
   r('Cama Base', -6.6, 0.4, 0.1, 1.4, 12.2, 15.6, C.steel);
   r('Cama Gaveta', -6.2, 0, 0.5, 0.9, 12.1, 12.2, C.steelLight, deco);
-  r('Colchão', -6.5, 0.3, 1.4, 1.9, 12.3, 15.5, C.sheet);
-  r('Cobertor', -4.3, 0.35, 1.9, 2.1, 12.25, 15.55, C.blanket);
-  r('Travesseiro', -6.3, -4.9, 1.9, 2.4, 12.6, 15.2, C.sheet);
+  if (wrecked) {
+    // colchão e cobertor arrancados da cama, no chão; entulho espalhado
+    r('Colchão', -1.5, 4, 0.1, 0.6, 4, 7.4, C.sheet, deco);
+    r('Cobertor', 0.5, 3.6, 0.1, 0.3, 8, 10.5, C.blanket, deco);
+    r('Travesseiro', -6.3, -4.9, 1.4, 1.9, 12.6, 15.2, C.sheet);
+    rubble(b, `Ruínas/Cela ${id}`, cx - 2, zAt(9), 100 + number, { n: 6, spread: 1.4, floorY: y0 + 0.1, big: 0.9 });
+  } else {
+    r('Colchão', -6.5, 0.3, 1.4, 1.9, 12.3, 15.5, C.sheet);
+    r('Cobertor', -4.3, 0.35, 1.9, 2.1, 12.25, 15.55, C.blanket);
+    r('Travesseiro', -6.3, -4.9, 1.9, 2.4, 12.6, 15.2, C.sheet);
+  }
   r('Cabeceira', -6.8, -6.5, 0.1, 3, 12.2, 15.6, C.steel);
 
   // Vaso sanitário
@@ -731,6 +837,7 @@ export function buildPrison() {
   for (const x of COLUMN_X) {
     for (const s of [-1, 1]) {
       if ((x === -30 && s < 0) || (x === 30 && s > 0)) brokenColumn(b, x, s * E);
+      else if (x === 0 && s > 0) collapsedColumn(b, x, s * E);
       else b.box('Estrutura/Colunas', 'Coluna', [x, ROOF / 2, s * E], [COL, ROOF, COL], C.column);
       b.box('Estrutura/Colunas', 'Base Coluna', [x, 0.45, s * E], [COL + 0.6, 0.9, COL + 0.6], C.columnBase, {
         surface: 'Inlet',
@@ -825,8 +932,8 @@ export function buildPrison() {
         lx,
         FIXTURE_Y,
         side * (CELL_FRONT + 5),
-        i % 2 ? null : GALLERY_LIGHT,
-        state,
+        GALLERY_LIGHT,
+        i % 2 ? 'dead' : state,
       );
     }
   }
@@ -1103,9 +1210,9 @@ export function buildPrison() {
   b.span(RN, 'Vidro Protetor', [-140, 3.8, 54.4], [-100, 7, 54.6], C.glass, { transparency: 0.6 });
   for (const x of [-132, -120, -108]) {
     b.span(RN, 'Quadro Cardápio', [x - 4, 8, IN_Z - 0.3], [x + 4, 13, IN_Z], C.steel);
-    b.span(RN, 'Lâmpada do Quadro', [x - 3.6, 13, IN_Z - 0.5], [x + 3.6, 13.3, IN_Z], C.neon, {
+    // a luz dos quadros queimou: sem emissão, sem brilho
+    b.span(RN, 'Lâmpada do Quadro', [x - 3.6, 13, IN_Z - 0.5], [x + 3.6, 13.3, IN_Z], C.lampDead, {
       canCollide: false,
-      material: 'Neon',
     });
   }
   // 8 mesas em 2 fileiras, com corredor largo entre elas

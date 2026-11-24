@@ -2,7 +2,7 @@
 // nada aberto para fora e salas novas no túnel de acesso.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPrison } from '../src/prison.js';
+import { buildPrison, WRECKED_CELLS, CLOSED_CELLS } from '../src/prison.js';
 
 const { parts } = buildPrison();
 
@@ -34,6 +34,33 @@ test('estragos com sentido: colunas rachadas, rombo numa parede interna e entulh
   assert.ok(parts.filter((p) => p.name === 'Entulho').length >= 40, 'entulho espalhado');
   for (const p of parts.filter((x) => x.name === 'Entulho' || x.name === 'Mancha' || x.name === 'Poça')) {
     assert.equal(p.canCollide, false, `${p.model}/${p.name}: decoração de abandono não colide`);
+  }
+});
+
+test('destruição de verdade: coluna desabada com o topo partido e o fuste caído no chão', () => {
+  assert.equal(parts.filter((p) => p.name === 'Toco da Coluna').length, 1, 'toco da coluna desabada');
+  assert.equal(parts.filter((p) => p.name === 'Coluna Partida (topo)').length, 1, 'topo partido preso na viga');
+  const fallen = parts.filter((p) => p.name === 'Coluna Caída');
+  assert.ok(fallen.length >= 3, 'fuste caído em pedaços');
+  for (const p of fallen) assert.ok(p.position[1] - p.size[1] / 2 <= 0.001, `${p.name} está no chão`);
+});
+
+test('celas destruídas e celas trancadas', () => {
+  const cellOf = (n) => `Celas/Cela ${String(n).padStart(2, '0')}`;
+  for (const n of WRECKED_CELLS) {
+    const names = parts.filter((p) => p.model === cellOf(n)).map((p) => p.name);
+    assert.ok(names.includes('Caco de Vidro'), `cela ${n}: janela estilhaçada`);
+    const door = parts.find((p) => p.model === cellOf(n) && p.name === 'Porta Topo');
+    assert.ok(door.size[1] < 0.5, `cela ${n}: porta arrancada, deitada no chão`);
+  }
+  assert.ok(WRECKED_CELLS.length >= 3 && CLOSED_CELLS.length >= 3);
+  for (const n of CLOSED_CELLS) {
+    const bars = parts.filter((p) => p.model === cellOf(n) && p.name === 'Porta Barra');
+    assert.ok(bars.length >= 4 && bars.every((p) => p.canCollide), `cela ${n}: grade fechada com colisão`);
+    assert.ok(
+      parts.some((p) => p.model === cellOf(n) && p.name === 'Cadeado'),
+      `cela ${n}: trancada com cadeado`,
+    );
   }
 });
 

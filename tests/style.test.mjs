@@ -42,6 +42,8 @@ test('materiais: Plastic em tudo, Neon apenas em lâmpadas sem colisão', () => 
     assert.ok(['Plastic', 'Neon'].includes(p.material), `${p.name}: material ${p.material}`);
     if (p.material === 'Neon') assert.equal(p.canCollide, false, `${p.name}: Neon não deve colidir`);
     if (p.light) assert.equal(p.material, 'Neon', `${p.name}: luz precisa estar numa peça Neon`);
+    // e o contrário: só brilha o que emite luz (nada de lâmpada "acesa" de enfeite numa sala escura)
+    if (p.material === 'Neon') assert.ok(p.light, `${p.model}/${p.name}: Neon sem luz é lâmpada falsa`);
   }
 });
 
