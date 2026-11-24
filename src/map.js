@@ -417,8 +417,7 @@ const ROAD_RECTS = ROAD_PIECES.map(rectOf);
 
 const distToRect = (x, z, r) => Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));
 const distToRoads = (x, z) => ROAD_RECTS.reduce((d, r) => Math.min(d, distToRect(x, z, r)), Infinity);
-const rectsApart = (a, b, gap) =>
-  a.x1 + gap <= b.x0 || b.x1 + gap <= a.x0 || a.z1 + gap <= b.z0 || b.z1 + gap <= a.z0;
+const rectsApart = (a, b, gap) => a.x1 + gap <= b.x0 || b.x1 + gap <= a.x0 || a.z1 + gap <= b.z0 || b.z1 + gap <= a.z0;
 
 // ---------------------------------------------------------------------------
 // Zonas livres e limites (usados nos testes)
@@ -519,7 +518,8 @@ function densest(points, radius) {
 function classicBuilder() {
   const b = makeBuilder();
   const box = b.box;
-  b.box = (model, name, center, size, color, opts = {}) => box(model, name, center, size, color, { studs: true, ...opts });
+  b.box = (model, name, center, size, color, opts = {}) =>
+    box(model, name, center, size, color, { studs: true, ...opts });
   return b;
 }
 
@@ -807,7 +807,13 @@ export function buildMap() {
       const oz = r.z0 + 3 + Math.round(rand() * (d - d2 - 6));
       const h2 = 6 + Math.round(rand() * 6);
       b.span(M, 'Rocha', [ox, top, oz], [ox + w2, top + h2, oz + d2], C.rock);
-      b.span(M, 'Topo de Grama', [ox - 0.4, top + h2, oz - 0.4], [ox + w2 + 0.4, top + h2 + 0.8, oz + d2 + 0.4], C.grass);
+      b.span(
+        M,
+        'Topo de Grama',
+        [ox - 0.4, top + h2, oz - 0.4],
+        [ox + w2 + 0.4, top + h2 + 0.8, oz + d2 + 0.4],
+        C.grass,
+      );
       area = [ox, ox + w2, oz, oz + d2];
       top += h2 + 0.8;
     }

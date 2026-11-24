@@ -52,7 +52,8 @@ test('sem textura, decal, UI, NPC ou script: só os campos conhecidos de Part', 
 
 test('cores neutras: toda cor vem da paleta e nenhuma é berrante (saturação HSV <= 0,55)', () => {
   for (const c of Object.values(C)) assert.ok(saturation(c) <= 0.55, `cor saturada demais na paleta: ${c}`);
-  for (const p of parts) assert.ok(PALETTE.has(p.color.join(',')), `${p.model}/${p.name}: cor fora da paleta ${p.color}`);
+  for (const p of parts)
+    assert.ok(PALETTE.has(p.color.join(',')), `${p.model}/${p.name}: cor fora da paleta ${p.color}`);
 });
 
 test('relevo clássico (Inlet/Weld/Universal) só em peças opacas de Plastic', () => {
