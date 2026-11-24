@@ -34,10 +34,12 @@ scene.add(new THREE.HemisphereLight(0xf4f1ea, 0x4a4845, 0.65));
 scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 // "Luz de teto" difusa vinda de cima (o teto não projeta sombra no visualizador).
 const ceilingLight = new THREE.DirectionalLight(0xfff6e8, 1.15);
-ceilingLight.position.set(30, 200, 70);
+ceilingLight.position.set(-2, 200, 70);
+ceilingLight.target.position.set(-32, 0, 0);
+scene.add(ceilingLight.target);
 ceilingLight.castShadow = true;
 ceilingLight.shadow.mapSize.set(4096, 4096);
-Object.assign(ceilingLight.shadow.camera, { left: -110, right: 110, top: 110, bottom: -110, near: 10, far: 500 });
+Object.assign(ceilingLight.shadow.camera, { left: -140, right: 140, top: 110, bottom: -110, near: 10, far: 500 });
 ceilingLight.shadow.bias = -0.0004;
 ceilingLight.shadow.normalBias = 0.4;
 scene.add(ceilingLight);
@@ -190,24 +192,23 @@ orbit.enableDamping = true;
 orbit.maxDistance = 400;
 
 const c2 = cellCenterX(2);
-const OVERVIEW = { pos: [-55, 200, 185], target: [0, 0, 0], cut: true };
+const OVERVIEW = { pos: [-95, 240, 215], target: [-32, 0, 0], cut: true };
 const VIEWS = [
   { id: 'overview', title: 'Visão geral (corte, sem teto)', ...OVERVIEW },
-  { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-86, 8, -26], target: [-50, 8, 12] },
+  { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-62, 8, -26], target: [-88, 6, 4] },
   { id: 'atrium', title: 'Átrio e vão de pé-direito duplo', pos: [-84, 9, 0], target: [10, 12, 0] },
-  {
-    id: 'corridor',
-    title: 'Corredor das celas (térreo, aberto até o teto)',
-    pos: [-64, 6, 29.5],
-    target: [40, 8, 30.5],
-  },
+  { id: 'corridor', title: 'Corredor das celas (térreo, aberto até o teto)', pos: [-64, 6, 29.5], target: [40, 8, 30.5] },
   { id: 'upper', title: 'Galeria do 2º andar (sobre as celas do térreo)', pos: [-64, 23, 39], target: [40, 21, 39.5] },
   { id: 'gallery-view', title: 'Vista da galeria para o vão', pos: [-40, 23.5, 37], target: [0, 4, -10] },
   { id: 'cells', title: 'Fachada das celas', pos: [c2 + 2, 7, -18], target: [c2 - 3, 8, -38] },
   { id: 'cell', title: 'Interior de uma cela', pos: [c2 + 3.8, 5.5, -35.8], target: [c2 - 3.5, 2.5, -48] },
+  { id: 'service', title: 'Ala oeste: corredor de serviço', pos: [-91, 6.5, -3.5], target: [-150, 5, 2] },
+  { id: 'cafeteria', title: 'Ala oeste: refeitório', pos: [-92, 11, 9], target: [-140, 3, 40] },
+  { id: 'storeroom', title: 'Ala oeste: almoxarifado', pos: [-134, 8, -9], target: [-134, 3, -56] },
+  { id: 'infirmary', title: 'Ala oeste: enfermaria', pos: [-92, 8, -10], target: [-106, 2.5, -58] },
+  { id: 'guards', title: 'Sala dos guardas', pos: [-62, 8, 37], target: [-84, 3, 57] },
   { id: 'stairs', title: 'Escada para o mezanino', pos: [22, 7, 3], target: [52, 10, 0] },
   { id: 'visits', title: 'Sala de visitas', pos: [68, 6.5, -22], target: [78, 3.5, 8] },
-  { id: 'storage', title: 'Estoque sob o mezanino', pos: [68, 7.5, 25], target: [80, 4, 50] },
   { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
   { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },
   { id: 'build-75', title: 'Montagem — 75% das etapas', ...OVERVIEW, step: 0.75 },
