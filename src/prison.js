@@ -1565,7 +1565,7 @@ export function buildPrison() {
   ]) {
     b.span(RC, 'Borda Partida', [x0, y0, z0], [x1, ROOF, z1], C.ceiling, { canCollide: false });
   }
-  for (const x of [3, 8.5, 19]) {
+  for (const x of [3, 12, 19]) {
     b.span(RC, 'Vergalhão', [x - 0.08, ROOF - 0.15, hz0 - 1], [x + 0.08, ROOF, hz0 + 2.4], C.rust, {
       canCollide: false,
     });
