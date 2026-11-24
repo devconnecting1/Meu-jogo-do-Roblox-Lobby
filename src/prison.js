@@ -575,10 +575,12 @@ export function buildPrison() {
     b.span(D, 'Caixilho Base', [-84, 3, zf0], [-66, 3.2, zf1], C.steel);
     if (s > 0) {
       // armários dos guardas na parede do fundo + mesa de monitoramento
-      for (let k = 0; k < 6; k++) b.span(D, 'Armário', [-86 + k * 2, 0, IN_Z - 1.6], [-84 + k * 2, 7, IN_Z], C.steelLight);
+      for (let k = 0; k < 6; k++)
+        b.span(D, 'Armário', [-86 + k * 2, 0, IN_Z - 1.6], [-84 + k * 2, 7, IN_Z], C.steelLight);
       b.span(D, 'Mesa', [-80, 2.8, 44], [-70, 3.1, 47], C.steelLight);
       for (const lx of [-79.5, -71]) b.span(D, 'Mesa Pé', [lx, 0, 44.3], [lx + 0.5, 2.8, 46.7], C.steel);
-      for (const mx of [-78, -74]) b.span(D, 'Monitor', [mx, 3.1, 45.8], [mx + 2, 4.6, 46.2], C.steel, { canCollide: false });
+      for (const mx of [-78, -74])
+        b.span(D, 'Monitor', [mx, 3.1, 45.8], [mx + 2, 4.6, 46.2], C.steel, { canCollide: false });
       panelLight(b, D, -74, F2 - 1, 47);
     } else {
       rack(b, D, -74, -55, 14, 3.5, 11, 'roupas');

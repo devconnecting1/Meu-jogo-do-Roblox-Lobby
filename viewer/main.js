@@ -197,7 +197,12 @@ const VIEWS = [
   { id: 'overview', title: 'Visão geral (corte, sem teto)', ...OVERVIEW },
   { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-62, 8, -26], target: [-88, 6, 4] },
   { id: 'atrium', title: 'Átrio e vão de pé-direito duplo', pos: [-84, 9, 0], target: [10, 12, 0] },
-  { id: 'corridor', title: 'Corredor das celas (térreo, aberto até o teto)', pos: [-64, 6, 29.5], target: [40, 8, 30.5] },
+  {
+    id: 'corridor',
+    title: 'Corredor das celas (térreo, aberto até o teto)',
+    pos: [-64, 6, 29.5],
+    target: [40, 8, 30.5],
+  },
   { id: 'upper', title: 'Galeria do 2º andar (sobre as celas do térreo)', pos: [-64, 23, 39], target: [40, 21, 39.5] },
   { id: 'gallery-view', title: 'Vista da galeria para o vão', pos: [-40, 23.5, 37], target: [0, 4, -10] },
   { id: 'cells', title: 'Fachada das celas', pos: [c2 + 2, 7, -18], target: [c2 - 3, 8, -38] },

@@ -8,8 +8,17 @@ const inside = (p, [x0, x1], [z0, z1]) =>
   p.position[0] > x0 && p.position[0] < x1 && p.position[2] > z0 && p.position[2] < z1;
 
 test('salas próprias: refeitório, almoxarifado, enfermaria, guardas e rouparia', () => {
-  for (const m of ['Ala Oeste/Refeitório', 'Ala Oeste/Almoxarifado', 'Ala Oeste/Enfermaria', 'Salas/Sala dos Guardas', 'Salas/Rouparia']) {
-    assert.ok(parts.some((p) => p.model === m), `falta a sala ${m}`);
+  for (const m of [
+    'Ala Oeste/Refeitório',
+    'Ala Oeste/Almoxarifado',
+    'Ala Oeste/Enfermaria',
+    'Salas/Sala dos Guardas',
+    'Salas/Rouparia',
+  ]) {
+    assert.ok(
+      parts.some((p) => p.model === m),
+      `falta a sala ${m}`,
+    );
   }
 });
 
