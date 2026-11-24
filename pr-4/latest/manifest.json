@@ -78,7 +78,7 @@
     }
   ],
   "stats": {
-    "total": 4617,
+    "total": 4631,
     "lights": 0,
     "groups": {
       "Mar": 1,
@@ -87,15 +87,15 @@
       "Estradas": 65,
       "Pontes": 70,
       "Lotes": 330,
-      "Relevo": 443,
+      "Relevo": 457,
       "Recursos": 128,
       "Costa": 45,
       "Vegetação": 2740
     }
   },
   "manual": {
-    "parts": 4617,
+    "parts": 4631,
     "steps": 748,
-    "connections": 11057
+    "connections": 11112
   }
 }

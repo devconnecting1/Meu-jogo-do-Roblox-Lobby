@@ -1,6 +1,6 @@
 # Manual de montagem do Reino
 
-**4617 peças · 748 etapas · 11057 pontos de conexão verificados**
+**4631 peças · 748 etapas · 11112 pontos de conexão verificados**
 
 ## Mar (base de tudo)
 
@@ -328,22 +328,22 @@
 304. **Relevo/Planalto 15** — 5× Degrau, Base de Rocha
 305. **Relevo/Planalto 16** — 8× Degrau
 306. **Relevo/Planalto 16** — 4× Degrau, Base de Rocha
-307. **Relevo/Planalto 01** — Rocha, Topo de Grama
-308. **Relevo/Planalto 02** — Rocha, Topo de Grama
-309. **Relevo/Planalto 03** — Rocha, Topo de Grama
-310. **Relevo/Planalto 04** — Rocha, Topo de Grama
-311. **Relevo/Planalto 05** — Rocha, Topo de Grama
+307. **Relevo/Planalto 01** — 2× Rocha, Topo de Grama
+308. **Relevo/Planalto 02** — 2× Rocha, Topo de Grama
+309. **Relevo/Planalto 03** — 2× Rocha, Topo de Grama
+310. **Relevo/Planalto 04** — 2× Rocha, Topo de Grama
+311. **Relevo/Planalto 05** — 2× Rocha, Topo de Grama
 312. **Relevo/Planalto 06** — Rocha
-313. **Relevo/Planalto 07** — Rocha, Topo de Grama
-314. **Relevo/Planalto 08** — Rocha, Topo de Grama
+313. **Relevo/Planalto 07** — 2× Rocha, Topo de Grama
+314. **Relevo/Planalto 08** — 2× Rocha, Topo de Grama
 315. **Relevo/Planalto 09** — Rocha
-316. **Relevo/Planalto 10** — Rocha, Topo de Grama
-317. **Relevo/Planalto 11** — Rocha, Topo de Grama
-318. **Relevo/Planalto 12** — Rocha, Topo de Grama
-319. **Relevo/Planalto 13** — Rocha, Topo de Grama
-320. **Relevo/Planalto 14** — Rocha, Topo de Grama
-321. **Relevo/Planalto 15** — Rocha, Topo de Grama
-322. **Relevo/Planalto 16** — Rocha, Topo de Grama
+316. **Relevo/Planalto 10** — 2× Rocha, Topo de Grama
+317. **Relevo/Planalto 11** — 2× Rocha, Topo de Grama
+318. **Relevo/Planalto 12** — 2× Rocha, Topo de Grama
+319. **Relevo/Planalto 13** — 2× Rocha, Topo de Grama
+320. **Relevo/Planalto 14** — 2× Rocha, Topo de Grama
+321. **Relevo/Planalto 15** — 2× Rocha, Topo de Grama
+322. **Relevo/Planalto 16** — 2× Rocha, Topo de Grama
 323. **Relevo/Planalto 02** — Rocha
 324. **Relevo/Planalto 04** — Rocha
 325. **Relevo/Planalto 05** — Rocha
