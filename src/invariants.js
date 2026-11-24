@@ -252,7 +252,11 @@ export function fullProblems(w, built, warnings = []) {
   collect(out, 'orçamento', budget);
 
   const missing = REQUIRED_LANDMARKS.filter((k) => landmarkSize(landmarks[k]) === 0);
-  collect(out, 'marcos', missing.map((k) => `nenhum(a) ${LANDMARK_NAMES[k]} (${k})`));
+  collect(
+    out,
+    'marcos',
+    missing.map((k) => `nenhum(a) ${LANDMARK_NAMES[k]} (${k})`),
+  );
   for (const k of OPTIONAL_LANDMARKS) {
     if (landmarkSize(landmarks[k]) === 0) warnings.push(`marcos opcionais: nenhum(a) ${LANDMARK_NAMES[k]} (${k})`);
   }

@@ -68,8 +68,13 @@ export const CATALOG = Object.freeze([
   entry('arbusto', 'Arbusto', 'Árvores', 'bush', null, bush),
   entry('canteiro', 'Canteiro de flores', 'Árvores', 'flowerPatch', null, flowerPatch),
   ...Object.keys(BUILDINGS).map((k) =>
-    entry(`construcao-${k}`, BUILDING_TITLES[k] ?? `Construção (${k})`, 'Construções', 'building', k, (b, m, x, y, z, rand) =>
-      building(b, m, k, x, y, z, 's', rand),
+    entry(
+      `construcao-${k}`,
+      BUILDING_TITLES[k] ?? `Construção (${k})`,
+      'Construções',
+      'building',
+      k,
+      (b, m, x, y, z, rand) => building(b, m, k, x, y, z, 's', rand),
     ),
   ),
 ]);
@@ -100,7 +105,8 @@ export function seedOf(id) {
 function classicBuilder() {
   const b = makeBuilder();
   const box = b.box;
-  b.box = (model, name, center, size, color, opts = {}) => box(model, name, center, size, color, { studs: true, ...opts });
+  b.box = (model, name, center, size, color, opts = {}) =>
+    box(model, name, center, size, color, { studs: true, ...opts });
   return b;
 }
 

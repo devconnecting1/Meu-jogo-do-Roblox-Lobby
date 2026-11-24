@@ -84,7 +84,8 @@ let md = '# Catálogo de peças\n\n';
 md += 'Gerado pelo CI (`tools/catalog-shots.mjs`) a partir de `src/catalog.js`: cada peça reaproveitável ';
 md += 'sozinha no seu chão de studs. Na imagem "colisão", o que colide fica vermelho e o resto translúcido.\n\n';
 md += `**${entries.length} peças** · ${stats.total - entries.length} partes (fora os chãos) · ${stats.collidable} com colisão\n\n`;
-if (images.todos) md += `![Todas as peças](${images.todos.normal})\n\n[Todas as peças com colisão](${images.todos.colisao})\n\n`;
+if (images.todos)
+  md += `![Todas as peças](${images.todos.normal})\n\n[Todas as peças com colisão](${images.todos.colisao})\n\n`;
 md += '| Grupo | Peça | Partes | Partes com colisão | Tamanho (L × A × P) | O que colide | Imagens |\n';
 md += '|---|---|---:|---:|---|---|---|\n';
 for (const e of withImages) {

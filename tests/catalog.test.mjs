@@ -57,7 +57,8 @@ test('catálogo cobre toda peça exportada em src/props/ (exatamente uma entrada
       }
     }
   }
-  for (const e of CATALOG) if (!exported.has(e.prop)) problems.push(`${e.id}: "${e.prop}" não é exportada por src/props/`);
+  for (const e of CATALOG)
+    if (!exported.has(e.prop)) problems.push(`${e.id}: "${e.prop}" não é exportada por src/props/`);
   assert.deepEqual(problems, []);
 });
 

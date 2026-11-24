@@ -152,7 +152,10 @@ test('vida no reino: vilas com casas, campos, jazidas, torres de vigia, acampame
     const V = `Vila/Vila ${i + 1}`;
     const inV = (p) => p.model.startsWith(`${V}/`);
     for (const n of ['Rua da Vila', 'Praça da Vila', 'Largo da Vila']) {
-      assert.ok(parts.some((p) => inV(p) && p.name === n), `${V} sem "${n}"`);
+      assert.ok(
+        parts.some((p) => inV(p) && p.name === n),
+        `${V} sem "${n}"`,
+      );
     }
     assert.ok(count((p) => inV(p) && p.name === 'Calçada') >= 3, `${V}: casas sem calçada até a rua`);
     assert.ok(count((p) => inV(p) && p.name === 'Cerca') >= 3, `${V}: quintais sem cerca`);
