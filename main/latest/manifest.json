@@ -33,6 +33,26 @@
       "title": "Interior de uma cela"
     },
     {
+      "id": "service",
+      "title": "Ala oeste: corredor de serviço"
+    },
+    {
+      "id": "cafeteria",
+      "title": "Ala oeste: refeitório"
+    },
+    {
+      "id": "storeroom",
+      "title": "Ala oeste: almoxarifado"
+    },
+    {
+      "id": "infirmary",
+      "title": "Ala oeste: enfermaria"
+    },
+    {
+      "id": "guards",
+      "title": "Sala dos guardas"
+    },
+    {
       "id": "stairs",
       "title": "Escada para o mezanino"
     },
@@ -41,8 +61,28 @@
       "title": "Sala de visitas"
     },
     {
-      "id": "storage",
-      "title": "Estoque sob o mezanino"
+      "id": "mezzanine",
+      "title": "2º andar: salas do mezanino"
+    },
+    {
+      "id": "control",
+      "title": "Sala de controle (vidraça para o vão)"
+    },
+    {
+      "id": "office",
+      "title": "Diretoria"
+    },
+    {
+      "id": "rest",
+      "title": "Sala de descanso dos guardas"
+    },
+    {
+      "id": "library",
+      "title": "Biblioteca (2º andar)"
+    },
+    {
+      "id": "classroom",
+      "title": "Sala de aula (2º andar)"
     },
     {
       "id": "build-25",
@@ -58,27 +98,27 @@
     }
   ],
   "stats": {
-    "total": 2381,
-    "lights": 73,
+    "total": 2872,
+    "lights": 86,
     "groups": {
       "Piso": 1,
-      "Paredes": 24,
-      "Teto": 8,
-      "Estrutura": 20,
+      "Paredes": 28,
+      "Teto": 16,
+      "Estrutura": 22,
       "Pisos": 6,
       "Celas": 1650,
       "Galerias": 46,
-      "Iluminação": 170,
+      "Iluminação": 216,
       "Escada": 40,
       "Hall": 6,
-      "Depósitos": 312,
-      "Átrio": 57,
-      "Sala de Visitas": 41
+      "Salas": 385,
+      "Sala de Visitas": 55,
+      "Ala Oeste": 401
     }
   },
   "manual": {
-    "parts": 2381,
-    "steps": 478,
-    "connections": 7645
+    "parts": 2872,
+    "steps": 561,
+    "connections": 8825
   }
 }

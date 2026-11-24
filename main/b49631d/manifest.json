@@ -1,0 +1,124 @@
+{
+  "views": [
+    {
+      "id": "overview",
+      "title": "Visão geral (corte, sem teto)"
+    },
+    {
+      "id": "hall",
+      "title": "Hall de entrada e posto de guarda"
+    },
+    {
+      "id": "atrium",
+      "title": "Átrio e vão de pé-direito duplo"
+    },
+    {
+      "id": "corridor",
+      "title": "Corredor das celas (térreo, aberto até o teto)"
+    },
+    {
+      "id": "upper",
+      "title": "Galeria do 2º andar (sobre as celas do térreo)"
+    },
+    {
+      "id": "gallery-view",
+      "title": "Vista da galeria para o vão"
+    },
+    {
+      "id": "cells",
+      "title": "Fachada das celas"
+    },
+    {
+      "id": "cell",
+      "title": "Interior de uma cela"
+    },
+    {
+      "id": "service",
+      "title": "Ala oeste: corredor de serviço"
+    },
+    {
+      "id": "cafeteria",
+      "title": "Ala oeste: refeitório"
+    },
+    {
+      "id": "storeroom",
+      "title": "Ala oeste: almoxarifado"
+    },
+    {
+      "id": "infirmary",
+      "title": "Ala oeste: enfermaria"
+    },
+    {
+      "id": "guards",
+      "title": "Sala dos guardas"
+    },
+    {
+      "id": "stairs",
+      "title": "Escada para o mezanino"
+    },
+    {
+      "id": "visits",
+      "title": "Sala de visitas"
+    },
+    {
+      "id": "mezzanine",
+      "title": "2º andar: salas do mezanino"
+    },
+    {
+      "id": "control",
+      "title": "Sala de controle (vidraça para o vão)"
+    },
+    {
+      "id": "office",
+      "title": "Diretoria"
+    },
+    {
+      "id": "rest",
+      "title": "Sala de descanso dos guardas"
+    },
+    {
+      "id": "library",
+      "title": "Biblioteca (2º andar)"
+    },
+    {
+      "id": "classroom",
+      "title": "Sala de aula (2º andar)"
+    },
+    {
+      "id": "build-25",
+      "title": "Montagem — 25% das etapas"
+    },
+    {
+      "id": "build-50",
+      "title": "Montagem — 50% das etapas"
+    },
+    {
+      "id": "build-75",
+      "title": "Montagem — 75% das etapas"
+    }
+  ],
+  "stats": {
+    "total": 2872,
+    "lights": 86,
+    "groups": {
+      "Piso": 1,
+      "Paredes": 28,
+      "Teto": 16,
+      "Estrutura": 22,
+      "Pisos": 6,
+      "Celas": 1650,
+      "Galerias": 46,
+      "Iluminação": 216,
+      "Escada": 40,
+      "Hall": 6,
+      "Salas": 385,
+      "Sala de Visitas": 55,
+      "Ala Oeste": 401
+    }
+  },
+  "manual": {
+    "parts": 2872,
+    "steps": 561,
+    "connections": 8825
+  }
+}
