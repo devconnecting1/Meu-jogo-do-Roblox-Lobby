@@ -24,6 +24,8 @@ Prisão **fechada e espaçosa** de 2 andares, feita só com **Part clássico** e
 - **Luz equilibrada:** tecnologia Future, sem sol, ambiente e exposição baixos, bloom leve e todas as luminárias no mesmo patamar de brilho (testado), para nenhuma sala estourar com gráficos baixos.
 
 - **Abandono e terror:** fluorescentes frias, parte queimada e algumas piscando suave (único script do lugar, só visual), poeira no ar, colunas rachadas com vergalhão aparente, rombo numa parede interna, forro furado, entulho, manchas de mofo, poças e móveis tombados. Nada abre para o lado de fora.
+- **Destruição com história:** rebelião (barricada, sala dos guardas incendiada, sala de controle invadida), telhado do átrio desabado com céu de noite e luar, viga e lajes no chão, rachadura de terremoto, fuga por uma corda de lençóis pendurada no rombo, túnel cavado numa cela, trepadeiras, musgo e poças de chuva.
+- **Câmera em primeira pessoa** e neblina de poeira no ar.
 - **Salas do túnel:** triagem e revista na eclusa de entrada; casa de máquinas e solitária na eclusa do fundo.
 
 ## Como funciona

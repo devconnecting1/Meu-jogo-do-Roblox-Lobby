@@ -52,6 +52,12 @@ export const C = Object.freeze({
   rust: [112, 92, 80], // ferrugem dessaturada
   puddle: [40, 46, 46], // poça d'água parada
   lampDead: [84, 86, 88], // lâmpada queimada (Plastic, sem luz)
+  soot: [38, 38, 37], // fuligem do incêndio
+  charred: [50, 46, 42], // móvel carbonizado
+  moss: [64, 78, 62], // musgo / trepadeira que entrou pelo rombo do telhado
+  mossDark: [44, 56, 45],
+  dirt: [86, 78, 68], // terra do túnel cavado
+  crack: [28, 29, 29], // rachadura
 
   // Luz
   neon: [255, 246, 228], // branco quente das lâmpadas

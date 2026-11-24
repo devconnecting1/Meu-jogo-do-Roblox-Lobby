@@ -76,3 +76,22 @@ test('salas novas do túnel: triagem, revista, casa de máquinas e solitária, c
   const doors = parts.filter((p) => p.model === 'Túnel/Envoltória' && p.name === 'Batente Topo');
   assert.equal(doors.length, 4, 'uma porta para cada sala lateral das eclusas');
 });
+
+test('a destruição conta uma história: rebelião, desabamento, fuga e anos de abandono', () => {
+  const has = (model, name) => parts.some((p) => p.model === model && p.name === name);
+  // rebelião
+  assert.ok(has('Ruínas/Barricada', 'Mesa Virada'), 'barricada no hall');
+  assert.ok(has('Ruínas/Incêndio', 'Fuligem no Teto'), 'sala dos guardas incendiada');
+  assert.ok(has('Ruínas/Controle', 'Monitor Quebrado'), 'sala de controle invadida');
+  // desabamento: telhado caído com pedaços no chão e trepadeiras entrando pelo rombo
+  assert.ok(parts.filter((p) => p.name === 'Laje Caída').length >= 2, 'lajes caídas no átrio');
+  assert.ok(has('Estrutura/Teto', 'Viga Partida'), 'viga partida na borda do rombo');
+  assert.ok(parts.filter((p) => p.name === 'Trepadeira').length >= 6, 'trepadeiras pendendo do rombo');
+  // fuga: corda de lençóis do chão até o rombo e túnel cavado numa cela
+  const rope = parts.filter((p) => p.model === 'Ruínas/Fuga' && p.name === 'Lençol Amarrado');
+  const top = Math.max(...rope.map((p) => p.position[1] + p.size[1] / 2));
+  assert.ok(rope.length >= 20 && top >= 44 - 1e-6, 'corda de lençóis chega ao teto');
+  assert.ok(has('Ruínas/Cela 17', 'Buraco Cavado'), 'túnel cavado na cela 17');
+  // terremoto
+  assert.ok(parts.filter((p) => p.name === 'Rachadura').length >= 8, 'rachadura no piso do átrio');
+});

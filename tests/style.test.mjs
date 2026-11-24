@@ -29,9 +29,9 @@ test('somente Part clássico (Block; Cylinder só girado como tampo) e SpawnLoca
     assert.ok(['Part', 'SpawnLocation'].includes(p.className), `${p.name}: classe ${p.className}`);
     assert.ok(['Block', 'Cylinder'].includes(p.shape), `${p.name}: shape ${p.shape}`);
     if (p.rotation && p.shape !== 'Cylinder') {
-      // ruínas (entulho, placas caídas) podem girar, mas só em torno de Y: continuam deitadas no piso
+      // ruínas (entulho, lajes tombadas, vigas caídas) podem girar em qualquer eixo, mas nunca colidem:
+      // o apoio é checado pela caixa envolvente e o jogador não tropeça em geometria inclinada
       assert.ok(p.model.includes('Ruínas'), `${p.model}/${p.name}: só cilindros e ruínas podem ser girados`);
-      assert.ok(p.rotation[0] % 90 === 0 && p.rotation[2] % 90 === 0, `${p.name}: ruína girada fora de Y`);
       assert.equal(p.canCollide, false, `${p.name}: ruína girada não pode colidir`);
     }
   }

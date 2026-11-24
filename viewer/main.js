@@ -35,7 +35,7 @@ const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerH
 scene.add(new THREE.HemisphereLight(0xcfe0dc, 0x262b2a, 0.34));
 scene.add(new THREE.AmbientLight(0xd8e6e2, 0.12));
 // "Luz de teto" difusa vinda de cima (o teto não projeta sombra no visualizador).
-const ceilingLight = new THREE.DirectionalLight(0xdfeeea, 0.55);
+const ceilingLight = new THREE.DirectionalLight(0xdfeeea, 0.3);
 ceilingLight.position.set(-2, 200, 70);
 ceilingLight.target.position.set(-32, 0, 0);
 scene.add(ceilingLight.target);
@@ -44,7 +44,36 @@ ceilingLight.shadow.mapSize.set(4096, 4096);
 Object.assign(ceilingLight.shadow.camera, { left: -200, right: 140, top: 110, bottom: -110, near: 10, far: 500 });
 ceilingLight.shadow.bias = -0.0004;
 ceilingLight.shadow.normalBias = 0.4;
+ceilingLight.castShadow = false; // só preenchimento; a sombra é da lua
 scene.add(ceilingLight);
+
+// Lua: luz fria que só atravessa o rombo do telhado (o teto projeta sombra)
+const moon = new THREE.DirectionalLight(0xb8c8e0, 1.1);
+moon.position.set(60, 260, -40);
+moon.target.position.set(11, 0, 0);
+moon.castShadow = true;
+moon.shadow.mapSize.set(4096, 4096);
+Object.assign(moon.shadow.camera, { left: -220, right: 160, top: 120, bottom: -120, near: 10, far: 600 });
+moon.shadow.bias = -0.0004;
+moon.shadow.normalBias = 0.4;
+scene.add(moon, moon.target);
+
+// Céu noturno com estrelas (visível pelo telhado desabado)
+{
+  const r = (s) => () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296;
+  const rnd = r(7);
+  const pos = [];
+  for (let k = 0; k < 1500; k++) {
+    const u = rnd() * 2 - 1;
+    const t = rnd() * Math.PI * 2;
+    const y = Math.abs(u);
+    const rr = Math.sqrt(1 - y * y);
+    pos.push(Math.cos(t) * rr * 800, 120 + y * 700, Math.sin(t) * rr * 800);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xdfe6ff, size: 1.6, fog: false })));
+}
 
 // Simula a superfície Studs do Roblox (só no navegador).
 function studTexture() {
@@ -131,7 +160,8 @@ const unitCyl = new THREE.CylinderGeometry(0.5, 0.5, 1, 40).rotateZ(Math.PI / 2)
 const groups = new Map();
 const cache = new Map();
 const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
-const NO_SHADOW_GROUPS = new Set(['Teto', 'Iluminação']);
+// o teto projeta sombra: assim o luar só entra pelo telhado desabado
+const NO_SHADOW_GROUPS = new Set(['Iluminação']);
 
 function material(p, studs = false, relief = null) {
   const k = `${p.color}|${p.transparency}|${p.material}|${studs}|${relief}`;
@@ -292,6 +322,11 @@ const VIEWS = [
   { id: 'tunnel', title: 'Túnel de acesso até o portão fechado', pos: [-166, 6.5, 3.5], target: [-217, 5.5, 0] },
   { id: 'breach', title: 'Rombo na parede do bloco e coluna rachada', pos: [-66, 9, -6], target: [-88, 22, 22] },
   { id: 'column', title: 'Coluna rachada no átrio', pos: [-22, 8, -6], target: [-30, 11, -24] },
+  { id: 'roof', title: 'Telhado desabado: céu de noite, trepadeiras e a corda de lençóis da fuga', pos: [-6, 5, -16], target: [12, 34, 2] },
+  { id: 'roof-floor', title: 'Destroços do telhado no átrio (lajes, viga, poça e musgo)', pos: [-14, 7, -14], target: [12, 0, 4] },
+  { id: 'barricade', title: 'Barricada da rebelião no hall', pos: [-78, 6, -2], target: [-62, 3, -15] },
+  { id: 'fire', title: 'Sala dos guardas incendiada', pos: [-64, 8, 37], target: [-80, 6, 52] },
+  { id: 'crack', title: 'Rachadura do terremoto no piso do átrio', pos: [-60, 10, 16], target: [-30, 0, 4] },
   { id: 'collapse', title: 'Coluna desabada: toco, topo partido e fuste caído', pos: [-8, 9, 12], target: [12, 8, 24] },
   {
     id: 'wrecked-cell',

@@ -11,6 +11,7 @@ import {
   ANNEX,
   ANNEX_INTERIOR,
   TUNNEL,
+  ROOF_HOLE,
   LEVELS,
 } from '../src/prison.js';
 import { findFloating, findZFighting, findClearanceViolations, findEdgeGaps, findOutside } from '../src/checks.js';
@@ -65,12 +66,15 @@ test('tudo fica dentro da envoltória (prédio + túnel); o interior não vaza p
   assert.equal(inner.length, 0, report(inner));
 });
 
-test('ambiente fechado: piso, teto e 4 paredes opacos; o único vão é o portal do túnel', () => {
+test('ambiente fechado: paredes opacas; vãos só no portal do túnel e no telhado desabado (céu)', () => {
   const shell = parts.filter((p) => p.model === 'Envoltória');
   assert.deepEqual(
     shell.map((p) => p.name).sort(),
     [
-      'Laje Teto',
+      'Laje Teto Leste',
+      'Laje Teto Norte',
+      'Laje Teto Oeste',
+      'Laje Teto Sul',
       'Laje Térreo',
       'Parede Leste',
       'Parede Norte',
@@ -86,10 +90,23 @@ test('ambiente fechado: piso, teto e 4 paredes opacos; o único vão é o portal
   }
   const span = (p, i) => [p.position[i] - p.size[i] / 2, p.position[i] + p.size[i] / 2];
   const byName = Object.fromEntries(shell.map((p) => [p.name, p]));
-  for (const n of ['Laje Térreo', 'Laje Teto']) {
-    assert.deepEqual(span(byName[n], 0), [ENVELOPE.min[0], ENVELOPE.max[0]], `${n} cobre X`);
-    assert.deepEqual(span(byName[n], 2), [ENVELOPE.min[2], ENVELOPE.max[2]], `${n} cobre Z`);
+  assert.deepEqual(span(byName['Laje Térreo'], 0), [ENVELOPE.min[0], ENVELOPE.max[0]], 'Laje Térreo cobre X');
+  assert.deepEqual(span(byName['Laje Térreo'], 2), [ENVELOPE.min[2], ENVELOPE.max[2]], 'Laje Térreo cobre Z');
+  // teto: as 4 lajes cobrem a envoltória inteira, menos exatamente o rombo do desabamento
+  const roof = shell.filter((p) => p.name.startsWith('Laje Teto'));
+  const area = (p) => p.size[0] * p.size[2];
+  const total = (ENVELOPE.max[0] - ENVELOPE.min[0]) * (ENVELOPE.max[2] - ENVELOPE.min[2]);
+  const hole = (ROOF_HOLE.x[1] - ROOF_HOLE.x[0]) * (ROOF_HOLE.z[1] - ROOF_HOLE.z[0]);
+  assert.ok(Math.abs(roof.reduce((a, p) => a + area(p), 0) - (total - hole)) < 1e-6, 'teto cobre tudo menos o rombo');
+  for (const p of roof) {
+    const [x0, x1] = span(p, 0);
+    const [z0, z1] = span(p, 2);
+    assert.ok(x0 >= ENVELOPE.min[0] && x1 <= ENVELOPE.max[0] && z0 >= ENVELOPE.min[2] && z1 <= ENVELOPE.max[2]);
+    const overlapsHole = x0 < ROOF_HOLE.x[1] && x1 > ROOF_HOLE.x[0] && z0 < ROOF_HOLE.z[1] && z1 > ROOF_HOLE.z[0];
+    assert.ok(!overlapsHole, `${p.name} invade o rombo`);
   }
+  // o rombo fica sobre o átrio (dentro do prédio, longe das paredes externas)
+  assert.ok(ROOF_HOLE.x[0] > -LEVELS.ROW && ROOF_HOLE.x[1] < LEVELS.ROW && Math.abs(ROOF_HOLE.z[0]) < LEVELS.EDGE);
   for (const n of ['Parede Sul', 'Parede Norte', 'Parede Leste', 'Parede Oeste S', 'Parede Oeste N']) {
     assert.deepEqual(span(byName[n], 1), [0, LEVELS.ROOF], `${n} vai do piso ao teto`);
   }

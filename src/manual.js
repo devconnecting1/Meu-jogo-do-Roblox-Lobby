@@ -42,12 +42,12 @@ export const PHASES = [
   {
     id: 'teto',
     title: 'Laje do teto e vigas',
-    match: (p) => p.model.startsWith('Estrutura/Teto') || p.name === 'Laje Teto',
+    match: (p) => p.model.startsWith('Estrutura/Teto') || p.name.startsWith('Laje Teto'),
   },
   {
     id: 'ruinas',
     title: 'Abandono: entulho, rachaduras, manchas e poças',
-    match: (p) => !isFixture(p) && p.model.includes('Ruínas'),
+    match: (p) => !isFixture(p) && /Ruínas|Caído/.test(p.model),
   },
   { id: 'luz', title: 'Iluminação', match: () => true },
 ];

@@ -57,7 +57,10 @@ test('orientação do CFrame é uma rotação válida (ortonormal)', () => {
 test('projeto: Lighting Future, ambiente noturno/fechado e efeitos sutis', () => {
   const L = project.tree.Lighting;
   assert.equal(L.$properties.Technology.Enum, 4, 'Technology = Future');
-  assert.equal(L.$properties.Brightness, 0, 'sem sol (ambiente fechado)');
+  // noite: só a lua entra pelo telhado desabado
+  const clock = L.$properties.ClockTime;
+  assert.ok(clock >= 20 || clock <= 4, `ClockTime ${clock} não é noite`);
+  assert.ok(L.$properties.Brightness > 0 && L.$properties.Brightness <= 1, 'luar fraco');
   assert.equal(L['Correcao de Cor'].$className, 'ColorCorrectionEffect');
   assert.equal(L['Brilho das Lampadas'].$className, 'BloomEffect');
   assert.equal(L['Poeira no Ar'].$className, 'Atmosphere');
@@ -86,6 +89,10 @@ test('projeto: Workspace + Lighting + um único script de cintilação (sem UI, 
   const sps = project.tree.StarterPlayer.StarterPlayerScripts;
   const scripts = Object.keys(sps).filter((k) => !k.startsWith('$'));
   assert.deepEqual(scripts, ['Cintilacao'], 'só o script de cintilação');
+  // câmera só em primeira pessoa, presa na cabeça do personagem
+  const sp = project.tree.StarterPlayer.$properties;
+  assert.equal(sp.CameraMode.Enum, 1, 'CameraMode = LockFirstPerson');
+  assert.ok(sp.CameraMaxZoomDistance <= 0.5 && sp.CameraMinZoomDistance <= 0.5, 'sem zoom para trás');
   assert.match(sps.Cintilacao.$path, /\.client\.luau$/, 'roda no cliente (LocalScript)');
   const src = readFileSync(new URL(`../${sps.Cintilacao.$path}`, import.meta.url), 'utf8');
   assert.ok(src.includes('Luz Piscando'), 'o script anima só as luzes marcadas');
