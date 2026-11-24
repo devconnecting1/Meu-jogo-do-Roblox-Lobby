@@ -171,6 +171,12 @@ test('vida no reino: vilas com casas, campos, jazidas, torres de vigia, acampame
   const mines = (k) => landmarks.mines.filter((m) => m[2] === k).length;
   assert.ok(mines('ouro') >= 2 && mines('pedra') >= 2, `jazidas: ${mines('ouro')} de ouro, ${mines('pedra')} de pedra`);
   assert.ok(landmarks.towers.length >= 2, `só ${landmarks.towers.length} torres de vigia`);
+  // regiões de fazenda: 6 campos cercados com culturas, espantalho e sede
+  assert.ok(landmarks.farmDistricts.length >= 1, 'nenhuma região de fazenda');
+  for (const [, , fields, houses] of landmarks.farmDistricts) {
+    assert.equal(fields, 6, 'fazenda com campos faltando');
+    assert.ok(houses >= 2, 'fazenda sem sede');
+  }
   assert.ok(landmarks.camps.length >= 1, 'nenhum acampamento');
   assert.ok(landmarks.docks.length >= 1, 'nenhum cais na praia');
 });
@@ -199,6 +205,7 @@ test('trilhas ligam cada lugar à malha de estradas (nada solto no meio do mato)
     [],
     'trilhas soltas',
   );
+  // regiões de fazenda entram em landmarks.farms (uma trilha cada), além dos campos soltos
   const places = ['villages', 'farms', 'mines', 'towers', 'camps'].reduce((n, k) => n + landmarks[k].length, 0);
   assert.equal(landmarks.trails, places, 'cada vila, campo, jazida, torre e acampamento tem a sua trilha');
 });

@@ -21,7 +21,11 @@ export const PHASES = [
     match: (p) => /^Relevo\/(Montanha|Colina|Afloramento)/.test(p.model),
   },
   { id: 'trilhas', title: 'Trilhas de terra', match: (p) => p.model === 'Trilhas' },
-  { id: 'recursos', title: 'Recursos: trigo, ouro e pedra', match: (p) => p.model.startsWith('Recursos') },
+  {
+    id: 'recursos',
+    title: 'Recursos e fazendas: campos, ouro e pedra',
+    match: (p) => /^(Recursos|Fazendas)\//.test(p.model),
+  },
   {
     id: 'construcoes',
     title: 'Vilas, torres de vigia e acampamentos',

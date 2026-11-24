@@ -42,7 +42,7 @@ export const DIM = Object.freeze({
   lobbyRun: 1.25, // profundidade de cada degrau das escadarias
   road: 8, // largura das estradas
   maxBridge: 50, // ponte mais longa (studs sobre a água)
-  maxParts: 18000, // orçamento de Parts por mapa (testado em todas as sementes)
+  maxParts: 24000, // orçamento de Parts por mapa (testado em todas as sementes)
 });
 
 export const SEED = 20260114;
@@ -524,69 +524,83 @@ export function createWorld(seed = SEED) {
   const deco = { canCollide: false };
 
   /**
-   * Montanha natural: camadas empilhadas, cada uma é a união de vários blocos sorteados
-   * dentro de um bloco da camada de baixo (terraços irregulares, como os rochedos clássicos).
-   * Devolve os topos de grama livres (para plantar pinheiros) e a altura do pico.
+   * Montanha natural (mapa de alturas em colunas): encostas irregulares, cristas e picos
+   * secundários, em vez de caixas empilhadas. Devolve pontos de encosta de grama (para
+   * pinheiros) e a altura do pico.
    */
   function mountain(b, model, cx, cz, R, H, rand, snowy, rocky = false, dry = false) {
-    const nL = Math.max(2, Math.round(H / 7));
-    let y = DIM.land - 0.1;
-    let prev = null;
-    const layers = [];
-    for (let k = 0; k < nL; k++) {
-      const f = 1 - k / (nL + 1);
-      const h = 5 + Math.round(rand() * 4);
-      const boxes = [];
-      const n = k === 0 ? 5 : Math.max(1, 4 - Math.floor(k / 2));
-      for (let i = 0; i < n; i++) {
-        const base = prev ? prev[Math.floor(rand() * prev.length)] : { x0: cx - R, x1: cx + R, z0: cz - R, z1: cz + R };
-        const bw = base.x1 - base.x0;
-        const bd = base.z1 - base.z0;
-        const px = (base.x0 + base.x1) / 2 + (rand() - 0.5) * bw * (prev ? 0.5 : 0.4);
-        const pz = (base.z0 + base.z1) / 2 + (rand() - 0.5) * bd * (prev ? 0.5 : 0.4);
-        const hw = R * f * (0.35 + rand() * 0.3);
-        const hd = R * f * (0.35 + rand() * 0.3);
-        const r = {
-          x0: Math.round(Math.max(base.x0 + (prev ? 1 : 0), px - hw)),
-          x1: Math.round(Math.min(base.x1 - (prev ? 1 : 0), px + hw)),
-          z0: Math.round(Math.max(base.z0 + (prev ? 1 : 0), pz - hd)),
-          z1: Math.round(Math.min(base.z1 - (prev ? 1 : 0), pz + hd)),
-        };
-        if (r.x1 - r.x0 >= 4 && r.z1 - r.z0 >= 4) boxes.push(r);
-      }
-      if (!boxes.length) break;
-      const top = y + h;
-      const lastLayers = k >= nL - 2;
-      const rockA = dry ? C.rockDesert : C.rock;
-      const rockB = dry ? C.rock : C.rockDark;
-      const green = dry ? C.desertSand : C.grass;
-      const capColor = snowy && lastLayers ? C.snow : !rocky && k < Math.ceil(nL * 0.6) ? green : k % 2 ? rockB : rockA;
-      for (const r of boxes) {
-        b.span(model, 'Rocha', [r.x0, y, r.z0], [r.x1, top - 0.8, r.z1], k % 2 ? rockB : rockA);
-        b.span(model, snowy && lastLayers ? 'Neve' : 'Topo', [r.x0, top - 0.8, r.z0], [r.x1, top, r.z1], capColor);
-      }
-      layers.push({ boxes, top, grass: capColor === C.grass });
-      prev = boxes;
-      y = top;
+    // Relevo natural em "voxels": um mapa de alturas (pico principal + picos secundários +
+    // ruído de cristas) virado em colunas, com degraus de 1,5 stud. Cor pela altura: encosta de
+    // grama com lateral de terra embaixo, rocha listrada no meio e neve no topo das altas.
+    const cell = R >= 34 ? 6 : R >= 16 ? 5 : 3;
+    const stepH = 1.5;
+    const salt = 31 + Math.floor(rand() * 1000);
+    const peaks = [[cx, cz, 1]];
+    const extra = R >= 30 ? 1 + Math.floor(rand() * 2) : R >= 16 ? Math.floor(rand() * 2) : 0;
+    for (let k = 0; k < extra; k++) {
+      const a = rand() * Math.PI * 2;
+      const d = R * (0.3 + rand() * 0.3);
+      peaks.push([cx + Math.cos(a) * d, cz + Math.sin(a) * d, 0.5 + rand() * 0.35]);
     }
-    // pontos de grama livres (fora dos blocos da camada de cima) para os pinheiros
-    const spots = [];
-    layers.forEach((L, k) => {
-      if (!L.grass) return;
-      const above = layers[k + 1]?.boxes ?? [];
-      for (const r of L.boxes) {
-        for (let tries = 0; tries < 3; tries++) {
-          const x = r.x0 + 2.5 + rand() * (r.x1 - r.x0 - 5);
-          const z = r.z0 + 2.5 + rand() * (r.z1 - r.z0 - 5);
-          if (r.x1 - r.x0 < 6 || r.z1 - r.z0 < 6) continue;
-          if (above.some((o) => x > o.x0 - 2.5 && x < o.x1 + 2.5 && z > o.z0 - 2.5 && z < o.z1 + 2.5)) continue;
-          if (L.boxes.some((o) => o !== r && x > o.x0 - 1 && x < o.x1 + 1 && z > o.z0 - 1 && z < o.z1 + 1)) continue;
-          spots.push([Math.round(x * 10) / 10, L.top, Math.round(z * 10) / 10]);
-          break;
-        }
+    const heightAt = (x, z) => {
+      let h = 0;
+      for (const [px, pz, w] of peaks) {
+        const d = Math.hypot(x - px, z - pz) / R;
+        if (d < 1) h = Math.max(h, w * Math.pow(1 - d, 1.25));
       }
-    });
-    return { spots, peak: y };
+      const fade = Math.max(0, 1 - Math.hypot(x - cx, z - cz) / R);
+      const ridges = nz(x, z, R * 0.45, salt) * 0.55 + nz(x, z, R * 0.18, salt + 1) * 0.3;
+      return Math.min(1.25, h * (0.7 + ridges)) * H * Math.min(1, fade * 3);
+    };
+    const n = Math.ceil((2 * R) / cell);
+    const gx0 = Math.round(cx - (n * cell) / 2);
+    const gz0 = Math.round(cz - (n * cell) / 2);
+    const grid = [];
+    for (let j = 0; j < n; j++) {
+      grid.push([]);
+      for (let i = 0; i < n; i++) {
+        const h = Math.round(heightAt(gx0 + (i + 0.5) * cell, gz0 + (j + 0.5) * cell) / stepH) * stepH;
+        grid[j].push(h >= stepH ? h : 0);
+      }
+    }
+    const band = (h) => (snowy && h > H * 0.72 ? 'neve' : rocky || h > H * 0.42 ? 'rocha' : 'grama');
+    const rockA = dry ? C.rockDesert : C.rock;
+    const rockB = dry ? C.rock : C.rockDark;
+    const look = (h) => {
+      const bd = band(h);
+      const strata = Math.floor(h / 6) % 2 ? rockB : rockA;
+      if (bd === 'neve') return { body: strata, top: C.snow, cap: 'Neve' };
+      if (bd === 'rocha') return { body: strata, top: strata, cap: 'Topo' };
+      return { body: dry ? C.rockDesert : C.soil, top: dry ? C.desertSand : C.grass, cap: 'Topo' };
+    };
+    let peakY = DIM.land;
+    const spots = [];
+    for (let j = 0; j < n; j++) {
+      const z0 = gz0 + j * cell;
+      let i = 0;
+      while (i < n) {
+        const h = grid[j][i];
+        let k = i;
+        while (k + 1 < n && grid[j][k + 1] === h && band(grid[j][k + 1]) === band(h)) k++;
+        if (h > 0) {
+          const x0 = gx0 + i * cell;
+          const x1 = gx0 + (k + 1) * cell;
+          const top = DIM.land + h;
+          const L = look(h);
+          b.span(model, 'Rocha', [x0, DIM.land - 0.1, z0], [x1, top - 0.8, z0 + cell], L.body);
+          b.span(model, L.cap, [x0, top - 0.8, z0], [x1, top, z0 + cell], L.top);
+          peakY = Math.max(peakY, top);
+          // pinheiros nas encostas de grama (no meio de uma coluna)
+          if (band(h) === 'grama' && !dry && h >= 3) {
+            for (let c = i; c <= k; c++) {
+              if (rand() < 0.22) spots.push([gx0 + (c + 0.5) * cell, top, z0 + cell / 2]);
+            }
+          }
+        }
+        i = k + 1;
+      }
+    }
+    return { spots, peak: peakY };
   }
 
   /** Pedras: blocos girados e meio enterrados (sem colisão). */
@@ -914,7 +928,11 @@ export function createWorld(seed = SEED) {
       const r = connect([x, z], [...KINGDOM.legs, ...trailLegs], [], ctx);
       if (!r) return false;
       landmarks.trails++;
-      for (const [a, c] of r.legs) {
+      for (const [a, c] of r.legs) drawLeg(a, c);
+      return true;
+    };
+    function drawLeg(a, c) {
+      {
         trailLegs.push([a, c]);
         const q = {
           // meia-largura 2,05: a borda da trilha nunca cai no mesmo plano da borda de um campo
@@ -927,8 +945,7 @@ export function createWorld(seed = SEED) {
         trailRects.push(q);
         b.span('Trilhas', 'Trilha', [q.x0, land - 0.03, q.z0], [q.x1, land + 0.2, q.z1], C.path);
       }
-      return true;
-    };
+    }
     const canPlace = (kind, x, z, face, onTrail = false) => {
       const fp = footprint(kind, face);
       const r = { x0: x - fp.w / 2, x1: x + fp.w / 2, z0: z - fp.d / 2, z1: z + fp.d / 2 };
@@ -1078,6 +1095,91 @@ export function createWorld(seed = SEED) {
       landmarks.villages.push([x, z, count]);
     }
 
+    // --- Regiões de fazenda: grade de campos cercados (trigo, repolho, abóbora, milho) com
+    // corredores de terra entre eles, espantalho, e sede (casa, celeiro, feno) na beira ---
+    landmarks.farmDistricts = [];
+    const CROPS = [
+      ['Trigo', C.wheat, 1.4],
+      ['Repolho', C.leafLight, 0.9],
+      ['Abóbora', C.autumn, 1],
+      ['Milho', C.leafLight, 2.8],
+    ];
+    const field = (F, r, crop) => {
+      const [name, color, h] = crop;
+      b.span(F, 'Terra Arada', [r.x0, land - 0.08, r.z0], [r.x1, land + 0.22, r.z1], C.soil);
+      for (let k = 0; k < 5; k++) {
+        const zz = r.z0 + 2.4 + k * 4.3;
+        b.span(F, name, [r.x0 + 1, land + 0.22, zz], [r.x1 - 1, land + 0.22 + h, zz + 1.4], color, deco);
+      }
+      for (const [cx, cz] of [
+        [r.x0, r.z0],
+        [r.x1, r.z0],
+        [r.x0, r.z1],
+        [r.x1, r.z1],
+      ]) {
+        b.span(F, 'Estaca da Cerca', [cx - 0.3, land + 0.22, cz - 0.3], [cx + 0.3, land + 2.6, cz + 0.3], C.woodDark);
+      }
+      for (const cz of [r.z0, r.z1]) {
+        b.span(F, 'Cerca', [r.x0 - 0.15, land + 1.9, cz - 0.15], [r.x1 + 0.15, land + 2.2, cz + 0.15], C.wood, deco);
+      }
+    };
+    for (let attempt = 0; attempt < 8000 && landmarks.farmDistricts.length < 3; attempt++) {
+      const cx = Math.round((rand() * 2 - 1) * 420);
+      const cz = Math.round((rand() * 2 - 1) * 420);
+      const area = { x0: cx - 58, x1: cx + 58, z0: cz - 28, z1: cz + 54 };
+      const ok =
+        Math.hypot(cx, cz) > 190 &&
+        biomeAt(cx, cz) === 'campo' &&
+        allGrass(area.x0, area.x1, area.z0, area.z1, 4) &&
+        clearOfPlots(area, 12) &&
+        awayFromRoads(area, 0) &&
+        trailRects.every((t) => rectsApart(area, t, 2)) &&
+        distToRoads(cx, cz) < 200 &&
+        free(area, 8) &&
+        landmarks.villages.every(([vx, vz]) => Math.hypot(vx - cx, vz - cz) > 160);
+      if (!ok) continue;
+      // o corredor principal (z = cz) liga numa ponta na malha de estradas
+      const ends = [
+        [cx + 54, cz],
+        [cx - 54, cz],
+      ].sort((p, q) => distToRoads(...p) - distToRoads(...q));
+      if (!ends.some(([ex, ez]) => addTrail(ex, ez, area))) continue;
+      const Fz = `Fazendas/Fazenda ${landmarks.farmDistricts.length + 1}`;
+      drawLeg([cx - 54, cz], [cx + 54, cz]); // corredor entre as duas fileiras de campos
+      drawLeg([cx - 18, cz - 25], [cx - 18, cz + 30]); // corredores entre as colunas
+      drawLeg([cx + 18, cz - 25], [cx + 18, cz + 25]);
+      drawLeg([cx - 48, cz + 30], [cx + 48, cz + 30]); // frente da sede
+      let n = 0;
+      for (const fx of [-36, 0, 36]) {
+        for (const fz of [-14, 14]) {
+          const r = { x0: cx + fx - 15, x1: cx + fx + 15, z0: cz + fz - 11, z1: cz + fz + 11 };
+          const crop = CROPS[Math.floor(rand() * CROPS.length)];
+          field(`${Fz}/Campo ${++n}`, r, crop);
+          blocked.push(r);
+        }
+      }
+      // espantalho no campo do meio
+      const E = `${Fz}/Espantalho`;
+      const ex = cx + 4;
+      const ez = cz + 14;
+      b.span(E, 'Poste do Espantalho', [ex - 0.2, land + 0.22, ez - 0.2], [ex + 0.2, land + 6, ez + 0.2], C.woodDark, deco);
+      b.span(E, 'Braços do Espantalho', [ex - 2, land + 4.2, ez - 0.15], [ex + 2, land + 4.5, ez + 0.15], C.woodDark, deco);
+      b.span(E, 'Roupa do Espantalho', [ex - 0.8, land + 2.8, ez - 0.4], [ex + 0.8, land + 4.2, ez + 0.4], C.banner, deco);
+      b.span(E, 'Cabeça do Espantalho', [ex - 0.5, land + 6, ez - 0.5], [ex + 0.5, land + 7, ez + 0.5], C.hay, deco);
+      b.span(E, 'Chapéu do Espantalho', [ex - 0.9, land + 7, ez - 0.9], [ex + 0.9, land + 7.3, ez + 0.9], C.roofThatch, deco);
+      // sede da fazenda, de frente para os campos
+      let count = 0;
+      for (const [dx, dz, kind, name] of [
+        [-32, 41, 'casa', 'Casa da Fazenda'],
+        [2, 43, 'celeiro', 'Celeiro'],
+        [34, 39, 'feno', 'Feno'],
+      ]) {
+        if (placeBuilding(`${Fz}/${name}`, kind, cx + dx, cz + dz, 'n', true)) count++;
+      }
+      landmarks.farmDistricts.push([cx, cz, n, count]);
+      landmarks.farms.push([cx, cz]);
+    }
+
     const mountainSpots = [];
     landmarks.mountains = [];
     landmarks.hills = [];
@@ -1085,7 +1187,7 @@ export function createWorld(seed = SEED) {
     const relief = [
       { list: landmarks.mountains, want: 9, R: [36, 58], H: [40, 78], name: 'Montanha' },
       { list: landmarks.hills, want: 16, R: [18, 30], H: [12, 22], name: 'Colina' },
-      { list: landmarks.outcrops, want: 22, R: [7, 13], H: [5, 9], name: 'Afloramento' },
+      { list: landmarks.outcrops, want: 14, R: [8, 13], H: [5, 9], name: 'Afloramento' },
     ];
     for (const kind of relief) {
       for (let attempt = 0; attempt < 6000 && kind.list.length < kind.want; attempt++) {

@@ -240,6 +240,10 @@ if (landmarks.villages.length) {
   add({ id: 'village', title: 'Vila: casas, poço, celeiro e moinho', ...look(x, z, 60, 42, 70, 6) });
   add({ id: 'village-walk', title: 'Rua da vila (altura do jogador)', pos: [x + 34, 11, z + 6], target: [x, 8, z] });
 }
+if (landmarks.farmDistricts?.length) {
+  const [x, z] = landmarks.farmDistricts[0];
+  add({ id: 'farmland', title: 'Região de fazenda: campos, espantalho e sede', ...look(x, z + 10, 70, 55, 90, 4) });
+}
 if (landmarks.towers.length) {
   const [x, z] = landmarks.towers[0];
   add({ id: 'tower', title: 'Torre de vigia na beira da estrada', ...look(x, z, 30, 22, 34, 10) });
