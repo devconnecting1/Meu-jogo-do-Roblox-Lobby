@@ -181,7 +181,8 @@ function reliefGeometry([sx, sy, sz], tile) {
     [sx, sy],
   ];
   for (let f = 0; f < 6; f++) {
-    for (let i = f * 4; i < f * 4 + 4; i++) uv.setXY(i, (uv.getX(i) * dims[f][0]) / tile, (uv.getY(i) * dims[f][1]) / tile);
+    for (let i = f * 4; i < f * 4 + 4; i++)
+      uv.setXY(i, (uv.getX(i) * dims[f][0]) / tile, (uv.getY(i) * dims[f][1]) / tile);
   }
   return g;
 }
