@@ -596,9 +596,16 @@ function puddle(b, model, x, z, w, d, floorY, seed) {
     const px = x + (r() - 0.5) * (w - ww);
     const pz = z + (r() - 0.5) * (d - dd);
     // a base fica 0,02 dentro do piso: assim não divide plano com entulho, musgo ou lajes caídas
-    b.span(model, 'Poça', [px - ww / 2, floorY - 0.02, pz - dd / 2], [px + ww / 2, floorY + 0.04, pz + dd / 2], C.puddle, {
-      canCollide: false,
-    });
+    b.span(
+      model,
+      'Poça',
+      [px - ww / 2, floorY - 0.02, pz - dd / 2],
+      [px + ww / 2, floorY + 0.04, pz + dd / 2],
+      C.puddle,
+      {
+        canCollide: false,
+      },
+    );
   }
 }
 
