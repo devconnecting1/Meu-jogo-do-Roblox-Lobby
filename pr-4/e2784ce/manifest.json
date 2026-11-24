@@ -1,0 +1,165 @@
+{
+  "views": [
+    {
+      "id": "overview",
+      "title": "Visão geral do reino"
+    },
+    {
+      "id": "top",
+      "title": "Mapa visto de cima (30 lotes, estradas, rio e lago)"
+    },
+    {
+      "id": "lobby",
+      "title": "Lobby: fonte com a estátua clássica, mercado e colunas antigas"
+    },
+    {
+      "id": "market",
+      "title": "Mercado do Lobby (altura do jogador)"
+    },
+    {
+      "id": "lobby-stairs",
+      "title": "Escadaria de madeira do Lobby"
+    },
+    {
+      "id": "fountain",
+      "title": "Fonte do Lobby: estátua do boneco clássico com o logo"
+    },
+    {
+      "id": "plot",
+      "title": "Lote 05: fundação do castelo"
+    },
+    {
+      "id": "plots",
+      "title": "Lotes espalhados pelo mapa"
+    },
+    {
+      "id": "bridge",
+      "title": "Ponte de madeira sobre o rio"
+    },
+    {
+      "id": "bridge-walk",
+      "title": "Atravessando a ponte (altura do jogador)"
+    },
+    {
+      "id": "lake",
+      "title": "Lago e rio"
+    },
+    {
+      "id": "forest",
+      "title": "Floresta"
+    },
+    {
+      "id": "autumn",
+      "title": "Bosque de outono"
+    },
+    {
+      "id": "mountain",
+      "title": "Montanha com neve e pinheiros"
+    },
+    {
+      "id": "hill",
+      "title": "Colina em terraços"
+    },
+    {
+      "id": "village",
+      "title": "Vila: casas, poço, celeiro e moinho"
+    },
+    {
+      "id": "village-walk",
+      "title": "Rua da vila (altura do jogador)"
+    },
+    {
+      "id": "tower",
+      "title": "Torre de vigia na beira da estrada"
+    },
+    {
+      "id": "camp",
+      "title": "Acampamento na floresta"
+    },
+    {
+      "id": "farm",
+      "title": "Campo de trigo"
+    },
+    {
+      "id": "mine",
+      "title": "Jazida de ouro"
+    },
+    {
+      "id": "dock",
+      "title": "Cais e barco na praia"
+    },
+    {
+      "id": "beach",
+      "title": "Praia com coqueiros"
+    },
+    {
+      "id": "build-25",
+      "title": "Montagem — 25% das etapas"
+    },
+    {
+      "id": "build-50",
+      "title": "Montagem — 50% das etapas"
+    },
+    {
+      "id": "build-75",
+      "title": "Montagem — 75% das etapas"
+    },
+    {
+      "id": "variante-101",
+      "title": "Variante do servidor (semente 101): vista de cima"
+    },
+    {
+      "id": "variante-101-geral",
+      "title": "Variante do servidor (semente 101): visão geral"
+    },
+    {
+      "id": "variante-2027",
+      "title": "Variante do servidor (semente 2027): vista de cima"
+    },
+    {
+      "id": "variante-2027-geral",
+      "title": "Variante do servidor (semente 2027): visão geral"
+    },
+    {
+      "id": "variante-4242",
+      "title": "Variante do servidor (semente 4242): vista de cima"
+    },
+    {
+      "id": "variante-4242-geral",
+      "title": "Variante do servidor (semente 4242): visão geral"
+    },
+    {
+      "id": "variante-77777",
+      "title": "Variante do servidor (semente 77777): vista de cima"
+    },
+    {
+      "id": "variante-77777-geral",
+      "title": "Variante do servidor (semente 77777): visão geral"
+    }
+  ],
+  "stats": {
+    "total": 8633,
+    "lights": 0,
+    "groups": {
+      "Mar": 1,
+      "Terreno": 498,
+      "Lobby": 326,
+      "Estradas": 45,
+      "Pontes": 29,
+      "Lotes": 330,
+      "Trilhas": 28,
+      "Vila": 715,
+      "Relevo": 781,
+      "Recursos": 152,
+      "Costa": 45,
+      "Torres de Vigia": 170,
+      "Acampamentos": 72,
+      "Vegetação": 5441
+    }
+  },
+  "manual": {
+    "parts": 8633,
+    "steps": 1482,
+    "connections": 22404
+  }
+}
