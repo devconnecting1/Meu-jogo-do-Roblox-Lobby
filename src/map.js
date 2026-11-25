@@ -154,10 +154,10 @@ export const PLANS = Object.freeze({
     group: 'loja',
     parts: [
       [-4, -12, 4, 12],
-      [-12, -8, 12, 0],
+      [-12, -8, 12, -4],
     ],
   }, // nave + transepto
-  torreMago: { name: 'Torre do Mago', group: 'loja', parts: [{ c: [0, 0], r: 11 }] }, // torre redonda
+  torreMago: { name: 'Torre do Mago', group: 'loja', parts: [{ c: [0, 0], r: 12 }] }, // torre redonda
   estabulo: {
     name: 'Estábulo',
     group: 'loja',
@@ -172,7 +172,7 @@ export const PLANS = Object.freeze({
     group: 'loja',
     parts: [
       [-8, -12, 8, 4],
-      [-4, 4, 4, 12],
+      [-4, 4, 4, 8],
     ],
   }, // cofre + escadaria
   guilda: {
@@ -212,7 +212,7 @@ export const PLANS = Object.freeze({
     group: 'castelo',
     parts: [
       [-16, -8, 16, 8],
-      [-8, -16, 8, 16],
+      [-4, -16, 4, 16],
     ],
   },
   casteloU: {
@@ -229,7 +229,7 @@ export const PLANS = Object.freeze({
     group: 'castelo',
     parts: [
       [-16, -16, 16, -4],
-      [-8, -4, 8, 16],
+      [-4, -4, 4, 16],
     ],
   },
 });
