@@ -128,6 +128,11 @@ Cada item já derrubou o CI uma vez (na prisão ou no Reino clássico; as regras
 | Vale: "só 9 tamanhos de planta" | capela, ferraria e banco tinham 20 células; guilda e torre 24; cidadela e L 48; pátio e T 44 | cada prédio com área própria, como na vida real (capela 16, banco 18, torre r12 = 32, cidadela 40, forte em T 34); conte as células da planta nova antes do push |
 | "só 5 montanhas" (Lobby novo) | o relevo consome `rand()` (pinheiros nas encostas); mudar o perfil das montanhas mudou o sorteio e a vaga das montanhas acabou em 6000 tentativas | depois de 4000 tentativas o relevo aceita raio 15% menor, depois de 6500, 28% menor: mapa apertado nunca fica sem montanha |
 | orçamento divergente (10000 × 16000) | o limite de Parts estava repetido em vários testes | um só lugar: `DIM.maxParts` (18000), lido por todos os testes e pelo fuzz |
+| Construções: z-fighting Poste do Quadro × Quadro de Missões (Y = topo) | poste e quadro de cores diferentes com o topo na mesma altura (3,0) | topos de peças vizinhas em alturas diferentes (quadro em 2,85) |
+| Construções: z-fighting Telhado × Chaminé (Y = forro) | a chaminé começava no forro (y = H), no mesmo plano da face de baixo do telhado | chaminé começa 0,3 acima do forro, dentro do telhado |
+| Construções: "água abaixo do chão" | o teste de alturas trata toda peça com nome começando em "Água" como lagoa; poço, tina e cocho ficam acima do chão | água de enfeite se chama "Espelho do Poço/da Tina/do Cocho" |
+| Construções: "Fortaleza sem Ameia" | toda a muralha da Fortaleza é torre e as ameias de torre tinham outro nome | ameia de torre também se chama "Ameia" |
+| Construções: "Neon não deve colidir" (Bola de Cristal) | peça Neon com luz, mas com colisão | toda luz Neon (lampião, brasa, cristal) com `canCollide: false` |
 | captura com a vista anterior | o SwiftShader demora a desenhar muitas malhas | tudo instanciado no visualizador; o CI espera 2 quadros antes de capturar |
 
 - **Z-fighting:** duas peças com faces coplanares e cores diferentes. Desloque a decorativa (0,05 a 0,1), deixe uma por dentro da outra, ou use a mesma cor.

@@ -63,7 +63,7 @@ export const SHOPS = {
     },
     outside(f) {
       // chaminé da lareira e placa com caneca sobre a porta
-      f.span('Chaminé', [-11.6, 8, 4.6], [-10.2, 13, 7.4], C.pxStoneWallDark);
+      f.span('Chaminé', [-11.6, 8.3, 4.6], [-10.2, 13, 7.4], C.pxStoneWallDark);
       f.span('Placa', [4.6, 6.4, 0], [7.4, 7.6, 0.2], C.pxWoodDark);
       f.span('Caneca da Placa', [5.6, 6.7, 0.2], [6.4, 7.3, 0.3], C.pxGold);
     },
@@ -94,7 +94,7 @@ export const SHOPS = {
       ]);
       add('Tina', [
         ...barril(5.6, 2.3),
-        ['Água da Tina', [5.1, 1.4, 1.8], [6.1, 1.45, 2.8], C.pxWater, { canCollide: false }],
+        ['Espelho da Tina', [5.1, 1.4, 1.8], [6.1, 1.45, 2.8], C.pxWater, { canCollide: false }],
       ]);
       const rack = [['Painel de Armas', [-9.6, 0, -7], [-4.4, 3.2, -6.7], C.pxWoodDark]];
       for (let u = -9.1; u <= -5.2; u += 1.0) rack.push(['Espada', [u, 0.5, -6.7], [u + 0.2, 2.9, -6.55], C.pxIron]);
@@ -111,7 +111,7 @@ export const SHOPS = {
       add('Cavalete', cavalete(-11, -5.6, -10.7, -2.6, '+u'));
     },
     outside(f) {
-      f.span('Chaminé', [8.6, 8, -0.9], [10.6, 12.6, 0.9], C.pxStoneWallDark);
+      f.span('Chaminé', [8.6, 8.3, -0.9], [10.6, 12.6, 0.9], C.pxStoneWallDark);
       f.span('Placa', [-5.4, 6.4, 8], [-2.6, 7.6, 8.2], C.pxWoodDark);
       f.span('Bigorna da Placa', [-4.6, 6.7, 8.2], [-3.4, 7.2, 8.3], C.pxIron);
     },
@@ -225,7 +225,11 @@ export const SHOPS = {
           [-0.4, 1.2, -0.4],
           [0.4, 2.0, 0.4],
           C.pxCream,
-          { material: 'Neon', light: { type: 'Point', range: 22, brightness: 1.4, color: [190, 205, 255] } },
+          {
+            material: 'Neon',
+            canCollide: false,
+            light: { type: 'Point', range: 22, brightness: 1.4, color: [190, 205, 255] },
+          },
         ],
       ]);
       add('Estante', estante(-2.6, -9.9, 2.6, -9.1, 3.6, '+v'));
@@ -263,7 +267,7 @@ export const SHOPS = {
           add('Feno da Baia', fardo(h0, v + 0.6, h1, v + 1.6));
           add('Cocho', [
             ['Cocho', [t0, 0, v + 2.1], [t1, 0.8, v + 3.3], C.pxWood],
-            ['Água do Cocho', [t0 + 0.1, 0.8, v + 2.2], [t1 - 0.1, 0.85, v + 3.2], C.pxWater, { canCollide: false }],
+            ['Espelho do Cocho', [t0 + 0.1, 0.8, v + 2.2], [t1 - 0.1, 0.85, v + 3.2], C.pxWater, { canCollide: false }],
           ]);
         }
         add('Feno da Baia', fardo(side < 0 ? -10.7 : 9.3, 9.0, side < 0 ? -9.3 : 10.7, 10.4));
@@ -361,7 +365,7 @@ export const SHOPS = {
       const board = [
         ['Poste do Quadro', [-10.9, 0, -2.0], [-10.6, 3.0, -1.7], C.pxWoodDark],
         ['Poste do Quadro', [-10.9, 0, 1.7], [-10.6, 3.0, 2.0], C.pxWoodDark],
-        ['Quadro de Missões', [-10.95, 1.2, -2.2], [-10.75, 3.0, 2.2], C.pxWood],
+        ['Quadro de Missões', [-10.95, 1.2, -2.2], [-10.75, 2.85, 2.2], C.pxWood],
       ];
       for (const [v0, y0] of [
         [-1.8, 1.5],

@@ -162,7 +162,7 @@ export function buildCastle(b, plot, floorY) {
     const top = CURTAIN.H + CURTAIN.tower;
     const merl = t.map((i, j) => t.has(i, j) && Math.floor((t.u0 + i + t.v0 + j) / 2) % 2 === 0);
     for (const [a, bb, c, d] of merl.rects())
-      fc.span('Ameia da Torre', [a, top, bb], [c, top + CURTAIN.merlon, d], C.pxStoneWall);
+      fc.span('Ameia', [a, top, bb], [c, top + CURTAIN.merlon, d], C.pxStoneWall);
   }
 
   // torre de menagem

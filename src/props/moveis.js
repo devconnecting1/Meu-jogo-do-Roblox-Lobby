@@ -147,7 +147,7 @@ export function estandarte(axis, at, dir, a0, a1, y0, y1, color) {
 /** Poço de pedra com água, dois postes, travessa e telhadinho. */
 export const poco = (u, v) => [
   ['Poço', [u - 1.2, 0, v - 1.2], [u + 1.2, 1.0, v + 1.2], C.pxStoneWall],
-  ['Água do Poço', [u - 0.9, 1.0, v - 0.9], [u + 0.9, 1.05, v + 0.9], C.pxWater, { canCollide: false }],
+  ['Espelho do Poço', [u - 0.9, 1.0, v - 0.9], [u + 0.9, 1.05, v + 0.9], C.pxWater, { canCollide: false }],
   ['Poste', [u - 1.1, 1.0, v - 0.15], [u - 0.8, 3.0, v + 0.15], C.pxWoodDark],
   ['Poste', [u + 0.8, 1.0, v - 0.15], [u + 1.1, 3.0, v + 0.15], C.pxWoodDark],
   ['Travessa', [u - 1.1, 3.0, v - 0.15], [u + 1.1, 3.3, v + 0.15], C.pxWoodDark],
