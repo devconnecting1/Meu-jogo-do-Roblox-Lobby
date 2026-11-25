@@ -114,7 +114,7 @@ const VIEWS = [
   },
   { id: 'lobby', title: 'Lobby: praça de pedra com o estrado no meio', ...look(0, 0, 60, 52, 80, 4) },
   { id: 'lobby-walk', title: 'Chegando na praça (altura do jogador)', pos: [0, 9, 74], target: [0, 6, 0] },
-  { id: 'estatua', title: 'Estátua de Luvitlua no estrado', pos: [7, 14, 30], target: [0, 18, 0] },
+  { id: 'estatua', title: 'Estátua de Luvitlua (boneco R6) no estrado', pos: [12, 16, 42], target: [0, 17, 0] },
   { id: 'estatua-placa', title: 'Placa com o nome LUVITLUA', pos: [0, 8.5, 16], target: [0, 8.5, 0] },
   { id: 'pads', title: 'Áreas de construção em volta da praça', ...look(pad.x, pad.z, 40, 34, 46, 4) },
   { id: 'plot', title: `${plot.name}: lote do castelo`, ...look(plot.x, plot.z, 40, 30, 48, 4) },

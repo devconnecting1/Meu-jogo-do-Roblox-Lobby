@@ -63,19 +63,39 @@ test('Lobby no centro: praça de pedra com faixas, estrado e spawn sobre a praç
   assert.ok(Math.hypot(s.position[0], s.position[2]) < DIM.plazaR - 8, 'spawn dentro da praça');
 });
 
-test('estátua de Luvitlua no estrado: pedestal, nome em letras de pixel e espada de gelo acesa', () => {
+test('estátua de Luvitlua no estrado: boneco R6 oficial, pedestal e nome em letras de pixel', () => {
   const st = parts.filter((p) => p.model.startsWith('Lobby/Estátua de Luvitlua'));
   assert.ok(st.length >= 60, `estátua com só ${st.length} peças`);
   const letters = new Set(st.filter((p) => p.name.startsWith('Letra ')).map((p) => p.name.slice(6)));
   for (const ch of 'LUVITA') assert.ok(letters.has(ch), `placa sem a letra ${ch}`);
   const topY = Math.max(...st.map((p) => p.position[1] + p.size[1] / 2));
   assert.ok(topY >= DIM.land + 25, `estátua baixa (${topY})`);
-  const blade = st.find((p) => p.name === 'Lâmina');
-  assert.ok(blade && blade.material === 'Neon' && blade.light, 'lâmina de gelo sem brilho');
   for (const p of st) {
-    for (const i of [0, 2])
-      assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= 7.5 + 1e-6, `${p.name} fora do estrado`);
+    for (const i of [0, 2]) assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= 7.5 + 1e-6, `${p.name} fora do estrado`);
   }
+  // proporções do R6 oficial: tronco 2×2×1, braços e pernas 1×2×1 (vinco de 0,02), mesma altura
+  const r6 = st.filter((p) => p.model.endsWith('/Boneco R6'));
+  const one = (name) => {
+    const p = r6.find((x) => x.name === name);
+    assert.ok(p, `boneco sem ${name}`);
+    return p.size;
+  };
+  const [tw, th, td] = one('Tronco');
+  assert.ok(Math.abs(tw - th) < 1e-6 && Math.abs(tw - 2 * td) < 1e-6, 'tronco fora do 2×2×1');
+  for (const n of ['Braço Esquerdo', 'Braço Direito', 'Perna Esquerda', 'Perna Direita']) {
+    const [w, h, d] = one(n);
+    assert.ok(Math.abs(h - th) < 1e-6, `${n} com altura diferente do tronco`);
+    assert.ok(Math.abs(w - tw / 2) <= tw * 0.02 && Math.abs(d - td) <= td * 0.05, `${n} fora do 1×2×1`);
+  }
+  assert.ok(r6.filter((p) => p.name === 'Cabeça').length >= 1, 'boneco sem cabeça');
+  assert.ok(r6.every((p) => p.color.join() === r6[0].color.join()), 'estátua em mais de uma cor');
+  // só o corpo do R6: nada de armadura, roupa, arma ou item (pedido do dono do jogo)
+  const body = new Set(['Cabeça', 'Tronco', 'Braço Esquerdo', 'Braço Direito', 'Perna Esquerda', 'Perna Direita']);
+  const extra = r6.filter((p) => !body.has(p.name)).map((p) => p.name);
+  assert.deepEqual(extra, [], `boneco com peças além do corpo R6: ${extra.join(', ')}`);
+  const sub = new Set(st.map((p) => p.model.split('/').slice(2).join('/')));
+  for (const m of sub) assert.ok(['Pedestal', 'Pedestal/Nome', 'Boneco R6'].includes(m), `estátua com ${m}`);
+  assert.ok(st.every((p) => !p.light && p.material !== 'Neon'), 'estátua com brilho ou luz');
 });
 
 test('8 áreas de construção em volta da praça, planas e ligadas ao Lobby', () => {

@@ -121,8 +121,8 @@ export const C = Object.freeze({
   pxFire: [232, 150, 106], // chama (Neon com luz, só em lareira/forja/tocha)
   pxBook: [120, 70, 60],
   pxHay: [206, 176, 104],
-  pxIce: [170, 210, 228], // espada de gelo da estátua de Luvitlua
-  pxArmor: [58, 60, 70], // armadura escura da estátua
+  pxStatue: [186, 184, 180], // boneco R6 da estátua de Luvitlua (cinza claro, como o R6 sem roupa)
+  pxEngrave: [58, 60, 70], // letras escuras da placa da estátua
 });
 
 /** Saturação HSV (0..1) de uma cor [r,g,b]. */
