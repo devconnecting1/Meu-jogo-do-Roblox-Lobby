@@ -19,27 +19,27 @@ import { makeBuilder } from './builder.js';
 import { C } from './palette.js';
 
 export const DIM = Object.freeze({
-  half: 360, // a grade do terreno cobre x,z ∈ [-360, 360]
-  seaHalf: 700, // o mar vai até ±700
+  half: 400, // a grade do terreno cobre x,z ∈ [-400, 400]
+  seaHalf: 760, // o mar vai até ±760
   cell: 4, // "pixel" do terreno (lado de cada célula)
   land: 4, // topo do chão do vale
   bottom: -5, // fundo dos blocos de terra (dentro do mar)
   seaBottom: -6,
   cap: 1, // espessura da camada de superfície (grama, terra, pedra)
-  valley: 268, // raio de referência do vale (cada semente deforma)
-  valleyMin: 220,
-  valleyMax: 300,
+  valley: 300, // raio de referência do vale (cada semente deforma)
+  valleyMin: 250,
+  valleyMax: 330,
   cliffBand: 52, // largura da faixa de penhascos fora do vale
   plazaR: 46, // Lobby: praça de pedra
   daisR: 10, // estrado no centro da praça (futura construção central)
   ringRoad: [52, 62], // anel de terra em volta da praça
   pads: 8, // áreas de construção em volta da praça
-  padSize: 20,
-  padRing: 84,
+  padSize: 24, // múltiplo de 8: o piso cobre células inteiras da grade de 4
+  padRing: 88,
   plots: 30, // lotes de castelo (20 jogadores + 10 bots)
   players: 20,
   bots: 10,
-  plotSize: 28,
+  plotSize: 32, // múltiplo de 8: o piso cobre células inteiras da grade de 4
   plotSpacing: 64, // distância desejada entre centros de lotes
   minPlotSpacing: 56, // nunca mais perto que isso
   road: 10, // largura das estradas
@@ -231,8 +231,8 @@ export function createWorld(seed = SEED) {
   {
     const half = DIM.plotSize / 2;
     let spacing = DIM.plotSpacing;
-    for (let attempt = 0; attempt < 40000 && PLOTS.length < DIM.plots; attempt++) {
-      if (attempt > 0 && attempt % 8000 === 0) spacing = Math.max(DIM.minPlotSpacing, spacing - 4);
+    for (let attempt = 0; attempt < 60000 && PLOTS.length < DIM.plots; attempt++) {
+      if (attempt > 0 && attempt % 10000 === 0) spacing = Math.max(DIM.minPlotSpacing, spacing - 4);
       const x = Math.round(((rand() * 2 - 1) * DIM.valleyMax) / DIM.cell) * DIM.cell;
       const z = Math.round(((rand() * 2 - 1) * DIM.valleyMax) / DIM.cell) * DIM.cell;
       if (!plotFits(x, z, half)) continue;
@@ -362,18 +362,33 @@ export function createWorld(seed = SEED) {
       .map(([px, pz]) => [Math.round(px / 2) * 2, Math.round(pz / 2) * 2])
       .sort((p, q) => Math.hypot(p[0] - x, p[1] - z) - Math.hypot(q[0] - x, q[1] - z));
   };
-  /** Liga (x, z) à malha com um "L" (dois trechos retos): tenta os pontos mais perto e as duas ordens. */
+  /** Tenta um caminho de trechos retos; se todos os trechos servem, desenha e devolve true. */
+  const tryPath = (pts, own) => {
+    for (let k = 0; k + 1 < pts.length; k++) if (!legOk(pts[k], pts[k + 1], own)) return false;
+    for (let k = 0; k + 1 < pts.length; k++) drawLeg(pts[k], pts[k + 1]);
+    return true;
+  };
+  /**
+   * Liga (x, z) à malha: primeiro um "L" (dois trechos retos) até um dos pontos mais perto, nas duas
+   * ordens; se nenhum servir, um "Z" (três trechos) que desvia dos outros lotes por um corredor.
+   */
   const connect = (x, z, own) => {
-    for (const [nx, nzz] of netPoints(x, z).slice(0, 24)) {
+    const targets = netPoints(x, z).slice(0, 80);
+    for (const [nx, nzz] of targets) {
       for (const corner of [
         [x, nzz],
         [nx, z],
       ]) {
-        if (legOk([x, z], corner, own) && legOk(corner, [nx, nzz], own)) {
-          drawLeg([x, z], corner);
-          drawLeg(corner, [nx, nzz]);
-          return true;
-        }
+        if (tryPath([[x, z], corner, [nx, nzz]], own)) return true;
+      }
+    }
+    for (const [nx, nzz] of targets.slice(0, 30)) {
+      for (let f = 0.2; f < 0.85; f += 0.15) {
+        const mx = Math.round((x + (nx - x) * f) / 2) * 2;
+        const mz = Math.round((z + (nzz - z) * f) / 2) * 2;
+        const zx = [[x, z], [mx, z], [mx, nzz], [nx, nzz]];
+        const zz = [[x, z], [x, mz], [nx, mz], [nx, nzz]];
+        if (tryPath(zx, own) || tryPath(zz, own)) return true;
       }
     }
     return false;

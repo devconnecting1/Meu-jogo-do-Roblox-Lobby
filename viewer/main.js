@@ -106,7 +106,7 @@ const plot = [...PLOTS].sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.
 const pad = PADS[0];
 const VIEWS = [
   { id: 'overview', title: 'Visão geral do Vale', ...OVERVIEW },
-  { id: 'top', title: 'Vale visto de cima (Lobby, áreas, 30 lotes, estradas e lagoas)', pos: [0, 820, 90], target: [0, 0, 0] },
+  { id: 'top', title: 'Vale visto de cima (Lobby, áreas, 30 lotes, estradas e lagoas)', pos: [0, 900, 100], target: [0, 0, 0] },
   { id: 'lobby', title: 'Lobby: praça de pedra com o estrado no meio', ...look(0, 0, 60, 52, 80, 4) },
   { id: 'lobby-walk', title: 'Chegando na praça (altura do jogador)', pos: [0, 9, 74], target: [0, 6, 0] },
   { id: 'pads', title: 'Áreas de construção em volta da praça', ...look(pad.x, pad.z, 40, 34, 46, 4) },
