@@ -5,7 +5,7 @@
 // agrupar as falhas no resumo do CI (tools/ci/fuzz-summary.mjs).
 //
 // Duas camadas:
-//   * layoutProblems(w): barata (sem Parts). Lotes, áreas, estradas, vale, Lobby e relevo.
+//   * layoutProblems(w): barata (sem Parts). Lojas, estradas, vale, Lobby e relevo.
 //   * fullProblems(w, built): cara (com as Parts de w.buildMap()). Apoio, z-fighting, passagens,
 //     limites, spawn, manual de montagem, orçamento e marcos do mapa.
 
@@ -19,7 +19,7 @@ export const MAX_PER_CHECK = 20;
 export const FUZZ_PART_BUDGET = 32000; // igual a DIM.maxParts (o mundo informa o seu)
 
 /** Marcos que todo mapa precisa ter (lista não vazia ou contagem maior que zero). */
-const REQUIRED_LANDMARKS = ['plots', 'pads', 'ponds', 'roads', 'terraces'];
+const REQUIRED_LANDMARKS = ['pads', 'ponds', 'roads', 'terraces'];
 
 /** Marcos desejáveis: se faltarem, só geram aviso (mapa apertado pode não ter espaço). */
 const OPTIONAL_LANDMARKS = [];
@@ -77,56 +77,24 @@ function padIssue(w, p, kinds) {
 }
 
 function plotChecks(w, out) {
-  const { DIM, PLAZA, PLOTS, PADS } = w;
+  const { DIM, PADS } = w;
 
   const count = [];
-  if (PLOTS.length !== DIM.plots) count.push(`${PLOTS.length} lotes, esperado ${DIM.plots}`);
-  if (PADS.length !== DIM.pads) count.push(`${PADS.length} áreas de construção, esperado ${DIM.pads}`);
-  collect(out, 'lotes (quantidade)', count);
-  const seen = new Map();
-  for (const p of PLOTS) seen.set(p.name, (seen.get(p.name) ?? 0) + 1);
-  const dup = [];
-  for (const [name, n] of seen) if (n > 1) dup.push(`"${name}" aparece ${n} vezes`);
-  collect(out, 'lotes (nomes repetidos)', dup);
-
-  const close = [];
-  for (let i = 0; i < PLOTS.length; i++) {
-    for (let j = i + 1; j < PLOTS.length; j++) {
-      const [a, b] = [PLOTS[i], PLOTS[j]];
-      const d = Math.hypot(a.x - b.x, a.z - b.z);
-      if (d < DIM.minPlotSpacing)
-        close.push(`${a.name} e ${b.name} a ${d.toFixed(1)} studs (mín. ${DIM.minPlotSpacing})`);
-    }
-  }
-  collect(out, 'lotes (perto demais)', close);
+  if (PADS.length !== DIM.pads) count.push(`${PADS.length} lojas, esperado ${DIM.pads}`);
+  collect(out, 'lojas (quantidade)', count);
 
   const flat = [];
-  for (const p of PLOTS) {
-    const bad = padIssue(w, p, ['lote']);
-    if (bad) flat.push(`${p.name} em ${pt(p.x, p.z)}: ${bad}`);
-  }
   for (const p of PADS) {
     const bad = padIssue(w, p, ['area']);
     if (bad) flat.push(`${p.name} em ${pt(p.x, p.z)}: ${bad}`);
   }
-  collect(out, 'lotes (piso torto ou fora do chão)', flat);
+  collect(out, 'lojas (piso torto ou fora do chão)', flat);
 
   const lost = [];
-  const conn = w.plotsConnected ?? [];
-  PLOTS.forEach((p, k) => {
-    if (conn[k] !== true) lost.push(`${p.name} em ${pt(p.x, p.z)} sem estrada até o Lobby`);
-  });
   (w.padsConnected ?? []).forEach((ok, k) => {
     if (ok !== true) lost.push(`${PADS[k].name} sem estrada até o Lobby`);
   });
-  collect(out, 'lotes (sem estrada)', lost);
-
-  const side = (v) => (v >= 0 ? 1 : -1); // um lote exatamente no eixo conta no lado positivo
-  const quads = new Set(PLOTS.map((p) => `${side(p.x - PLAZA.x)},${side(p.z - PLAZA.z)}`));
-  const filled = ['1,1', '1,-1', '-1,1', '-1,-1'].filter((q) => quads.has(q));
-  const spread = [];
-  if (filled.length < 3) spread.push(`lotes em só ${filled.length} quadrante(s): ${filled.join(' ') || 'nenhum'}`);
-  collect(out, 'lotes (quadrantes)', spread);
+  collect(out, 'lojas (sem estrada)', lost);
 }
 
 function roadChecks(w, out) {
@@ -177,7 +145,7 @@ function valleyChecks(w, out) {
   collect(out, 'relevo (penhasco ou lagoa faltando)', relief);
 }
 
-/** Problemas de layout de um mundo (lotes, áreas, estradas, vale, Lobby e relevo). Lista vazia = tudo certo. */
+/** Problemas de layout de um mundo (lojas, estradas, vale, Lobby e relevo). Lista vazia = tudo certo. */
 export function layoutProblems(w) {
   const out = [];
   plotChecks(w, out);

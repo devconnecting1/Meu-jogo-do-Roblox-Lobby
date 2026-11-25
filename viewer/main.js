@@ -4,13 +4,13 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createWorld, SEED, DIM, PLANS, doorPoint, planPoint } from '../src/map.js';
 import { SHOP_DOORS } from '../src/props/lojas.js';
-import { KEEPS } from '../src/props/castelos.js';
 import { stats as countStats } from '../src/builder.js';
 import { buildManual } from '../src/manual.js';
 import { isWet, surfaceMaterial } from './surfaces.js';
 
 // ---------------------------------------------------------------------------
-// Cena: dia claro, sol com sombra e neblina leve (como o Lighting do Roblox)
+// Cena: noite (como o Lighting do Roblox): céu azul-escuro, luar fraco com sombra, neblina escura
+// e as luzes do mapa (lampiões, lanternas, postes) como luzes pontuais de verdade
 // ---------------------------------------------------------------------------
 const app = document.getElementById('app');
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -20,18 +20,18 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
+renderer.toneMappingExposure = 1.15;
 app.appendChild(renderer.domElement);
 
-const SKY = 0xaecbe0;
+const SKY = 0x121a2c;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(SKY);
-scene.fog = new THREE.FogExp2(0xc4d6e2, 0.00062);
+scene.fog = new THREE.FogExp2(0x182036, 0.0009);
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.5, 6000);
 
-scene.add(new THREE.HemisphereLight(0xe4eef6, 0x6e6654, 1.15));
-const sun = new THREE.DirectionalLight(0xfff3e0, 2.1);
+scene.add(new THREE.HemisphereLight(0x50618c, 0x1a1712, 0.75));
+const sun = new THREE.DirectionalLight(0xa8bce6, 0.55); // a lua
 sun.position.set(380, 620, 260);
 sun.target.position.set(0, 0, 0);
 sun.castShadow = true;
@@ -50,7 +50,7 @@ scene.add(sun, sun.target);
 const params = new URLSearchParams(location.hash.slice(1));
 const seed = SEED;
 const world = createWorld(seed);
-const { PLOTS, PADS, PONDS } = world;
+const { PADS, PONDS } = world;
 const { parts } = world.buildMap();
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
 const cache = new Map();
@@ -94,6 +94,30 @@ for (const list of buckets.values()) {
   instanced.push(entry);
 }
 
+// luzes do mapa (PointLight do Roblox): um conjunto fixo de 8 luzes pontuais que vai para as luzes
+// do mapa mais perto do alvo de cada vista (quantidade fixa: o shader não recompila e o SwiftShader
+// do CI aguenta)
+const MAP_LIGHTS = parts.filter((p) => p.light);
+const LIGHT_POOL = Array.from({ length: 8 }, () => {
+  const l = new THREE.PointLight(0xffffff, 0, 1, 1.5);
+  scene.add(l);
+  return l;
+});
+function placeLights([tx, , tz]) {
+  const near = [...MAP_LIGHTS]
+    .sort((a, b) => Math.hypot(a.position[0] - tx, a.position[2] - tz) - Math.hypot(b.position[0] - tx, b.position[2] - tz))
+    .slice(0, LIGHT_POOL.length);
+  LIGHT_POOL.forEach((l, k) => {
+    const p = near[k];
+    if (!p) return void (l.intensity = 0);
+    const [r, g, bl] = p.light.color ?? [255, 220, 170];
+    l.color.setRGB(r / 255, g / 255, bl / 255);
+    l.intensity = p.light.brightness * 40;
+    l.distance = p.light.range * 1.5;
+    l.position.fromArray(p.position);
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Vistas (também usadas pelo CI para as capturas)
 // ---------------------------------------------------------------------------
@@ -104,13 +128,12 @@ orbit.maxPolarAngle = Math.PI * 0.49;
 
 const look = (x, z, dx, h, dz, ty = 4) => ({ pos: [x + dx, h, z + dz], target: [x, ty, z] });
 const OVERVIEW = { pos: [380, 360, 500], target: [-10, 0, 20] };
-const plot = [...PLOTS].sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.z))[0];
 const pad = PADS[0];
 const VIEWS = [
   { id: 'overview', title: 'Visão geral do Vale', ...OVERVIEW },
   {
     id: 'top',
-    title: 'Vale visto de cima (Lobby, áreas, 30 lotes, estradas e lagoas)',
+    title: 'Vale visto de cima (Lobby, 8 lojas, estradas e lagoas)',
     pos: [0, 900, 100],
     target: [0, 0, 0],
   },
@@ -118,13 +141,12 @@ const VIEWS = [
   { id: 'lobby-walk', title: 'Chegando na praça (altura do jogador)', pos: [0, 9, 74], target: [0, 6, 0] },
   { id: 'estatua', title: 'Estátua de Luvitlua (boneco R6) no estrado', pos: [12, 16, 42], target: [0, 17, 0] },
   { id: 'estatua-placa', title: 'Placa com o nome LUVITLUA', pos: [0, 8.5, 16], target: [0, 8.5, 0] },
-  { id: 'pads', title: 'Áreas de construção em volta da praça', ...look(pad.x, pad.z, 40, 34, 46, 4) },
-  { id: 'plot', title: `${plot.name}: lote do castelo`, ...look(plot.x, plot.z, 40, 30, 48, 4) },
+  { id: 'pads', title: 'Lojas em volta da praça à noite', ...look(pad.x, pad.z, 70, 60, 80, 8) },
   {
     id: 'road',
-    title: 'Estrada de terra (altura do jogador)',
-    pos: [plot.x * 0.55, 10, plot.z * 0.55 + 6],
-    target: [plot.x, 5, plot.z],
+    title: 'Saída da praça à noite (altura do jogador)',
+    pos: [70, 9, 6],
+    target: [160, 8, 40],
   },
 ];
 const add = (v) => v && VIEWS.push(v);
@@ -145,42 +167,27 @@ const add = (v) => v && VIEWS.push(v);
     target: [cx * (best.r + 20), best.h * 0.6, cz * (best.r + 20)],
   });
 }
-// construções: fachada de cada prédio do Lobby e de cada tipo de castelo, e o interior visto da porta
+// lojas: fachada de cada uma e o interior visto de dentro da porta
 const facade = (p, dist, h) => {
   const [dx, dz] = doorPoint(p);
   const [fx, fz] = [dx - p.x, dz - p.z];
   const len = Math.hypot(fx, fz) || 1;
   return { pos: [p.x + (fx / len) * dist, h, p.z + (fz / len) * dist], target: [p.x, 9, p.z] };
 };
-// vistas de dentro: do lado de dentro da porta, olhando para o fundo do prédio ou do salão do castelo
+// vistas de dentro: do lado de dentro da porta, olhando para o fundo da loja
 const inward = (p, du, dv, back, y0, y1) => {
   const [px, pz] = planPoint(p, du, dv);
   const [tx, tz] = planPoint(p, du, back);
   return { pos: [px, DIM.land + y0, pz], target: [tx, DIM.land + y1, tz] };
 };
+const Y = DIM.buildScaleY;
 for (const p of PADS) {
   const { door, floorTop } = SHOP_DOORS[p.plan];
-  add({ id: `predio-${p.plan}`, title: `${PLANS[p.plan].name} (fachada)`, ...facade(p, 40, 22) });
+  add({ id: `predio-${p.plan}`, title: `${PLANS[p.plan].name} (fachada)`, ...facade(p, 70, 26) });
   add({
     id: `predio-${p.plan}-dentro`,
     title: `${PLANS[p.plan].name} (interior)`,
-    ...inward(p, door[0], door[1] - 1.6, door[1] - 14, floorTop + 4.2, floorTop + 1.2),
-  });
-}
-for (const plan of new Set(PLOTS.map((p) => p.plan))) {
-  const p = PLOTS.find((q) => q.plan === plan);
-  const [du, dv] = PLANS[plan].door;
-  const [, b0, , b1] = KEEPS[plan].keep;
-  add({ id: `castelo-${plan}`, title: `${p.name}: ${PLANS[plan].name} (fachada)`, ...facade(p, 52, 30) });
-  add({
-    id: `castelo-${plan}-patio`,
-    title: `${p.name}: ${PLANS[plan].name} (pátio, do portão)`,
-    ...inward(p, du, dv + 1, b1, 6, 4),
-  });
-  add({
-    id: `castelo-${plan}-dentro`,
-    title: `${p.name}: ${PLANS[plan].name} (salão do trono)`,
-    ...inward(p, du, b1 - 1.4, b0, 4.6, 1.8),
+    ...inward(p, door[0], door[1] - 1.4, door[1] - 14, (floorTop + 4.4) * Y, (floorTop + 1.6) * Y),
   });
 }
 if (PONDS.length) {
@@ -214,6 +221,7 @@ function setView(id) {
   if (!v) return;
   camera.position.fromArray(v.pos);
   orbit.target.fromArray(v.target);
+  placeLights(v.target);
   orbit.update();
   setStep(v.step ? v.step * manual.steps.length : manual.steps.length);
   document.querySelectorAll('#views button').forEach((b) => b.classList.toggle('on', b.dataset.view === id));
@@ -235,7 +243,7 @@ document.getElementById('toggle').onclick = () => document.getElementById('hud')
 const s = countStats(parts);
 document.getElementById('stats').textContent =
   `${s.total} peças · ${manual.steps.length} etapas · ${manual.connections} conexões verificadas · ` +
-  `${PLOTS.length} lotes (${DIM.players} jogadores + ${DIM.bots} bots)`;
+  `${PADS.length} lojas · ${s.lights} luzes`;
 
 addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;

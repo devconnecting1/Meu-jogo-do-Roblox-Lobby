@@ -3,7 +3,9 @@
 // Cada construção é desenhada em coordenadas locais, na mesma planta de `PLANS` (src/map.js):
 //   u = lado (x local), v = frente/fundo (z local, a FRENTE do prédio fica em +v, virada para o Lobby),
 //   y = altura a partir do chão do vale (y = 0 é o topo do terreno, y = 4 no mundo).
-// O referencial gira a planta em passos de 90° (`plot.rot`) e leva para o centro do lote/área.
+// O referencial gira a planta em passos de 90° (`plot.rot`), leva para o centro da área e aplica a
+// escala de montagem (`scale.s` em u e v, `scale.y` na altura): desenha-se em escala de desenho e a
+// loja sai em tamanho real (DIM.buildScale e DIM.buildScaleY em src/map.js).
 //
 // Regras do estilo voxel liso (AGENTS.md):
 //   * só blocos alinhados aos eixos (nada de `rotation`): é pixel art em 3D;
@@ -28,17 +30,17 @@ const rot90 = (x, z, k) =>
  * @param floorY altura do chão do vale no mundo (DIM.land)
  * @param zones lista compartilhada de zonas de passagem (a submontagem usa a mesma)
  */
-export function makeFrame(b, model, plot, floorY, zones = []) {
+export function makeFrame(b, model, plot, floorY, zones = [], scale = { s: 1, y: 1 }) {
   const toWorld = (u, v) => {
-    const [dx, dz] = rot90(u, v, plot.rot);
+    const [dx, dz] = rot90(u * scale.s, v * scale.s, plot.rot);
     return [plot.x + dx, plot.z + dz];
   };
   const box3 = ([u0, y0, v0], [u1, y1, v1]) => {
     const [ax, az] = toWorld(u0, v0);
     const [cx, cz] = toWorld(u1, v1);
     return {
-      min: [Math.min(ax, cx), floorY + Math.min(y0, y1), Math.min(az, cz)],
-      max: [Math.max(ax, cx), floorY + Math.max(y0, y1), Math.max(az, cz)],
+      min: [Math.min(ax, cx), floorY + Math.min(y0, y1) * scale.y, Math.min(az, cz)],
+      max: [Math.max(ax, cx), floorY + Math.max(y0, y1) * scale.y, Math.max(az, cz)],
     };
   };
   return {
@@ -53,7 +55,7 @@ export function makeFrame(b, model, plot, floorY, zones = []) {
     },
     /** Submontagem (outro modelo, mesmo referencial), ex.: frame.sub('Mesa 1').span(...). */
     sub(suffix) {
-      return makeFrame(b, `${model}/${suffix}`, plot, floorY, zones);
+      return makeFrame(b, `${model}/${suffix}`, plot, floorY, zones, scale);
     },
     /** Zona de passagem do jogador (porta, corredor, salão): nada com colisão pode entrar nela. */
     zone(name, a, c) {

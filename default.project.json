@@ -14,52 +14,73 @@
         "Technology": {
           "Enum": 4
         },
-        "ClockTime": 15.6,
+        "ClockTime": 22.5,
         "GeographicLatitude": 32,
-        "Brightness": 3,
-        "Ambient": [0.22, 0.23, 0.26],
-        "OutdoorAmbient": [0.5, 0.52, 0.56],
+        "Brightness": 1.2,
+        "Ambient": [
+          0.14,
+          0.15,
+          0.2
+        ],
+        "OutdoorAmbient": [
+          0.3,
+          0.33,
+          0.42
+        ],
         "EnvironmentDiffuseScale": 1,
         "EnvironmentSpecularScale": 1,
-        "ExposureCompensation": 0.1,
-        "ShadowSoftness": 0.12,
+        "ExposureCompensation": 0.2,
+        "ShadowSoftness": 0.2,
         "GlobalShadows": true,
-        "ColorShift_Top": [0.14, 0.09, 0.04],
-        "ColorShift_Bottom": [0, 0, 0]
+        "ColorShift_Top": [
+          0.06,
+          0.07,
+          0.12
+        ],
+        "ColorShift_Bottom": [
+          0,
+          0,
+          0
+        ]
       },
       "Correcao de Cor": {
         "$className": "ColorCorrectionEffect",
         "$properties": {
-          "Brightness": 0.02,
-          "Contrast": 0.12,
+          "Brightness": 0.03,
+          "Contrast": 0.1,
           "Saturation": 0,
-          "TintColor": [1, 0.98, 0.95]
+          "TintColor": [
+            0.96,
+            0.97,
+            1
+          ]
         }
       },
       "Brilho": {
         "$className": "BloomEffect",
         "$properties": {
-          "Intensity": 0.25,
-          "Size": 24,
-          "Threshold": 1.6
+          "Intensity": 0.3,
+          "Size": 28,
+          "Threshold": 1.1
         }
       },
       "Neblina Leve": {
         "$className": "Atmosphere",
         "$properties": {
-          "Density": 0.34,
-          "Offset": 0.25,
-          "Color": [0.78, 0.84, 0.9],
-          "Decay": [0.62, 0.66, 0.72],
-          "Glare": 0.35,
-          "Haze": 1.6
-        }
-      },
-      "Raios de Sol": {
-        "$className": "SunRaysEffect",
-        "$properties": {
-          "Intensity": 0.06,
-          "Spread": 0.6
+          "Density": 0.28,
+          "Offset": 0.2,
+          "Color": [
+            0.2,
+            0.24,
+            0.34
+          ],
+          "Decay": [
+            0.12,
+            0.14,
+            0.2
+          ],
+          "Glare": 0,
+          "Haze": 1.2
         }
       }
     }

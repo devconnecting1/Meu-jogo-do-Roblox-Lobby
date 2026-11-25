@@ -1,4 +1,4 @@
-// Regras do terreno do Vale: Lobby no centro, áreas de construção, 30 lotes ligados por estradas,
+// Regras do Vale: Lobby no centro, 8 lojas grandes ligadas por estradas,
 // penhascos, terraços e lagoas, tudo plano onde se constrói.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -7,7 +7,6 @@ import {
   DIM,
   T,
   PLAZA,
-  PLOTS,
   PADS,
   PONDS,
   createWorld,
@@ -19,9 +18,7 @@ import {
   inPlan,
 } from '../src/map.js';
 import { SHOPS } from '../src/props/lojas.js';
-import { KEEPS } from '../src/props/castelos.js';
 import { SKIPPED } from '../src/props/oficina.js';
-import { C } from '../src/palette.js';
 
 const { parts, landmarks } = buildMap();
 const world = createWorld(SEED);
@@ -37,25 +34,6 @@ function flatPad(p, kinds) {
   }
   return null;
 }
-
-test('30 lotes (20 jogadores + 10 bots) com nomes únicos, planos, espaçados e nos 4 quadrantes', () => {
-  assert.equal(PLOTS.length, DIM.plots);
-  assert.equal(new Set(PLOTS.map((p) => p.name)).size, DIM.plots);
-  assert.equal(PLOTS.filter((p) => p.owner === 'jogador').length, DIM.players);
-  assert.equal(PLOTS.filter((p) => p.owner === 'bot').length, DIM.bots);
-  for (const p of PLOTS) {
-    const bad = flatPad(p, ['lote']);
-    assert.equal(bad, null, `${p.name}: ${bad}`);
-  }
-  for (let a = 0; a < PLOTS.length; a++) {
-    for (let b = a + 1; b < PLOTS.length; b++) {
-      const d = Math.hypot(PLOTS[a].x - PLOTS[b].x, PLOTS[a].z - PLOTS[b].z);
-      assert.ok(d >= DIM.minPlotSpacing, `${PLOTS[a].name} e ${PLOTS[b].name} a ${d.toFixed(1)} studs`);
-    }
-  }
-  const quad = new Set(PLOTS.map((p) => `${p.x >= 0 ? 'L' : 'O'}${p.z >= 0 ? 'S' : 'N'}`)); // x = 0 conta no leste
-  assert.equal(quad.size, 4, `lotes só em ${quad.size} quadrantes`);
-});
 
 test('Lobby no centro: praça de pedra com faixas, estrado e spawn sobre a praça', () => {
   assert.equal(surfaceAt(0, 30) === 'pedra' || surfaceAt(0, 30) === 'pedraEscura', true, 'praça de pedra no centro');
@@ -119,23 +97,22 @@ test('8 áreas de construção em volta da praça, planas e ligadas ao Lobby', (
   assert.ok(world.padsConnected.every(Boolean), 'área sem estrada até o Lobby');
 });
 
-test('cada área segue a planta do seu prédio: formatos variados, não só quadrados', () => {
+test('cada loja segue a planta do seu prédio: formatos e tamanhos diferentes, sem igreja nem castelo', () => {
   const shops = new Set(PADS.map((p) => p.plan));
   assert.equal(shops.size, PADS.length, 'cada área em volta da praça é de um prédio diferente');
-  for (const p of PADS) assert.equal(PLANS[p.plan].group, 'loja', `${p.name}: planta de castelo na praça`);
-  const castles = new Set(PLOTS.map((p) => p.plan));
-  assert.ok(castles.size >= 6, `só ${castles.size} plantas de castelo diferentes`);
-  for (const p of PLOTS) assert.equal(PLANS[p.plan].group, 'castelo', `${p.name}: planta de loja num lote`);
-  // formatos de verdade: áreas (número de células) e contornos diferentes
-  const sizes = new Set([...PADS, ...PLOTS].map((p) => world.footprint(p).length));
-  assert.ok(sizes.size >= 10, `só ${sizes.size} tamanhos de planta`);
-  const square = [...PADS, ...PLOTS].filter((p) => world.footprint(p).length === (p.size / DIM.cell) ** 2).length;
-  assert.ok(square <= 3, `${square} plantas são quadrados cheios`);
+  for (const p of PADS) assert.equal(PLANS[p.plan].group, 'loja', `${p.name}: só lojas no mapa`);
+  assert.ok(!Object.keys(PLANS).includes('capela'), 'sem igreja (pedido do dono)');
+  assert.ok(Object.values(PLANS).every((q) => q.group === 'loja'), 'sem plantas de castelo');
+  // tamanho real: cada loja ocupa a área inteira de 48×48, com formato e área próprios
+  const sizes = new Set(PADS.map((p) => world.footprint(p).length));
+  assert.equal(sizes.size, PADS.length, `lojas com áreas repetidas (${[...sizes].join(', ')} células)`);
+  for (const p of PADS) assert.ok(world.footprint(p).length >= 60, `${p.name}: loja pequena demais`);
+  const square = PADS.filter((p) => world.footprint(p).length === (p.size / DIM.cell) ** 2).length;
+  assert.equal(square, 0, `${square} plantas são quadrados cheios`);
 });
 
-test('estradas de terra ligam o Lobby a todos os lotes (sem pular degrau nem água)', () => {
-  const lost = PLOTS.filter((_, k) => !world.plotsConnected[k]).map((p) => p.name);
-  assert.deepEqual(lost, [], `lotes sem estrada até o Lobby: ${lost.join(', ')}`);
+test('estradas de terra ligam o Lobby a todas as lojas (sem pular degrau nem água)', () => {
+  assert.ok(world.padsConnected.every(Boolean), 'loja sem estrada até o Lobby');
   assert.ok(count((p) => p.name === 'Terra da Estrada') >= 100, 'poucas estradas');
   assert.ok(count((p) => p.name === 'Terra Batida') >= 20, 'estrada sem as manchas de terra batida');
 });
@@ -164,7 +141,7 @@ test('borda do vale variada: parte penhasco, parte planalto sobre o mar', () => 
 
 const under = (root) => parts.filter((p) => p.model === root || p.model.startsWith(`${root}/`));
 
-/** Toda peça da construção fica na planta da área/lote (sinais e bandeiras podem sair até 1 stud). */
+/** Toda peça da loja fica na planta da área (placas e lanternas da fachada saem no máximo 2 studs). */
 function outsidePlan(p, list) {
   return list
     .filter((q) => {
@@ -179,7 +156,7 @@ function outsidePlan(p, list) {
         [x0, z1],
         [x1, z0],
         [x1, z1],
-      ].some(([x, z]) => !inPlan(p, x, z, 1.05));
+      ].some(([x, z]) => !inPlan(p, x, z, 2.1));
     })
     .map((q) => `${q.model}/${q.name}`);
 }
@@ -192,34 +169,26 @@ test('construções com interior: todo móvel coube no lugar (nada pulado)', () 
   );
 });
 
-test('8 prédios do Lobby: paredes, porta, janelas, telhado, uma luz e interior mobiliado, dentro da planta', () => {
+test('8 lojas grandes: paredes, porta, janelas, telhado, luz por dentro e na fachada e interior mobiliado', () => {
   for (const p of PADS) {
     const root = `Construções/${SHOPS[p.plan].model}`;
     const ps = under(root);
     const names = new Set(ps.map((q) => q.name));
-    for (const n of ['Piso', 'Parede', 'Base da Parede', 'Janela', 'Telhado'])
+    for (const n of ['Piso', 'Parede', 'Base da Parede', 'Janela', 'Telhado', 'Lanterna da Fachada'])
       assert.ok(names.has(n), `${root} sem ${n}`);
-    assert.equal(ps.filter((q) => q.light).length, 1, `${root}: precisa de exatamente 1 luz`);
+    const lights = ps.filter((q) => q.light);
+    assert.equal(lights.length, 3, `${root}: 1 luz por dentro e 2 na fachada (tem ${lights.length})`);
     const inside = ps.filter((q) => q.model.includes('/Interior/')).length;
     assert.ok(inside >= 20, `${root}: interior com só ${inside} peças`);
     assert.deepEqual(outsidePlan(p, ps), [], `${root}: peças fora da planta`);
+    // tamanho real: pé-direito de pelo menos 12 studs (o boneco R6 tem 5)
+    const wallTop = Math.max(...ps.filter((q) => q.name === 'Parede').map((q) => q.position[1] + q.size[1] / 2));
+    assert.ok(wallTop - DIM.land >= 12, `${root}: paredes baixas (${wallTop - DIM.land})`);
   }
 });
 
-test('30 castelos: muralha com ameias e portão, pátio, torre de menagem com trono, cores do dono e uma luz', () => {
-  for (const p of PLOTS) {
-    const root = `Construções/${p.name}`;
-    const ps = under(root);
-    const names = new Set(ps.map((q) => q.name));
-    for (const n of ['Parede', 'Ameia', 'Pátio', 'Piso', 'Telhado', 'Janela', 'Assento do Trono', 'Bandeira'])
-      assert.ok(names.has(n), `${root} (${p.plan}) sem ${n}`);
-    assert.equal(ps.filter((q) => q.light).length, 1, `${root}: precisa de exatamente 1 luz`);
-    const inside = ps.filter((q) => q.model.startsWith(`${root}/Torre de Menagem/Interior/`)).length;
-    assert.ok(inside >= 15, `${root}: salão com só ${inside} peças`);
-    const cloth = p.owner === 'bot' ? C.pxClothRed : C.pxClothBlue;
-    const flag = ps.find((q) => q.name === 'Bandeira');
-    assert.deepEqual(flag.color, cloth, `${root}: bandeira fora da cor do dono (${p.owner})`);
-    assert.ok(KEEPS[p.plan], `${root}: planta sem torre de menagem`);
-    assert.deepEqual(outsidePlan(p, ps), [], `${root}: peças fora da planta`);
-  }
+test('noite no Lobby: postes de luz acesos na praça', () => {
+  const lamps = parts.filter((q) => q.name === 'Lanterna do Poste');
+  assert.ok(lamps.length >= 8, `só ${lamps.length} postes de luz na praça`);
+  assert.ok(lamps.every((q) => q.light && q.canCollide === false), 'poste sem luz ou lanterna com colisão');
 });

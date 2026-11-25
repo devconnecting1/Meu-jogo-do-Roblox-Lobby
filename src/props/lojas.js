@@ -1,13 +1,16 @@
-// Prédios do Lobby, cada um na planta da sua área (PLANS em src/map.js), com interior mobiliado:
-// Taverna, Ferraria, Mercado Coberto, Capela, Torre do Mago, Estábulo, Banco e Salão do Clã (a
-// planta "Salão da Guilda": nas peças o nome não pode ter a sílaba proibida do teste de estilo).
+// Lojas do Vale, cada uma na planta da sua área (PLANS em src/map.js), em tamanho real e com
+// interior mobiliado: Taverna, Ferraria, Mercado Coberto, Padaria, Torre do Mago (loja de magia),
+// Estábulo, Banco e Salão do Clã (a planta "Salão da Guilda": nas peças o nome não pode ter a sílaba
+// proibida do teste de estilo). Só lojas: sem castelos nem igreja (pedido do dono).
 //
-// Cada prédio: piso, paredes em camadas (base de pedra, janelas acesas, porta de 6 studs com verga),
-// telhado em degraus, uma única luz (lampião, brasa da forja ou bola de cristal) e móveis que fazem
-// sentido para o ofício. A zona de passagem da porta fica livre (sem nada com colisão).
+// Desenho em escala de desenho (planta em 24×24, porta de 4 × 6) e montagem em tamanho real pelo
+// referencial (DIM.buildScale em u e v, DIM.buildScaleY na altura): a loja sai com 48 × 48 studs,
+// porta de 8 × 9 e pé-direito de 12 ou mais. Cores neutras (reboco, creme, pedra, madeira, ardósia).
+// Luz: o lampião (ou a brasa, o forno, a bola de cristal) por dentro e duas lanternas acesas na
+// fachada, dos lados da porta. A zona de passagem da porta fica livre (sem nada com colisão).
 
 import { C } from '../palette.js';
-import { PLANS } from '../map.js';
+import { PLANS, DIM } from '../map.js';
 import { makeFrame } from './frame.js';
 import { planMask, buildShell, makeKit, SKIPPED } from './oficina.js';
 import {
@@ -39,7 +42,7 @@ export const SHOPS = {
     door: [6, 0],
     H: 8,
     wall: C.pxPlaster,
-    roof: C.pxRoofRed,
+    roof: C.pxRoofSlate,
     floor: C.pxWood,
     furnish(add, H) {
       add('Balcão', balcao(-7.7, -8.3, 1.7, -7.3));
@@ -53,7 +56,7 @@ export const SHOPS = {
         add('Banco', banco(u0, -3.4, u0 + 3.2, -2.8));
       }
       add('Lareira', lareira(-11, 4.1, -10.1, 7.9, 3.1, '+u'));
-      add('Tapete', tapete(-9.7, 4.6, -8.4, 7.4, C.pxClothRed));
+      add('Tapete', tapete(-9.7, 4.6, -8.4, 7.4, C.pxCream));
       for (const v0 of [2.3, 8.3]) {
         add('Mesa', mesa(-7.6, v0, -4.4, v0 + 1.6));
         add('Banco', banco(-7.6, v0 - 0.9, -4.4, v0 - 0.3));
@@ -74,7 +77,7 @@ export const SHOPS = {
     door: [-4, 8],
     H: 8,
     wall: C.pxStoneWall,
-    roof: C.pxRoofSlate,
+    roof: C.pxStoneWallDark,
     floor: C.pxStoneDark,
     furnish(add) {
       add('Forja', [
@@ -122,13 +125,13 @@ export const SHOPS = {
     door: [0, 12],
     H: 8,
     wall: C.pxWoodLight,
-    roof: C.pxThatch,
+    roof: C.pxWoodDark,
     floor: C.pxStoneWall,
     furnish(add, H) {
       const stalls = [
-        [-10.6, C.pxClothRed, [C.pxClothRed, C.pxHay, C.pxMoss]],
-        [-2.6, C.pxClothBlue, [C.pxCream, C.pxBook, C.pxWindowLit]],
-        [5.4, C.pxCream, [C.pxMoss, C.pxClothRed, C.pxHay]],
+        [-10.6, C.pxCream, [C.pxClothRed, C.pxHay, C.pxMoss]],
+        [-2.6, C.pxWoodLight, [C.pxCream, C.pxBook, C.pxWindowLit]],
+        [5.4, C.pxStoneWall, [C.pxMoss, C.pxClothRed, C.pxHay]],
       ];
       for (const [u0, cloth, goods] of stalls) {
         const u1 = u0 + 5.2;
@@ -163,42 +166,48 @@ export const SHOPS = {
     },
   },
 
-  capela: {
-    model: 'Capela',
-    door: [0, 12],
-    H: 9,
+  padaria: {
+    model: 'Padaria',
+    door: [0, 8],
+    H: 8,
     wall: C.pxCream,
     roof: C.pxRoofSlate,
     floor: C.pxStoneWall,
-    windows: { y0: 3.0, y1: 6.2, period: 4, phase: 1 },
-    furnish(add, H) {
-      for (const v of [4.6, 2.6, 0.6, -1.4]) {
-        for (const [u0, u1] of [
-          [-2.9, -0.9],
-          [0.9, 2.9],
-        ])
-          add('Banco da Capela', [
-            ['Assento', [u0, 0.5, v], [u1, 0.9, v + 0.6], C.pxWood],
-            ['Encosto', [u0, 0, v + 0.6], [u1, 1.9, v + 0.8], C.pxWood],
-          ]);
-      }
-      add('Tapete', tapete(-0.7, -6.6, 0.7, 10.9, C.pxClothRed));
-      add('Altar', [
-        ['Altar', [-1.6, 0, -10.2], [1.6, 1.3, -9.0], C.pxCream],
-        ['Toalha do Altar', [-1.4, 1.3, -10.0], [1.4, 1.4, -9.2], C.pxGold],
-        ['Vela', [-1.2, 1.4, -9.7], [-1.0, 2.0, -9.5], C.pxCream],
-        ['Vela', [1.0, 1.4, -9.7], [1.2, 2.0, -9.5], C.pxCream],
+    furnish(add) {
+      add('Forno', [
+        ['Forno', [-8.6, 0, -9], [-3.4, 3.2, -7.2], C.pxStoneWallDark],
+        [
+          'Fogo do Forno',
+          [-6.8, 0.6, -7.2],
+          [-5.2, 1.6, -6.95],
+          C.pxFire,
+          { material: 'Neon', canCollide: false, light: LIGHT_FIRE },
+        ],
       ]);
-      for (const u of [-9.2, 9.2])
-        add('Castiçal', [
-          ['Castiçal', [u - 0.2, 0, -6.4], [u + 0.2, 2.2, -6.0], C.pxGold],
-          ['Vela', [u - 0.1, 2.2, -6.3], [u + 0.1, 2.7, -6.1], C.pxCream],
-        ]);
-      add('Lampião', lampiao(0.3, -5.7, H));
+      const breads = [C.pxHay, C.pxWoodLight, C.pxCream];
+      add('Prateleira de Pães', estante(-9, -6.6, -8.3, -1.4, 3.4, '+u', breads));
+      add('Prateleira de Pães', estante(8.3, -6.6, 9, -1.4, 3.4, '-u', breads));
+      add('Balcão', [
+        ...balcao(-4.6, -2.6, 4.6, -1.8, 1.6),
+        ['Pão', [-3.9, 1.6, -2.4], [-2.9, 1.9, -2.0], C.pxHay],
+        ['Pão', [-0.5, 1.6, -2.4], [0.5, 1.9, -2.0], C.pxWoodLight],
+        ['Pão', [2.9, 1.6, -2.4], [3.9, 1.9, -2.0], C.pxHay],
+      ]);
+      add('Mesa de Sovar', [
+        ...mesa(3.4, -8.8, 8.2, -7.4),
+        ['Massa', [4.4, 1.5, -8.5], [5.8, 1.7, -7.7], C.pxCream],
+        ['Massa', [6.4, 1.5, -8.5], [7.6, 1.7, -7.7], C.pxCream],
+      ]);
+      add('Saco de Farinha', saco(6.8, -5.0));
+      add('Saco de Farinha', saco(6.8, -3.8));
+      add('Barril', barril(-6.8, 1.6));
+      add('Vitrine', [...mesa(2.6, 4.6, 4.4, 6.4), ['Bolo', [3.0, 1.5, 5.0], [4.0, 1.9, 6.0], C.pxCream]]);
+      add('Vitrine', [...mesa(-4.4, 4.6, -2.6, 6.4), ['Bolo', [-4.0, 1.5, 5.0], [-3.0, 1.9, 6.0], C.pxHay]]);
     },
     outside(f) {
-      f.span('Cruz', [-0.2, 6.4, 12], [0.2, 8.6, 12.15], C.pxGold);
-      f.span('Cruz', [-0.8, 7.6, 12], [0.8, 8.0, 12.15], C.pxGold);
+      f.span('Chaminé', [-7.7, 8.3, -8.6], [-6.3, 13, -7.4], C.pxStoneWallDark);
+      f.span('Placa', [-1.4, 6.3, 8], [1.4, 7.5, 8.2], C.pxWoodDark);
+      f.span('Pão da Placa', [-0.6, 6.6, 8.2], [0.6, 7.2, 8.3], C.pxHay);
     },
   },
 
@@ -207,15 +216,15 @@ export const SHOPS = {
     door: [0, 12],
     H: 13,
     wall: C.pxStoneWall,
-    roof: C.pxClothBlue,
+    roof: C.pxRoofSlate,
     roofStep: 1,
     roofRise: 1.1,
     floor: C.pxWoodDark,
     windows: { y0: 3.0, y1: 5.2, period: 5, phase: 2 },
     furnish(add) {
       add('Tapete Estrelado', [
-        ...tapete(-3.1, -1.1, 3.1, 1.1, C.pxClothBlue),
-        ...tapete(-1.1, -3.1, 1.1, 3.1, C.pxClothBlue),
+        ...tapete(-3.1, -1.1, 3.1, 1.1, C.pxStoneDark),
+        ...tapete(-1.1, -3.1, 1.1, 3.1, C.pxStoneDark),
       ]);
       add('Mesa do Mago', [
         ['Pedestal', [-0.5, 0.1, -0.5], [0.5, 1.0, 0.5], C.pxWoodDark],
@@ -259,7 +268,7 @@ export const SHOPS = {
       for (const side of [-1, 1]) {
         const [w0, w1] = side < 0 ? [-11, -6.6] : [6.6, 11];
         const wallU = side < 0 ? -11 : 11;
-        for (const v of [0.15, 4.15, 8.15])
+        for (const v of [0.15, 4.15])
           add('Divisória', [['Divisória', [w0, 0, v], [w1, 2.2, v + 0.3], C.pxWoodDark]]);
         for (const v of [0.45, 4.45]) {
           const [h0, h1] = side < 0 ? [wallU + 0.3, wallU + 1.7] : [wallU - 1.7, wallU - 0.3];
@@ -270,7 +279,6 @@ export const SHOPS = {
             ['Espelho do Cocho', [t0 + 0.1, 0.8, v + 2.2], [t1 - 0.1, 0.85, v + 3.2], C.pxWater, { canCollide: false }],
           ]);
         }
-        add('Feno da Baia', fardo(side < 0 ? -10.7 : 9.3, 9.0, side < 0 ? -9.3 : 10.7, 10.4));
       }
       add('Selas', [
         ['Cavalete de Selas', [-8.6, 0, -11], [-3.4, 1.6, -10.6], C.pxWoodDark],
@@ -329,7 +337,7 @@ export const SHOPS = {
         ]);
       add('Banco de Espera', banco(-6.9, 0.4, -6.3, 2.6));
       add('Banco de Espera', banco(6.3, 0.4, 6.9, 2.6));
-      add('Tapete', tapete(-1.2, -7.6, 1.2, 2.9, C.pxClothRed));
+      add('Tapete', tapete(-1.2, -7.6, 1.2, 2.9, C.pxStoneDark));
       add('Lampião', lampiao(0.3, -5.3, H));
     },
     outside(f) {
@@ -348,7 +356,7 @@ export const SHOPS = {
     door: [0, 12],
     H: 9,
     wall: C.pxWoodLight,
-    roof: C.pxRoofTeal,
+    roof: C.pxRoofSlate,
     floor: C.pxWood,
     furnish(add, H) {
       add('Mesa Redonda', mesa(-2.4, -3.6, 2.4, -0.4, 1.5));
@@ -361,7 +369,7 @@ export const SHOPS = {
         [1.1, 0.3],
       ])
         add('Banquinho', banquinho(u, v));
-      add('Tapete', tapete(-1.2, 1.6, 1.2, 10.9, C.pxClothBlue));
+      add('Tapete', tapete(-1.2, 1.6, 1.2, 10.9, C.pxStoneDark));
       const board = [
         ['Poste do Quadro', [-10.9, 0, -2.0], [-10.6, 3.0, -1.7], C.pxWoodDark],
         ['Poste do Quadro', [-10.9, 0, 1.7], [-10.6, 3.0, 2.0], C.pxWoodDark],
@@ -379,14 +387,14 @@ export const SHOPS = {
         ['Pedestal do Troféu', [-0.7, 0, -10.9], [0.7, 1.2, -9.5], C.pxStoneWall],
         ['Troféu', [-0.4, 1.2, -10.5], [0.4, 2.2, -9.9], C.pxGold],
       ]);
-      add('Estandarte', estandarte('v', -11, 1, -2.6, -1.6, 2.5, 6.0, C.pxClothRed));
-      add('Estandarte', estandarte('v', -11, 1, 1.6, 2.6, 2.5, 6.0, C.pxClothBlue));
+      add('Estandarte', estandarte('v', -11, 1, -2.6, -1.6, 2.5, 6.0, C.pxCream));
+      add('Estandarte', estandarte('v', -11, 1, 1.6, 2.6, 2.5, 6.0, C.pxCream));
       add('Cavalete', cavalete(10.7, -2.6, 11, 1.4, '-u'));
       add('Barril', barril(9.6, 2.2));
       add('Lampião', lampiao(0.3, -2.3, H));
     },
     outside(f) {
-      f.span('Escudo da Placa', [-1.0, 6.3, 12], [1.0, 7.9, 12.2], C.pxClothBlue);
+      f.span('Escudo da Placa', [-1.0, 6.3, 12], [1.0, 7.9, 12.2], C.pxWoodDark);
       f.span('Faixa do Escudo', [-0.2, 6.5, 12.2], [0.2, 7.7, 12.3], C.pxGold);
     },
   },
@@ -397,22 +405,25 @@ export const SHOP_DOORS = Object.fromEntries(
   Object.entries(SHOPS).map(([k, s]) => [k, { door: s.door, floorTop: s.floorTop ?? 0.4, model: s.model }]),
 );
 
-/** Monta o prédio da área `pad` (chão do vale em `floorY`). Devolve as zonas de passagem (mundo). */
+const SCALE = { s: DIM.buildScale, y: DIM.buildScaleY };
+const LIGHT_LANTERN = { type: 'Point', range: 22, brightness: 1.4, color: [255, 206, 140] };
+
+/** Monta a loja da área `pad` (chão do vale em `floorY`). Devolve as zonas de passagem (mundo). */
 export function buildShop(b, pad, floorY) {
   const s = SHOPS[pad.plan];
-  const f = makeFrame(b, `Construções/${s.model}`, pad, floorY);
-  const occ = planMask(s.parts ?? PLANS[pad.plan].parts, pad.size / 2);
+  const f = makeFrame(b, `Construções/${s.model}`, pad, floorY, [], SCALE);
+  const occ = planMask(s.parts ?? PLANS[pad.plan].parts, pad.size / 2 / DIM.buildScale);
   const floorTop = s.floorTop ?? 0.4;
   const shell = buildShell(f, occ, {
     door: s.door,
-    doorW: 6,
+    doorW: 4,
     doorH: s.doorH ?? 6,
     H: s.H,
     floorTop,
     floor: s.floor,
     base: [s.baseTop ?? 1.0, C.pxStoneWallDark],
     wall: s.wall,
-    windows: { y0: 2.4, y1: 4.6, period: 6, phase: 0, color: C.pxWindowLit, ...(s.windows ?? {}) },
+    windows: { y0: 2.4, y1: 4.6, period: 6, phase: 0, color: C.pxWindowLit, material: 'Neon', ...(s.windows ?? {}) },
     roof: { color: s.roof, step: s.roofStep ?? 2, rise: s.roofRise ?? 1.2, trim: C.pxWoodDark },
   });
   const zone = shell.zone;
@@ -422,5 +433,20 @@ export function buildShop(b, pad, floorY) {
   s.furnish((name, pieces) => kit.item(name, pieces), s.H - floorTop);
   SKIPPED.push(...kit.skipped);
   if (s.outside) s.outside(f);
+
+  // duas lanternas acesas na fachada, dos lados da porta (presas na parede por um suporte de ferro)
+  const { du, dv } = shell.door;
+  const out = -shell.door.s;
+  for (const side of [-1, 1]) {
+    const u = du + side * 2.7;
+    const [b0, b1] = out > 0 ? [dv, dv + 0.45] : [dv - 0.45, dv];
+    const [l0, l1] = out > 0 ? [dv + 0.2, dv + 0.65] : [dv - 0.65, dv - 0.2];
+    f.span('Suporte da Lanterna', [u - 0.1, 4.6, b0], [u + 0.1, 4.75, b1], C.pxIron, { canCollide: false });
+    f.span('Lanterna da Fachada', [u - 0.25, 3.9, l0], [u + 0.25, 4.6, l1], C.pxWindowLit, {
+      material: 'Neon',
+      canCollide: false,
+      light: LIGHT_LANTERN,
+    });
+  }
   return f.zones;
 }

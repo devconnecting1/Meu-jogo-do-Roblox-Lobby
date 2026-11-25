@@ -48,7 +48,7 @@ for (const v of views) {
   // espera dois quadros completos (o SwiftShader é lento) antes de capturar
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
   await page.waitForTimeout(800);
-  await page.screenshot({ path: join(outDir, `${v.id}.png`) });
+  await page.screenshot({ path: join(outDir, `${v.id}.png`), timeout: 150000 });
   console.log(`✔ ${v.id}.png — ${v.title}`);
 }
 writeFileSync(join(outDir, 'manifest.json'), JSON.stringify({ views, stats, manual }, null, 2));

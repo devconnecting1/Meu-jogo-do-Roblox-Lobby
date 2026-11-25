@@ -1,24 +1,22 @@
-// Terreno do Vale: mapa base em estilo voxel pixelado (blocos lisos, bordas "em escada" de 4 studs),
-// descrito como dados puros. O mesmo arquivo gera o lugar do Roblox e o visualizador.
+// O Vale: mapa base em estilo voxel pixelado (blocos lisos, bordas "em escada" de 4 studs), descrito
+// como dados puros. O mesmo arquivo gera o lugar do Roblox e o visualizador.
 //
-// O que existe (terreno vazio, pronto para receber construções):
+// O que existe (mapa fixo, sempre igual):
 //   * um vale plano no meio de um planalto, cercado em boa parte por penhascos de rocha em blocos
 //     (degraus de 6 studs, com musgo no topo); no resto, o planalto termina numa borda sobre o mar;
-//   * o Lobby: praça central de pedra clara com faixas escuras em padrão pixelado e um estrado no
-//     meio (lugar da futura construção central), com o spawn;
-//   * 8 áreas de construção em volta da praça (lojas futuras) e 30 lotes de castelo pelo vale;
-//   * estradas de terra com borda serrilhada ligando a praça a todas as áreas e lotes;
-//   * terraços de grama (degraus de 2 studs) e lagoas, longe das áreas de construção.
-// Tudo sai da semente: cada servidor tem um vale com outro formato, outros lotes e outras estradas.
+//   * o Lobby: praça central de pedra clara com faixas escuras em padrão pixelado, estrado com a
+//     estátua de Luvitlua, postes de luz e o spawn;
+//   * 8 lojas grandes em volta da praça, em tamanho real (planta em escala DIM.buildScale), com
+//     interior mobiliado e iluminação (só lojas: sem castelos nem igreja);
+//   * estradas de terra com borda serrilhada ligando a praça a todas as lojas;
+//   * terraços de grama (degraus de 2 studs) e lagoas, longe das lojas.
 //
-// Regras (testadas em tests/): nada flutua, nada de z-fighting, áreas de construção e estradas
-// planas e livres, todos os lotes ligados à praça, estilo liso (SmoothPlastic, sem studs) e cores
-// só da paleta.
+// Regras (testadas em tests/): nada flutua, nada de z-fighting, áreas planas e livres, todas as
+// lojas ligadas à praça, estilo liso (SmoothPlastic, sem studs) e cores só da paleta.
 
 import { makeBuilder } from './builder.js';
 import { C } from './palette.js';
 import { buildShop } from './props/lojas.js';
-import { buildCastle } from './props/castelos.js';
 import { buildStatue } from './props/estatua.js';
 
 export const DIM = Object.freeze({
@@ -34,17 +32,13 @@ export const DIM = Object.freeze({
   valleyMax: 330,
   cliffBand: 52, // largura da faixa de penhascos fora do vale
   plazaR: 46, // Lobby: praça de pedra
-  daisR: 10, // estrado no centro da praça (futura construção central)
+  daisR: 10, // estrado no centro da praça (estátua de Luvitlua)
   ringRoad: [52, 62], // anel de terra em volta da praça
-  pads: 8, // áreas de construção em volta da praça
-  padSize: 24, // múltiplo de 8: o piso cobre células inteiras da grade de 4
-  padRing: 88,
-  plots: 30, // lotes de castelo (20 jogadores + 10 bots)
-  players: 20,
-  bots: 10,
-  plotSize: 32, // múltiplo de 8: o piso cobre células inteiras da grade de 4
-  plotSpacing: 64, // distância desejada entre centros de lotes
-  minPlotSpacing: 56, // nunca mais perto que isso
+  pads: 8, // lojas em volta da praça
+  padSize: 48, // múltiplo de 8: o piso cobre células inteiras da grade de 4
+  padRing: 124, // centro das lojas (longe do anel de terra da praça)
+  buildScale: 2, // as plantas de PLANS são desenhadas em 24×24 e montadas no dobro (tamanho real)
+  buildScaleY: 1.5, // alturas das construções: porta de 9, pé-direito de 12 ou mais
   road: 10, // largura das estradas
   maxParts: 32000,
 });
@@ -121,14 +115,13 @@ const PATH_SURF = new Set([
 const KEEP_SURF = new Set(['pedra', 'pedraEscura', 'lote', 'loteBorda', 'area', 'areaBorda']);
 
 /**
- * Plantas das construções: cada área de construção tem o formato do prédio que vai receber, como
- * as construções reais (nada de quadrado igual para tudo). Coordenadas locais em studs, com a frente
- * (porta, alpendre, portão) para +z; partes são retângulos [x0, z0, x1, z1] e círculos { c: [x, z], r };
- * `door` é o ponto [u, v] da borda da planta onde fica a porta principal (a estrada chega ali).
- * Lojas em volta do Lobby cabem em 24×24; castelos cabem em 32×32.
+ * Plantas das lojas: cada área tem o formato do prédio que vai receber, como as construções reais
+ * (nada de quadrado igual para tudo). Coordenadas locais de desenho (cabem em 24×24, montadas em
+ * escala DIM.buildScale), com a frente (porta, alpendre, escadaria) para +z; partes são retângulos
+ * [x0, z0, x1, z1] e círculos { c: [x, z], r }; `door` é o ponto [u, v] da borda da planta onde fica a
+ * porta principal (a estrada chega ali). Só lojas: sem castelos nem igreja (pedido do dono).
  */
 export const PLANS = Object.freeze({
-  // prédios do Lobby (lojas e serviços); bordas em múltiplos de 4 para cobrir células inteiras
   taverna: {
     name: 'Taverna',
     group: 'loja',
@@ -156,26 +149,26 @@ export const PLANS = Object.freeze({
       [-4, 4, 4, 12],
     ],
   }, // salão + alpendre
-  capela: {
-    name: 'Capela',
+  padaria: {
+    name: 'Padaria',
     group: 'loja',
-    door: [0, 12],
+    door: [0, 8],
     parts: [
-      [-4, -12, 4, 12],
-      [-12, -8, 12, -4],
+      [-10, -10, 10, 4],
+      [-6, 4, 6, 8],
     ],
-  }, // nave + transepto
-  torreMago: { name: 'Torre do Mago', group: 'loja', door: [0, 12], parts: [{ c: [0, 0], r: 12 }] }, // torre redonda
+  }, // forno + balcão com vitrine
+  torreMago: { name: 'Torre do Mago', group: 'loja', door: [0, 12], parts: [{ c: [0, 0], r: 12 }] }, // loja de magia redonda
   estabulo: {
     name: 'Estábulo',
     group: 'loja',
     door: [0, -4],
     parts: [
       [-12, -12, 12, -4],
-      [-12, -4, -4, 12],
-      [4, -4, 12, 12],
+      [-12, -4, -4, 10],
+      [4, -4, 12, 10],
     ],
-  }, // U
+  }, // U em volta do picadeiro
   banco: {
     name: 'Banco',
     group: 'loja',
@@ -184,7 +177,7 @@ export const PLANS = Object.freeze({
       [-8, -12, 8, 4],
       [-4, 4, 4, 8],
     ],
-  }, // cofre + escadaria
+  }, // salão + escadaria
   guilda: {
     name: 'Salão da Guilda',
     group: 'loja',
@@ -194,64 +187,9 @@ export const PLANS = Object.freeze({
       [-8, -8, 8, 8],
       [-4, -12, 4, 12],
     ],
-  },
-  // castelos dos jogadores e dos bots
-  fortaleza: {
-    name: 'Fortaleza com Torres',
-    group: 'castelo',
-    door: [0, 12],
-    parts: [[-8, -8, 8, 8], { c: [-8, -8], r: 8 }, { c: [8, -8], r: 8 }, { c: [-8, 8], r: 8 }, { c: [8, 8], r: 8 }],
-  },
-  casteloL: {
-    name: 'Castelo em L',
-    group: 'castelo',
-    door: [8, 0],
-    parts: [
-      [-16, -16, 16, 0],
-      [-16, 0, 0, 16],
-    ],
-  },
-  casteloRedondo: { name: 'Castelo Redondo', group: 'castelo', door: [0, 16], parts: [{ c: [0, 0], r: 16 }] },
-  castelaoPatio: {
-    name: 'Castelo com Pátio',
-    group: 'castelo',
-    door: [0, 16],
-    parts: [
-      [-16, -12, 16, 8],
-      [-4, 8, 4, 16],
-    ],
-  },
-  cidadela: {
-    name: 'Cidadela em Cruz',
-    group: 'castelo',
-    door: [0, 16],
-    parts: [
-      [-16, -8, 16, 8],
-      [-4, -16, 4, 16],
-    ],
-  },
-  casteloU: {
-    name: 'Castelo em U',
-    group: 'castelo',
-    door: [0, -4],
-    parts: [
-      [-16, -16, 16, -4],
-      [-16, -4, -4, 16],
-      [4, -4, 16, 16],
-    ],
-  },
-  forteT: {
-    name: 'Forte em T',
-    group: 'castelo',
-    door: [0, 16],
-    parts: [
-      [-16, -16, 16, -4],
-      [-4, -4, 4, 16],
-    ],
-  },
+  }, // octógono
 });
 const SHOP_PLANS = Object.keys(PLANS).filter((k) => PLANS[k].group === 'loja');
-const CASTLE_PLANS = Object.keys(PLANS).filter((k) => PLANS[k].group === 'castelo');
 
 /** Gira (x, z) em passos de 90° (k = 0..3): a frente +z vai para +z, −x, −z e +x. */
 const rot90 = (x, z, k) =>
@@ -264,7 +202,10 @@ const rot90 = (x, z, k) =>
 
 /** O ponto (x, z) do mundo está na planta da construção p (com folga `m` em volta)? */
 export function inPlan(p, x, z, m = 0) {
-  const [lx, lz] = rot90(x - p.x, z - p.z, 4 - p.rot);
+  const S = DIM.buildScale;
+  const [wx, wz] = rot90(x - p.x, z - p.z, 4 - p.rot);
+  const [lx, lz] = [wx / S, wz / S];
+  m /= S;
   return PLANS[p.plan].parts.some((q) =>
     Array.isArray(q)
       ? lx > q[0] - m && lx < q[2] + m && lz > q[1] - m && lz < q[3] + m
@@ -278,22 +219,23 @@ export function planRects(p) {
     const [x0, z0, x1, z1] = Array.isArray(q)
       ? q
       : [q.c[0] - q.r * 0.7, q.c[1] - q.r * 0.7, q.c[0] + q.r * 0.7, q.c[1] + q.r * 0.7];
-    const [ax, az] = rot90(x0, z0, p.rot);
-    const [bx, bz] = rot90(x1, z1, p.rot);
+    const S = DIM.buildScale;
+    const [ax, az] = rot90(x0 * S, z0 * S, p.rot);
+    const [bx, bz] = rot90(x1 * S, z1 * S, p.rot);
     return [p.x + Math.min(ax, bx), p.z + Math.min(az, bz), p.x + Math.max(ax, bx), p.z + Math.max(az, bz)];
   });
 }
 
-/** Ponto local (u, v) da planta da construção p no mundo (u = lado, v = frente/fundo). */
+/** Ponto local (u, v) de desenho da planta da construção p no mundo (u = lado, v = frente/fundo). */
 export function planPoint(p, u, v) {
-  const [dx, dz] = rot90(u, v, p.rot);
+  const [dx, dz] = rot90(u * DIM.buildScale, v * DIM.buildScale, p.rot);
   return [p.x + dx, p.z + dz];
 }
 
 /** Ponto do mundo logo na frente da porta principal (1 célula para fora da planta): a estrada chega ali. */
 export function doorPoint(p) {
   const [u, v] = PLANS[p.plan].door;
-  const [dx, dz] = rot90(u, v + 2, p.rot);
+  const [dx, dz] = rot90(u * DIM.buildScale, v * DIM.buildScale + 2, p.rot);
   return [p.x + dx, p.z + dz];
 }
 
@@ -396,7 +338,7 @@ export function createWorld(seed = SEED) {
   const wantPonds = 1 + (seed % 2);
   for (let attempt = 0; attempt < 400 && PONDS.length < wantPonds; attempt++) {
     const a = rand() * Math.PI * 2;
-    const d = 150 + rand() * 90; // longe das áreas de construção em volta da praça
+    const d = 205 + rand() * 45; // longe das lojas em volta da praça
     const x = Math.round(Math.cos(a) * d);
     const z = Math.round(Math.sin(a) * d);
     const r = 16 + Math.round(rand() * 12);
@@ -423,39 +365,8 @@ export function createWorld(seed = SEED) {
     PADS.push(Object.freeze({ name, x, z, size: DIM.padSize, plan, rot: faceCenter(x, z) }));
   }
 
-  // --- Lotes de castelo pelo vale ---
-  const plotFits = (x, z, half) =>
-    Math.hypot(x, z) > DIM.padRing + DIM.padSize + half + 6 &&
-    !PONDS.some((p) => Math.hypot(p.x - x, p.z - z) < p.r + half + 18) &&
-    allGround(x - half - 8, x + half + 8, z - half - 8, z + half + 8);
+  // sem lotes de castelo (pedido do dono): o vale só tem as lojas em volta da praça
   const PLOTS = [];
-  {
-    const half = DIM.plotSize / 2;
-    // plantas de castelo em rodízio (ordem sorteada): todo vale tem os 7 tipos, misturados
-    const castleOrder = [...CASTLE_PLANS];
-    for (let k = castleOrder.length - 1; k > 0; k--) {
-      const r = Math.floor(rand() * (k + 1));
-      [castleOrder[k], castleOrder[r]] = [castleOrder[r], castleOrder[k]];
-    }
-    let spacing = DIM.plotSpacing;
-    for (let attempt = 0; attempt < 60000 && PLOTS.length < DIM.plots; attempt++) {
-      if (attempt > 0 && attempt % 10000 === 0) spacing = Math.max(DIM.minPlotSpacing, spacing - 4);
-      const x = Math.round(((rand() * 2 - 1) * DIM.valleyMax) / DIM.cell) * DIM.cell;
-      const z = Math.round(((rand() * 2 - 1) * DIM.valleyMax) / DIM.cell) * DIM.cell;
-      if (!plotFits(x, z, half)) continue;
-      if (PLOTS.some((p) => Math.hypot(p.x - x, p.z - z) < spacing)) continue;
-      const plan = castleOrder[PLOTS.length % castleOrder.length];
-      PLOTS.push({ x, z, size: DIM.plotSize, plan, rot: faceCenter(x, z) });
-    }
-    // numera do centro para fora: os 20 primeiros são de jogadores, o resto de bots
-    PLOTS.sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.z) || a.x - b.x || a.z - b.z);
-    PLOTS.forEach((p, k) => {
-      p.name = `Lote ${String(k + 1).padStart(2, '0')}`;
-      p.owner = k < DIM.players ? 'jogador' : 'bot';
-      p.planName = PLANS[p.plan].name;
-      Object.freeze(p);
-    });
-  }
 
   // --- Pinta a grade: praça, anel, áreas, lotes e lagoas ---
   const paint = (x0, x1, z0, z1, fn) => {
@@ -762,7 +673,6 @@ export function createWorld(seed = SEED) {
       const scratch = makeBuilder();
       cachedZones = [
         ...PADS.flatMap((p) => buildShop(scratch, p, land)),
-        ...PLOTS.flatMap((p) => buildCastle(scratch, p, land)),
       ];
     }
     return cachedZones;
@@ -871,7 +781,21 @@ export function createWorld(seed = SEED) {
     buildStatue(b, 0, land + 1, 0);
     // construções com interior: os 8 prédios do Lobby e os 30 castelos, cada um na sua planta
     for (const p of PADS) buildShop(b, p, land);
-    for (const p of PLOTS) buildCastle(b, p, land);
+    // postes de luz na praça (a noite do Lobby), entre as saídas e longe do caminho do spawn
+    for (let k = 0; k < 8; k++) {
+      const a = ((k + 0.5) * Math.PI) / 4;
+      const x = Math.round(Math.cos(a) * 40) + 0.3;
+      const z = Math.round(Math.sin(a) * 40) + 0.3;
+      const M = 'Lobby/Postes de Luz';
+      b.span(M, 'Base do Poste', [x - 0.7, land, z - 0.7], [x + 0.7, land + 0.8, z + 0.7], C.pxStoneWallDark);
+      b.span(M, 'Poste', [x - 0.25, land + 0.8, z - 0.25], [x + 0.25, land + 9, z + 0.25], C.pxIron);
+      b.span(M, 'Lanterna do Poste', [x - 0.6, land + 9, z - 0.6], [x + 0.6, land + 10.2, z + 0.6], C.pxWindowLit, {
+        material: 'Neon',
+        canCollide: false,
+        light: { type: 'Point', range: 30, brightness: 1.6, color: [255, 206, 140] },
+      });
+      b.span(M, 'Chapéu do Poste', [x - 0.8, land + 10.2, z - 0.8], [x + 0.8, land + 10.6, z + 0.8], C.pxIron);
+    }
 
     let terraces = 0;
     for (let j = 0; j < N; j++)

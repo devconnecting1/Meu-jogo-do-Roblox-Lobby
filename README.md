@@ -1,6 +1,6 @@
 # Reino — Roblox
 
-Mapa base de um jogo de estratégia no estilo **Lords Mobile** no Roblox. **Fase atual: o Vale com as construções**: terreno em estilo voxel pixelado (blocos lisos, bordas em escada, cores quentes), com os 8 prédios do Lobby e os 30 castelos mobiliados por dentro. O GitHub Actions testa, compila, renderiza e publica tudo automaticamente.
+Mapa base de um jogo de estratégia no estilo **Lords Mobile** no Roblox. **Fase atual: o Vale das lojas, à noite**: terreno em estilo voxel pixelado (blocos lisos, bordas em escada), com 8 lojas grandes em tamanho real, neutras e iluminadas, em volta do Lobby. O GitHub Actions testa, compila, renderiza e publica tudo automaticamente.
 
 ![Visão geral](https://raw.githubusercontent.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/ci-previews/main/latest/overview.png)
 
@@ -14,15 +14,14 @@ Mapa base de um jogo de estratégia no estilo **Lords Mobile** no Roblox. **Fase
 ## O que tem
 
 - **Mapa fixo:** um planalto com o vale no meio, sempre igual em todo servidor (sem geração procedural nem sorteio de mapa).
-- **Lobby** no centro: praça de pedra clara com faixas escuras pixeladas, estrado no meio com a **estátua de Luvitlua** (o boneco R6 oficial do Roblox, sem roupa nem itens, sobre pedestal com o nome em letras de pixel) e o spawn.
-- **Áreas com a planta do prédio:** 8 áreas em volta da praça, cada uma com o formato da construção que vai receber (taverna em L, capela em cruz, torre redonda, estábulo em U, mercado com alpendre…), e **30 lotes de castelo** (20 jogadores e 10 bots) com 7 plantas diferentes (fortaleza com torres, castelo em L, redondo, com pátio, em cruz, em U e em T), todos planos, com borda de pedra e a frente virada para o Lobby.
-- **Estradas de terra** com borda serrilhada ligando a praça a todas as áreas e lotes; passagem de pedra sobre as lagoas.
+- **Lobby** no centro: praça de pedra clara com faixas escuras pixeladas, estrado no meio com a **estátua de Luvitlua** (o boneco R6 oficial do Roblox, sem roupa nem itens, sobre pedestal com o nome em letras de pixel), 8 postes de luz e o spawn.
+- **8 lojas grandes em tamanho real** (48 × 48 studs, porta de 8 × 9, pé-direito de 12 ou mais), cada uma com a sua planta: taverna em L, ferraria com forja, mercado com alpendre, padaria com forno e vitrine, torre do mago redonda, estábulo em U, banco com escadaria e salão da guilda em octógono. Sem castelos e sem igreja.
+- **Estradas de terra** com borda serrilhada ligando a praça a todas as lojas; passagem de pedra sobre as lagoas.
 - **Relevo:** penhascos de rocha em blocos com musgo no topo cercando boa parte do vale, borda aberta sobre o mar no resto, terraços de grama e lagoas.
 - **Estilo voxel liso:** SmoothPlastic sem studs, grama com manchas escuras em blocos, paleta quente (`src/palette.js`, grupo `px…`).
-- **Luz de fim de tarde** (Lighting Future, sombra nítida, neblina leve no horizonte).
+- **Sempre de noite** (Lighting Future, luar azulado, neblina escura), com a cidade acesa: lampião ou fogo dentro de cada loja, duas lanternas na fachada, janelas acesas e postes na praça.
 - **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado.
-- **Prédios do Lobby com interior** (`src/props/lojas.js`): Taverna (balcão, barris, mesas, lareira), Ferraria (forja acesa, bigorna, tina, armas), Mercado Coberto (barracas com toldo e mercadorias), Capela (bancos, altar, castiçais), Torre do Mago (estantes, bola de cristal, caldeirão, luneta), Estábulo (baias com feno e cocho, selas), Banco (escadaria com colunas, caixas com grade, cofre, ouro) e Salão do Clã (mesa redonda, quadro de missões, troféu). Cada um com piso, paredes de base de pedra, janelas acesas, porta de 6 studs, telhado em degraus e uma luz.
-- **Castelos com interior** (`src/props/castelos.js`): muralha com ameias e portão (a Fortaleza com 4 torres redondas), pátio de pedra com poço, boneco de treino, barris e caixotes, e a torre de menagem com trono, tapete, estandartes, baú, lareira e lanças. Telhado e bandeiras na cor do dono (ardósia e azul para jogadores, telha e vermelho para bots).
+- **Lojas com interior** (`src/props/lojas.js`), em cores neutras: Taverna (balcão, barris, mesas, lareira), Ferraria (forja acesa, bigorna, tina, armas), Mercado Coberto (barracas com toldo e mercadorias), Padaria (forno aceso, prateleiras de pães, balcão, mesa de sovar, vitrines), Torre do Mago (estantes, bola de cristal acesa, caldeirão, luneta), Estábulo (baias com feno e cocho, selas), Banco (escadaria com colunas, caixas com grade, cofre, ouro) e Salão do Clã (mesa redonda, quadro de missões, troféu).
 - **Base comum** (`src/props/oficina.js`, `src/props/moveis.js`): planta rasterizada em 1 stud, paredes em camadas, porta, janelas e telhado automáticos, e móveis que só entram se couberem no piso livre e fora da passagem.
 
 **Guardados:** o Reino clássico até a versão 21 (ilha com vilas, fazendas, biomas, montanhas, Lobby com lojas e fonte, catálogo de peças, Plastic com studs) está no branch [`arquivo/reino-classico`](https://github.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/tree/arquivo/reino-classico), e a prisão do projeto anterior no [`arquivo/prisao`](https://github.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/tree/arquivo/prisao).

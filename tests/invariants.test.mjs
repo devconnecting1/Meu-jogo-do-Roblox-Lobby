@@ -13,7 +13,7 @@ const report = (seed, layer, problems) =>
   `semente ${seed} (${layer}): ${problems.length} problema(s)\n${problems.join('\n')}`;
 
 for (const seed of LAYOUT_SEEDS) {
-  test(`semente ${seed}: layout válido (lotes, estradas, ilha, Lobby e água)`, () => {
+  test(`semente ${seed}: layout válido (lojas, estradas, vale, Lobby e água)`, () => {
     const w = createWorld(seed);
     assert.equal(w.seed, seed, `createWorld(${seed}) devolveu a semente ${w.seed}`);
     const problems = layoutProblems(w);

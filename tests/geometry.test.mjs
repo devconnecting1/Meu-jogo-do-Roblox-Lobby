@@ -20,7 +20,7 @@ test('sem z-fighting entre faces visíveis', () => {
   assert.equal(p.length, 0, report(p));
 });
 
-test('áreas de construção, lotes e spawn livres de colisão', () => {
+test('portas das lojas, caminho do spawn e spawn livres de colisão', () => {
   const p = findClearanceViolations(parts, clearanceZones());
   assert.equal(p.length, 0, report(p));
 });
@@ -51,7 +51,7 @@ test('planalto cercado de mar: a borda da grade é mar e o terreno não passa de
 test('alturas do terreno: chão no topo certo, água abaixo do chão e sem colisão', () => {
   const top = (p) => p.position[1] + p.size[1] / 2;
   const names = new Set(parts.map((p) => p.name));
-  for (const n of ['Chão', 'Grama', 'Grama Escura', 'Terra da Estrada', 'Pedra da Praça', 'Lote', 'Rocha', 'Musgo']) {
+  for (const n of ['Chão', 'Grama', 'Grama Escura', 'Terra da Estrada', 'Pedra da Praça', 'Rocha', 'Musgo']) {
     assert.ok(names.has(n), `falta "${n}" no terreno`);
   }
   for (const p of parts.filter((x) => ['Terra da Estrada', 'Terra Batida', 'Lote', 'Borda do Lote'].includes(x.name))) {

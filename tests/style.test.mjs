@@ -32,10 +32,11 @@ test('somente Part clássico (Block, Cylinder ou Ball) e SpawnLocation', () => {
   }
 });
 
-test('materiais: SmoothPlastic em tudo (blocos lisos); Neon só em lâmpada sem colisão e com luz', () => {
+test('materiais: SmoothPlastic em tudo (blocos lisos); Neon só em lâmpada sem colisão e com luz, ou janela acesa', () => {
   for (const p of parts) {
     assert.ok(['SmoothPlastic', 'Neon'].includes(p.material), `${p.name}: material ${p.material}`);
-    if (p.material === 'Neon') {
+    // janela acesa de noite: vidraça Neon presa na parede (a luz vem do lampião de dentro)
+    if (p.material === 'Neon' && p.name !== 'Janela') {
       assert.equal(p.canCollide, false, `${p.name}: Neon não deve colidir`);
       assert.ok(p.light, `${p.model}/${p.name}: Neon sem luz é lâmpada falsa`);
     }

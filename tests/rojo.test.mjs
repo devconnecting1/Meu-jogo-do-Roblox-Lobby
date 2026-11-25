@@ -54,12 +54,13 @@ test('orientação do CFrame é uma rotação válida (ortonormal)', () => {
   }
 });
 
-test('projeto: Lighting Future, dia claro e efeitos sutis', () => {
+test('projeto: Lighting Future, noite com a cidade iluminada e efeitos sutis', () => {
   const L = project.tree.Lighting;
   const P = L.$properties;
   assert.equal(P.Technology.Enum, 4, 'Technology = Future');
-  assert.ok(P.ClockTime >= 9 && P.ClockTime <= 16, `ClockTime ${P.ClockTime} não é dia`);
-  assert.ok(P.Brightness >= 1 && P.Brightness <= 3, `Brightness ${P.Brightness}`);
+  assert.ok(P.ClockTime >= 20 || P.ClockTime <= 4, `ClockTime ${P.ClockTime} não é noite (o mapa é sempre de noite)`);
+  assert.ok(P.Brightness >= 0.5 && P.Brightness <= 2, `Brightness ${P.Brightness}`);
+  assert.ok(P.OutdoorAmbient.every((v) => v >= 0.2), 'noite escura demais: o mapa precisa continuar visível');
   for (const k of ['Ambient', 'OutdoorAmbient']) {
     for (const v of P[k]) assert.ok(v <= 0.6, `${k} = ${P[k]} (máximo 0,6: nada estoura com gráficos baixos)`);
   }
@@ -69,8 +70,7 @@ test('projeto: Lighting Future, dia claro e efeitos sutis', () => {
   assert.equal(L['Brilho'].$className, 'BloomEffect');
   assert.ok(L['Brilho'].$properties.Intensity <= 0.3, 'bloom forte demais');
   assert.equal(L['Neblina Leve'].$className, 'Atmosphere');
-  assert.equal(L['Raios de Sol'].$className, 'SunRaysEffect');
-  assert.ok(L['Raios de Sol'].$properties.Intensity <= 0.1, 'raios de sol fortes demais');
+  assert.equal(L['Raios de Sol'], undefined, 'de noite não há raios de sol');
   const atm = L['Neblina Leve'].$properties;
   assert.ok(atm.Density >= 0.2 && atm.Density <= 0.4, 'neblina: o horizonte some suave, mas o mapa continua visível');
 });

@@ -1,5 +1,4 @@
-// Oficina das construções do Vale: o que os prédios do Lobby (lojas.js) e os castelos (castelos.js)
-// têm em comum.
+// Oficina das construções do Vale: a base comum das lojas (lojas.js).
 //
 // Tudo é desenhado numa grade local de 1 stud (a planta de `PLANS` rasterizada), no referencial da
 // construção (frame.js: u = lado, v = frente/fundo com a frente em +v, y = altura a partir do chão):
@@ -229,9 +228,10 @@ export function buildShell(f, occ, o) {
     slabs(f, base ? 'Base da Parede' : 'Parede', mask, y0, y1, base ? baseColor : o.wall);
   }
   if (win) {
-    const { y0, y1, color } = o.windows;
-    for (const [a, b, c] of win.across.rects()) f.span('Janela', [a, y0, b + 0.4], [c, y1, b + 0.6], color);
-    for (const [a, b, , d] of win.along.rects()) f.span('Janela', [a + 0.4, y0, b], [a + 0.6, y1, d], color);
+    const { y0, y1, color, material } = o.windows;
+    const wo = material ? { material } : {};
+    for (const [a, b, c] of win.across.rects()) f.span('Janela', [a, y0, b + 0.4], [c, y1, b + 0.6], color, wo);
+    for (const [a, b, , d] of win.along.rects()) f.span('Janela', [a + 0.4, y0, b], [a + 0.6, y1, d], color, wo);
   }
 
   // ameias (castelos): blocos alternados em cima do anel
