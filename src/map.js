@@ -43,7 +43,7 @@ export const DIM = Object.freeze({
   lobbyRun: 1.25, // profundidade de cada degrau das escadarias
   road: 8, // largura das estradas
   maxBridge: 50, // ponte mais longa (studs sobre a água)
-  maxParts: 24000, // orçamento de Parts por mapa (testado em todas as sementes)
+  maxParts: 32000, // orçamento de Parts por mapa (testado em todas as sementes)
 });
 
 export const SEED = 20260114;
@@ -1002,7 +1002,8 @@ export function createWorld(seed = SEED) {
     const placeBuilding = (model, kind, x, z, face, onTrail = false) => {
       const r = canPlace(kind, x, z, face, onTrail);
       if (!r) return null;
-      building(b, model, kind, x, land, z, face, rand);
+      // 0,25 fora da grade: nenhuma parede ou lona cai na junta das faixas do terreno (múltiplos de 8)
+      building(b, model, kind, x + 0.25, land, z + 0.25, face, rand);
       blocked.push(r);
       return r;
     };
@@ -1498,7 +1499,7 @@ export function createWorld(seed = SEED) {
         spots.push([x, z, kind]);
       }
     }
-    const MAX_TREES = 1000;
+    const MAX_TREES = 1300;
     const chosen =
       spots.length > MAX_TREES ? spots.filter((_, k) => (k * MAX_TREES) % spots.length < MAX_TREES) : spots;
     for (const [x, z, kind] of chosen) {
@@ -1538,12 +1539,12 @@ export function createWorld(seed = SEED) {
     // arbustos e canteiros de flores silvestres pelos campos
     let bushes = 0;
     let flowers = 0;
-    for (let attempt = 0; attempt < 16000 && (bushes < 260 || flowers < 110); attempt++) {
+    for (let attempt = 0; attempt < 24000 && (bushes < 420 || flowers < 180); attempt++) {
       const x = Math.round((rand() * 2 - 1) * 540 * 10) / 10;
       const z = Math.round((rand() * 2 - 1) * 540 * 10) / 10;
       if (!groundFree(x, z, 3)) continue;
       blocked.push({ x0: x - 2, x1: x + 2, z0: z - 2, z1: z + 2 });
-      if (bushes < 260 && (flowers >= 110 || rand() < 0.65)) {
+      if (bushes < 420 && (flowers >= 180 || rand() < 0.65)) {
         bush(b, 'Vegetação/Arbustos', x, land, z, rand);
         bushes++;
       } else {
@@ -1565,14 +1566,14 @@ export function createWorld(seed = SEED) {
     // mato e pedrinhas pelo chão (1 a 2 peças cada, sem colisão): o campo nunca fica liso
     let tufts = 0;
     let pebbles = 0;
-    for (let attempt = 0; attempt < 30000 && (tufts < 900 || pebbles < 260); attempt++) {
+    for (let attempt = 0; attempt < 60000 && (tufts < 1800 || pebbles < 400); attempt++) {
       const x = Math.round((rand() * 2 - 1) * 560 * 10) / 10;
       const z = Math.round((rand() * 2 - 1) * 560 * 10) / 10;
       if (terrainAt(x, z) !== T.GRASS || !allGrass(x - 1.5, x + 1.5, z - 1.5, z + 1.5, 1.5)) continue;
       if (Math.hypot(x, z) < PLAZA_REACH + 8 || !awayFromPlots(x, z, 3)) continue;
       if (distToRoads(x, z) < 5 || distToTrails(x, z) < 3 || !free({ x0: x, x1: x, z0: z, z1: z }, 1.5)) continue;
       const rot = Math.round(rand() * 90);
-      if (tufts < 900 && (pebbles >= 260 || rand() < 0.78)) {
+      if (tufts < 1800 && (pebbles >= 400 || rand() < 0.8)) {
         const h = 1 + rand() * 1.4;
         const dryHere = biomeAt(x, z) === 'deserto';
         const col = dryHere ? C.hay : rand() < 0.5 ? C.grassDark : C.leafDark;
@@ -1602,6 +1603,64 @@ export function createWorld(seed = SEED) {
       }
     }
     landmarks.groundCover = tufts + pebbles;
+
+    // juncos na beira do lago e do rio (touceiras altas, sem colisão): a água ganha margem viva
+    const nearWater = (x, z) =>
+      [
+        [6, 0],
+        [-6, 0],
+        [0, 6],
+        [0, -6],
+      ].some(([dx, dz]) => [T.RIVER, T.LAKE].includes(terrainAt(x + dx, z + dz)));
+    let reeds = 0;
+    for (let attempt = 0; attempt < 40000 && reeds < 160; attempt++) {
+      const x = Math.round((rand() * 2 - 1) * 580 * 10) / 10;
+      const z = Math.round((rand() * 2 - 1) * 580 * 10) / 10;
+      if (terrainAt(x, z) !== T.GRASS || !nearWater(x, z)) continue;
+      if (distToRoads(x, z) < 9 || !awayFromPlots(x, z, 6) || !free({ x0: x, x1: x, z0: z, z1: z }, 1.5)) continue;
+      blocked.push({ x0: x - 1, x1: x + 1, z0: z - 1, z1: z + 1 });
+      for (let k = 0; k < 3; k++) {
+        const h = 3 + rand() * 2.5;
+        const ox = (rand() - 0.5) * 1.6;
+        const oz = (rand() - 0.5) * 1.6;
+        const tilt = [Math.round((rand() - 0.5) * 16), Math.round(rand() * 90), Math.round((rand() - 0.5) * 16)];
+        const col = k === 2 ? C.hay : rand() < 0.5 ? C.leafLight : C.palmLeaf;
+        b.box('Vegetação/Juncos', 'Junco', [x + ox, land - 0.05 + h / 2, z + oz], [0.3, h, 0.3], col, {
+          ...deco,
+          rotation: tilt,
+        });
+      }
+      reeds++;
+    }
+    landmarks.reeds = reeds;
+
+    // samambaias no chão das florestas (3 folhas inclinadas, sem colisão)
+    let ferns = 0;
+    for (let attempt = 0; attempt < 40000 && ferns < 320; attempt++) {
+      const x = Math.round((rand() * 2 - 1) * 560 * 10) / 10;
+      const z = Math.round((rand() * 2 - 1) * 560 * 10) / 10;
+      const shady = biomeAt(x, z) === 'floresta' || nz(x, z, 70, 9) < 0.42;
+      if (!shady || biomeAt(x, z) === 'deserto') continue;
+      if (terrainAt(x, z) !== T.GRASS || Math.hypot(x, z) < PLAZA_REACH + 10) continue;
+      if (distToRoads(x, z) < 6 || distToTrails(x, z) < 3 || !awayFromPlots(x, z, 4)) continue;
+      if (!free({ x0: x, x1: x, z0: z, z1: z }, 1.2)) continue;
+      blocked.push({ x0: x - 1, x1: x + 1, z0: z - 1, z1: z + 1 });
+      const yaw = Math.round(rand() * 120);
+      const col = rand() < 0.5 ? C.leafDark : C.pine;
+      for (let k = 0; k < 3; k++) {
+        const a = ((yaw + k * 120) * Math.PI) / 180;
+        b.box(
+          'Vegetação/Samambaias',
+          'Samambaia',
+          [x + Math.cos(a) * 0.9, land + 0.55, z - Math.sin(a) * 0.9],
+          [2.4, 0.2, 0.7],
+          col,
+          { ...deco, rotation: [0, yaw + k * 120, 24] },
+        );
+      }
+      ferns++;
+    }
+    landmarks.ferns = ferns;
 
     return { parts: b.parts, landmarks };
   }

@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { makeBuilder, aabb } from '../src/builder.js';
 import { findFloating, findZFighting } from '../src/checks.js';
 import { C } from '../src/palette.js';
+import { materialFor } from '../src/materials.js';
 import { fountainStatue, FOUNTAIN_HALF } from '../src/props/statue.js';
 
 const EPS = 1e-6;
@@ -81,7 +82,7 @@ test('fonte: peça inclinada (giro em X ou Z) nunca colide', () => {
 test('fonte: medidas >= 0,04, Plastic, nada de Neon e transparência <= 0,8', () => {
   for (const p of prop) {
     for (const v of p.size) assert.ok(v >= 0.04, `${label(p)}: tamanho ${v}`);
-    assert.equal(p.material, 'Plastic', `${label(p)}: material ${p.material}`);
+    assert.equal(p.material, materialFor(p.color), `${label(p)}: material ${p.material}`);
     assert.ok(p.transparency >= 0 && p.transparency <= 0.8, `${label(p)}: transparência ${p.transparency}`);
     assert.equal(p.light, null, `${label(p)}: luz inesperada`);
   }

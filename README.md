@@ -20,7 +20,9 @@ Mapa base de um jogo de estratégia no estilo **Lords Mobile**, feito só com **
 - **Natureza:** florestas verdes e bosques de outono com árvores de copa em camadas, arbustos, pedras e **planaltos de rocha** com topo de grama e escadaria de pedra para subir.
 - **Recursos** (futuros pontos de coleta): campos de trigo cercados, jazidas de ouro e pedreiras.
 - **Costa:** cais de madeira com barco amarrado.
-- **Dia claro** (Lighting Future), sombra suave e neblina leve no horizonte.
+- **Texturas nativas do Roblox** em cada peça pela cor (grama, areia, rocha, paralelepípedo, tábuas, tijolo, ardósia, tecido, metal, neve e água de vidro), sem Decal nem imagem enviada; studs só nos detalhes de Plastic.
+- **Luz realista** (Lighting Future, começo da tarde, sol forte com sombra nítida, reflexo do céu nas texturas, neblina leve no horizonte).
+- **Vegetação densa:** até 1300 árvores, ~1800 tufos de mato, arbustos, flores, juncos na beira da água e samambaias nas florestas.
 - **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado.
 - **Peças do Lobby:** fonte octogonal de dois andares com 8 filetes de água e borda para sentar; lojas de verdade (padaria, ferreiro, armazém e taverna) com vitrine aberta, balcão, placa pendurada e toldo listrado; banco de praça, vaso com árvore, arco de pedra e lampião (`src/props/lobby.js`).
 - **Catálogo de peças:** cada peça reaproveitável (estátua, árvores, arbusto, flores, construções e peças do Lobby) sozinha no seu chão de studs, fotografada pelo CI normal e com a colisão destacada em vermelho ([`viewer/catalog.html`](viewer/catalog.html), tabela em `CATALOG.md` no branch `ci-previews`).
