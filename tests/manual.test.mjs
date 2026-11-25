@@ -26,9 +26,9 @@ test('etapas com até 8 peças, numeradas em sequência', () => {
   });
 });
 
-test('fases na ordem de obra: o mar primeiro, a natureza por último', () => {
+test('fases na ordem de obra: o mar primeiro, as lagoas por último', () => {
   assert.equal(manual.steps[0].phase, 'base');
-  assert.equal(manual.steps.at(-1).phase, 'natureza');
+  assert.equal(manual.steps.at(-1).phase, 'agua');
   const order = manual.phases.map((p) => p.id);
   let last = -1;
   for (const s of manual.steps) {

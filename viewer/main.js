@@ -2,12 +2,15 @@
 // Usado no navegador (GitHub Pages / prévia do PR) e pelo CI para gerar as capturas.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { createWorld, SEED, DIM } from '../src/map.js';
+import { createWorld, SEED, DIM, PLANS, doorPoint, planPoint } from '../src/map.js';
+import { SHOP_DOORS } from '../src/props/lojas.js';
 import { stats as countStats } from '../src/builder.js';
 import { buildManual } from '../src/manual.js';
+import { isWet, surfaceMaterial } from './surfaces.js';
 
 // ---------------------------------------------------------------------------
-// Cena: dia claro, sol com sombra e neblina leve (como o Lighting do Roblox)
+// Cena: noite (como o Lighting do Roblox): céu azul-escuro, luar fraco com sombra, neblina escura
+// e as luzes do mapa (lampiões, lanternas, postes) como luzes pontuais de verdade
 // ---------------------------------------------------------------------------
 const app = document.getElementById('app');
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -17,18 +20,18 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
+renderer.toneMappingExposure = 1.15;
 app.appendChild(renderer.domElement);
 
-const SKY = 0xaecbe0;
+const SKY = 0x121a2c;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(SKY);
-scene.fog = new THREE.FogExp2(0xc4d6e2, 0.00062);
+scene.fog = new THREE.FogExp2(0x182036, 0.0009);
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.5, 6000);
 
-scene.add(new THREE.HemisphereLight(0xe4eef6, 0x6e6654, 1.15));
-const sun = new THREE.DirectionalLight(0xfff3e0, 2.1);
+scene.add(new THREE.HemisphereLight(0x50618c, 0x1a1712, 0.75));
+const sun = new THREE.DirectionalLight(0xa8bce6, 0.55); // a lua
 sun.position.set(380, 620, 260);
 sun.target.position.set(0, 0, 0);
 sun.castShadow = true;
@@ -38,97 +41,25 @@ sun.shadow.bias = -0.0006;
 sun.shadow.normalBias = 0.6;
 scene.add(sun, sun.target);
 
-// Studs clássicos no topo das peças: textura de 1 stud aplicada em coordenadas de mundo
-// (assim tudo continua instanciado e o CI renderiza rápido).
-function studTexture() {
-  const n = 64;
-  const c = document.createElement('canvas');
-  c.width = c.height = n;
-  const g = c.getContext('2d');
-  g.fillStyle = '#f2f2f2';
-  g.fillRect(0, 0, n, n);
-  g.strokeStyle = '#d6d6d6';
-  g.lineWidth = 2;
-  g.strokeRect(1, 1, n - 2, n - 2);
-  const cx = n / 2;
-  const r = n * 0.28;
-  const disc = (dx, dy, color, rr = r) => {
-    g.fillStyle = color;
-    g.beginPath();
-    g.arc(cx + dx, cx + dy, rr, 0, Math.PI * 2);
-    g.fill();
-  };
-  disc(3, 3, '#a9a9a9');
-  disc(-2, -2, '#ffffff');
-  disc(0, 0, '#e4e4e4', r * 0.9);
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
-  return t;
-}
-const STUD_TEX = studTexture();
-
-function addStuds(m) {
-  m.onBeforeCompile = (sh) => {
-    sh.uniforms.studMap = { value: STUD_TEX };
-    sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vStudUv;\nvarying float vStudTop;')
-      .replace(
-        '#include <begin_vertex>',
-        [
-          '#include <begin_vertex>',
-          'vec4 studWorld = vec4(transformed, 1.0);',
-          '#ifdef USE_INSTANCING',
-          '  studWorld = instanceMatrix * studWorld;',
-          '#endif',
-          'studWorld = modelMatrix * studWorld;',
-          'vStudUv = studWorld.xz;',
-          'vStudTop = normal.y;',
-        ].join('\n'),
-      );
-    sh.fragmentShader = sh.fragmentShader
-      .replace(
-        '#include <common>',
-        '#include <common>\nuniform sampler2D studMap;\nvarying vec2 vStudUv;\nvarying float vStudTop;',
-      )
-      .replace(
-        '#include <map_fragment>',
-        '#include <map_fragment>\nif (vStudTop > 0.5) diffuseColor.rgb *= texture2D(studMap, vStudUv).rgb;',
-      );
-  };
-  m.customProgramCacheKey = () => 'studs';
-  return m;
-}
-
 // ---------------------------------------------------------------------------
-// Parts -> malhas instanciadas (uma por grupo + cor + aparência)
+// Parts -> malhas instanciadas (uma por grupo + cor + material + aparência)
 // ---------------------------------------------------------------------------
-// #seed=123 mostra outra variante do mapa (cada servidor do jogo usa uma semente)
+// Aparência (viewer/surfaces.js): material do Roblox desenhado por shader em coordenadas da peça
+// (Grass, Cobblestone, WoodPlanks, Brick...) e studs no topo das peças Plastic; tudo instanciado.
+// o mapa é fixo: sempre o mesmo Vale
 const params = new URLSearchParams(location.hash.slice(1));
-const seed = Number(params.get('seed')) || SEED;
+const seed = SEED;
 const world = createWorld(seed);
-const { PLOTS, LAKE } = world;
-const { parts, landmarks } = world.buildMap();
+const { PADS, PONDS } = world;
+const { parts } = world.buildMap();
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
-const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
 const cache = new Map();
+const lookKey = (p) => `${p.color}|${p.transparency}|${p.material}|${p.studs}|${isWet(p)}`;
 
 function material(p) {
-  const k = `${p.color}|${p.transparency}|${p.material}|${p.studs}|${p.name === 'Mar'}`;
-  if (cache.has(k)) return cache.get(k);
-  const wet = p.name === 'Mar' || p.name.startsWith('Água');
-  const m = new THREE.MeshStandardMaterial({
-    color: srgb(p.color),
-    roughness: wet ? 0.3 : 0.82,
-    metalness: wet ? 0.05 : 0,
-    transparent: p.transparency > 0,
-    opacity: 1 - p.transparency,
-    depthWrite: p.transparency === 0,
-  });
-  if (p.studs) addStuds(m);
-  cache.set(k, m);
-  return m;
+  const k = lookKey(p);
+  if (!cache.has(k)) cache.set(k, surfaceMaterial(p));
+  return cache.get(k);
 }
 
 const manual = buildManual(parts);
@@ -137,7 +68,7 @@ for (const st of manual.steps) for (const i of st.parts) stepOf[i] = st.n;
 
 const buckets = new Map();
 parts.forEach((p, i) => {
-  const k = `${p.group}|${p.color}|${p.transparency}|${p.material}|${p.studs}`;
+  const k = `${p.group}|${lookKey(p)}`;
   if (!buckets.has(k)) buckets.set(k, []);
   buckets.get(k).push({ p, i });
 });
@@ -163,6 +94,32 @@ for (const list of buckets.values()) {
   instanced.push(entry);
 }
 
+// luzes do mapa (PointLight do Roblox): um conjunto fixo de 8 luzes pontuais que vai para as luzes
+// do mapa mais perto do alvo de cada vista (quantidade fixa: o shader não recompila e o SwiftShader
+// do CI aguenta)
+const MAP_LIGHTS = parts.filter((p) => p.light);
+const LIGHT_POOL = Array.from({ length: 8 }, () => {
+  const l = new THREE.PointLight(0xffffff, 0, 1, 1.5);
+  scene.add(l);
+  return l;
+});
+function placeLights([tx, , tz]) {
+  const near = [...MAP_LIGHTS]
+    .sort(
+      (a, b) => Math.hypot(a.position[0] - tx, a.position[2] - tz) - Math.hypot(b.position[0] - tx, b.position[2] - tz),
+    )
+    .slice(0, LIGHT_POOL.length);
+  LIGHT_POOL.forEach((l, k) => {
+    const p = near[k];
+    if (!p) return void (l.intensity = 0);
+    const [r, g, bl] = p.light.color ?? [255, 220, 170];
+    l.color.setRGB(r / 255, g / 255, bl / 255);
+    l.intensity = p.light.brightness * 40;
+    l.distance = p.light.range * 1.5;
+    l.position.fromArray(p.position);
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Vistas (também usadas pelo CI para as capturas)
 // ---------------------------------------------------------------------------
@@ -172,101 +129,73 @@ orbit.maxDistance = 2200;
 orbit.maxPolarAngle = Math.PI * 0.49;
 
 const look = (x, z, dx, h, dz, ty = 4) => ({ pos: [x + dx, h, z + dz], target: [x, ty, z] });
-const OVERVIEW = { pos: [560, 540, 760], target: [-20, 0, 40] };
-const plot = [...PLOTS].sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.z))[0];
+const OVERVIEW = { pos: [380, 360, 500], target: [-10, 0, 20] };
+const pad = PADS[0];
 const VIEWS = [
-  { id: 'overview', title: 'Visão geral do reino', ...OVERVIEW },
-  { id: 'top', title: 'Mapa visto de cima (30 lotes, estradas, rio e lago)', pos: [0, 1300, 140], target: [0, 0, 0] },
+  { id: 'overview', title: 'Visão geral do Vale', ...OVERVIEW },
   {
-    id: 'lobby',
-    title: 'Lobby: fonte com a estátua clássica, mercado e colunas antigas',
-    ...look(0, 0, 78, 48, 96, 10),
+    id: 'top',
+    title: 'Vale visto de cima (Lobby, 8 lojas, estradas e lagoas)',
+    pos: [0, 900, 100],
+    target: [0, 0, 0],
   },
-  { id: 'market', title: 'Mercado do Lobby (altura do jogador)', pos: [0, 17, 40], target: [0, 13, 0] },
-  { id: 'lobby-stairs', title: 'Escadaria de madeira do Lobby', pos: [74, 17, 26], target: [44, 8, 0] },
+  { id: 'lobby', title: 'Lobby: praça de pedra com o estrado no meio', ...look(0, 0, 60, 52, 80, 4) },
+  { id: 'lobby-walk', title: 'Chegando na praça (altura do jogador)', pos: [0, 9, 74], target: [0, 6, 0] },
+  { id: 'estatua', title: 'Estátua de Luvitlua (boneco R6) no estrado', pos: [12, 16, 42], target: [0, 17, 0] },
+  { id: 'estatua-placa', title: 'Placa com o nome LUVITLUA', pos: [0, 8.5, 16], target: [0, 8.5, 0] },
+  { id: 'pads', title: 'Lojas em volta da praça à noite', ...look(pad.x, pad.z, 70, 60, 80, 8) },
   {
-    id: 'fountain',
-    title: 'Fonte do Lobby: estátua do boneco clássico com o logo',
-    pos: [22, 20, 30],
-    target: [0, 22, 0],
-  },
-  { id: 'plot', title: `${plot.name}: fundação do castelo`, ...look(plot.x, plot.z, 52, 34, 62, 5) },
-  {
-    id: 'plots',
-    title: 'Lotes espalhados pelo mapa',
-    pos: [plot.x * 0.3 + 220, 260, plot.z * 0.3 + 260],
-    target: [plot.x, 0, plot.z],
+    id: 'road',
+    title: 'Saída da praça à noite (altura do jogador)',
+    pos: [70, 9, 6],
+    target: [160, 8, 40],
   },
 ];
 const add = (v) => v && VIEWS.push(v);
-if (landmarks.bridges.length) {
-  const [x, z, axis] = landmarks.bridges[0];
+// penhasco mais alto: câmera dentro do vale olhando para a parede de rocha
+{
+  let best = null;
+  for (let k = 0; k < 72; k++) {
+    const a = (k / 72) * Math.PI * 2;
+    const r = world.valleyR(Math.cos(a) * 200, Math.sin(a) * 200);
+    const h = world.heightAt(Math.cos(a) * (r + 30), Math.sin(a) * (r + 30));
+    if (!best || h > best.h) best = { a, r, h };
+  }
+  const [cx, cz] = [Math.cos(best.a), Math.sin(best.a)];
   add({
-    id: 'bridge',
-    title: 'Ponte de madeira sobre o rio',
-    ...(axis === 'x' ? look(x, z, 18, 24, 46) : look(x, z, 46, 24, 18)),
-  });
-  add({
-    id: 'bridge-walk',
-    title: 'Atravessando a ponte (altura do jogador)',
-    pos: axis === 'x' ? [x - 26, 12, z] : [x, 12, z - 26],
-    target: axis === 'x' ? [x + 20, 7, z] : [x, 7, z + 20],
-  });
-}
-add({ id: 'lake', title: 'Lago e rio', ...look(LAKE.x, LAKE.z, 120, 80, -100, 0) });
-if (landmarks.groves.green) {
-  const [x, z] = landmarks.groves.green;
-  add({ id: 'forest', title: 'Floresta', ...look(x, z, 62, 40, 62, 8) });
-}
-if (landmarks.groves.autumn) {
-  const [x, z] = landmarks.groves.autumn;
-  add({ id: 'autumn', title: 'Bosque de outono', ...look(x, z, 62, 40, 62, 8) });
-}
-const tallest = [...landmarks.mountains].sort((p, q) => q[2] - p[2])[0];
-if (tallest) {
-  const [x, z, peak, R] = tallest;
-  add({
-    id: 'mountain',
-    title: 'Montanha com neve e pinheiros',
-    ...look(x, z, R * 2.2, peak * 0.9, R * 2.2, peak * 0.4),
+    id: 'cliffs',
+    title: 'Penhascos de rocha em blocos cercando o vale',
+    pos: [cx * (best.r - 90), 22, cz * (best.r - 90)],
+    target: [cx * (best.r + 20), best.h * 0.6, cz * (best.r + 20)],
   });
 }
-if (landmarks.hills.length) {
-  const [x, z, peak, R] = landmarks.hills[0];
-  add({ id: 'hill', title: 'Colina em terraços', ...look(x, z, R * 2.2, peak + 18, R * 2, 8) });
+// lojas: fachada de cada uma e o interior visto de dentro da porta
+const facade = (p, dist, h) => {
+  const [dx, dz] = doorPoint(p);
+  const [fx, fz] = [dx - p.x, dz - p.z];
+  const len = Math.hypot(fx, fz) || 1;
+  return { pos: [p.x + (fx / len) * dist, h, p.z + (fz / len) * dist], target: [p.x, 9, p.z] };
+};
+// vistas de dentro: do lado de dentro da porta, olhando para o fundo da loja
+const inward = (p, du, dv, back, y0, y1) => {
+  const [px, pz] = planPoint(p, du, dv);
+  const [tx, tz] = planPoint(p, du, back);
+  return { pos: [px, DIM.land + y0, pz], target: [tx, DIM.land + y1, tz] };
+};
+const Y = DIM.buildScaleY;
+for (const p of PADS) {
+  const { door, floorTop } = SHOP_DOORS[p.plan];
+  add({ id: `predio-${p.plan}`, title: `${PLANS[p.plan].name} (fachada)`, ...facade(p, 70, 26) });
+  add({
+    id: `predio-${p.plan}-dentro`,
+    title: `${PLANS[p.plan].name} (interior)`,
+    ...inward(p, door[0], door[1] - 1.4, door[1] - 14, (floorTop + 4.4) * Y, (floorTop + 1.6) * Y),
+  });
 }
-if (landmarks.villages.length) {
-  const [x, z] = landmarks.villages[0];
-  add({ id: 'village', title: 'Vila: casas, poço, celeiro e moinho', ...look(x, z, 60, 42, 70, 6) });
-  add({ id: 'village-walk', title: 'Rua da vila (altura do jogador)', pos: [x + 34, 11, z + 6], target: [x, 8, z] });
+if (PONDS.length) {
+  const [p] = PONDS;
+  add({ id: 'pond', title: 'Lagoa com passagem de pedra', ...look(p.x, p.z, p.r * 1.6, 34, p.r * 1.8, 2) });
 }
-if (landmarks.farmDistricts?.length) {
-  const [x, z] = landmarks.farmDistricts[0];
-  add({ id: 'farmland', title: 'Região de fazenda: campos, espantalho e sede', ...look(x, z + 10, 70, 55, 90, 4) });
-}
-if (landmarks.towers.length) {
-  const [x, z] = landmarks.towers[0];
-  add({ id: 'tower', title: 'Torre de vigia na beira da estrada', ...look(x, z, 30, 22, 34, 10) });
-}
-if (landmarks.camps.length) {
-  const [x, z] = landmarks.camps[0];
-  add({ id: 'camp', title: 'Acampamento na floresta', ...look(x, z, 26, 18, 30, 4) });
-}
-if (landmarks.farms.length) {
-  const [x, z] = landmarks.farms[0];
-  add({ id: 'farm', title: 'Campo de trigo', ...look(x, z, 34, 22, 38, 3) });
-}
-const mine = landmarks.mines.find((m) => m[2] === 'ouro') ?? landmarks.mines[0];
-if (mine) add({ id: 'mine', title: 'Jazida de ouro', ...look(mine[0], mine[1], 24, 18, 28, 4) });
-if (landmarks.docks.length) {
-  const [x, z, axis, dir] = landmarks.docks[0];
-  const out = (t) => (axis === 'x' ? [x + dir * t, z] : [x, z + dir * t]);
-  const [tx, tz] = out(20);
-  add({ id: 'dock', title: 'Cais e barco na praia', ...look(tx, tz, 34, 20, 34, 2) });
-}
-const palm = parts.find((p) => p.model === 'Vegetação/Coqueiros' && p.name === 'Tronco');
-if (palm)
-  add({ id: 'beach', title: 'Praia com coqueiros', ...look(palm.position[0], palm.position[2], 36, 18, 36, 6) });
 VIEWS.push(
   { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
   { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },
@@ -294,6 +223,7 @@ function setView(id) {
   if (!v) return;
   camera.position.fromArray(v.pos);
   orbit.target.fromArray(v.target);
+  placeLights(v.target);
   orbit.update();
   setStep(v.step ? v.step * manual.steps.length : manual.steps.length);
   document.querySelectorAll('#views button').forEach((b) => b.classList.toggle('on', b.dataset.view === id));
@@ -315,7 +245,7 @@ document.getElementById('toggle').onclick = () => document.getElementById('hud')
 const s = countStats(parts);
 document.getElementById('stats').textContent =
   `${s.total} peças · ${manual.steps.length} etapas · ${manual.connections} conexões verificadas · ` +
-  `${PLOTS.length} lotes (${DIM.players} jogadores + ${DIM.bots} bots)`;
+  `${PADS.length} lojas · ${s.lights} luzes`;
 
 addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;

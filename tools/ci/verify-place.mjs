@@ -4,10 +4,10 @@
 
 import { readFileSync } from 'node:fs';
 import { buildMap } from '../../src/map.js';
-import { VARIANT_SEEDS } from '../../src/variants.js';
+import { MATERIAL_ENUM } from '../../src/materials.js';
 
 const xml = readFileSync(process.argv[2], 'utf8');
-const maps = [buildMap().parts, ...VARIANT_SEEDS.map((seed) => buildMap(seed).parts)];
+const maps = [buildMap().parts]; // mapa fixo: um só
 const parts = maps.flat();
 const count = (re) => (xml.match(re) || []).length;
 const problems = [];
@@ -37,19 +37,16 @@ for (const banned of [
 if (!/<Item class="Atmosphere"/.test(xml)) problems.push('Faltando Atmosphere (neblina leve) no Lighting');
 const spawns = count(/<Item class="SpawnLocation"/g);
 if (spawns !== maps.length) problems.push(`SpawnLocations no lugar: ${spawns}, esperado ${maps.length} (um por mapa)`);
-// único script: o sorteio da variante do mapa (servidor, sem gameplay)
+// mapa fixo: nenhum script no lugar
 const scripts = count(/<Item class="Script"/g);
-if (scripts !== 1) problems.push(`Scripts no lugar: ${scripts}, esperado 1 (EscolherMapa)`);
-if (!/<string name="Name">EscolherMapa<\/string>/.test(xml)) problems.push('Faltando o script EscolherMapa');
-const variants = VARIANT_SEEDS.filter((s) => xml.includes(`<string name="Name">Semente ${s}</string>`));
-if (variants.length !== VARIANT_SEEDS.length)
-  problems.push(`Variantes no ServerStorage: ${variants.length}/${VARIANT_SEEDS.length}`);
+if (scripts !== 0) problems.push(`Scripts no lugar: ${scripts}, esperado 0 (mapa fixo)`);
 if (!/<token name="Technology">4<\/token>/.test(xml)) problems.push('Lighting.Technology não está em Future (4)');
 for (const c of ['ColorCorrectionEffect', 'BloomEffect']) {
   if (!xml.includes(`<Item class="${c}"`)) problems.push(`Faltando ${c} no Lighting`);
 }
 const materials = new Set([...xml.matchAll(/<token name="Material">(\d+)<\/token>/g)].map((m) => m[1]));
-for (const m of materials) if (!['256', '288'].includes(m)) problems.push(`Material inesperado: ${m}`);
+const known = new Set(Object.values(MATERIAL_ENUM).map(String));
+for (const m of materials) if (!known.has(m)) problems.push(`Material inesperado: ${m}`);
 
 if (problems.length) {
   console.error('✖ Lugar inválido:\n' + problems.map((p) => '  - ' + p).join('\n'));

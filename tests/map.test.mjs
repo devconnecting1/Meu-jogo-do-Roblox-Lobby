@@ -1,273 +1,200 @@
-// Regras do reino: 30 lotes de castelo espalhados, todos ligados à praça por estradas,
-// e decoração variada (florestas, outono, planaltos, rio com pontes, recursos e cais).
+// Regras do Vale: Lobby no centro, 8 lojas grandes ligadas por estradas,
+// penhascos, terraços e lagoas, tudo plano onde se constrói.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildMap, PLOTS, PLAZA, DIM, T, terrainAt, LAKE, distToRiver, MAP_INFO } from '../src/map.js';
-import { aabb } from '../src/builder.js';
+import {
+  buildMap,
+  DIM,
+  T,
+  PLAZA,
+  PADS,
+  PONDS,
+  createWorld,
+  PLANS,
+  SEED,
+  terrainAt,
+  heightAt,
+  surfaceAt,
+  inPlan,
+} from '../src/map.js';
+import { SHOPS } from '../src/props/lojas.js';
+import { SKIPPED } from '../src/props/oficina.js';
 
 const { parts, landmarks } = buildMap();
+const world = createWorld(SEED);
 const count = (fn) => parts.filter(fn).length;
 
-test('30 lotes de castelo: 20 de jogadores + 10 de bots, com nomes únicos', () => {
-  assert.equal(DIM.players + DIM.bots, DIM.plots);
-  assert.equal(PLOTS.length, DIM.plots);
-  const names = PLOTS.map((p) => p.name);
-  assert.equal(new Set(names).size, names.length, 'nomes repetidos');
-  for (const p of PLOTS) {
-    const own = parts.filter((x) => x.model === `Lotes/${p.name}`);
-    assert.equal(own.filter((x) => x.name === 'Fundação').length, 1, `${p.name} sem fundação`);
-    assert.equal(own.filter((x) => x.name === 'Bandeira').length, 1, `${p.name} sem bandeira`);
+/** Todas as células da planta (o piso do prédio) têm a superfície esperada e estão no nível do chão. */
+function flatPad(p, kinds) {
+  const cells = world.footprint(p);
+  if (cells.length < 12) return `planta com só ${cells.length} células`;
+  for (const [x, z] of cells) {
+    if (terrainAt(x, z) !== T.GROUND || heightAt(x, z) !== DIM.land) return `(${x}, ${z}) fora do chão plano`;
+    if (!kinds.includes(surfaceAt(x, z))) return `(${x}, ${z}) com superfície ${surfaceAt(x, z)}`;
   }
-});
+  return null;
+}
 
-test('lotes espalhados pelo mapa, longe uns dos outros, da praça e da água', () => {
-  for (let i = 0; i < PLOTS.length; i++) {
-    const a = PLOTS[i];
-    assert.ok(Math.hypot(a.x - PLAZA.x, a.z - PLAZA.z) >= 110, `${a.name} colado na praça`);
-    assert.ok(Math.hypot(a.x - LAKE.x, a.z - LAKE.z) >= 110, `${a.name} colado no lago`);
-    assert.ok(distToRiver(a.x, a.z) >= 52, `${a.name} colado no rio`);
-    for (let j = i + 1; j < PLOTS.length; j++) {
-      const b = PLOTS[j];
-      const d = Math.hypot(a.x - b.x, a.z - b.z);
-      assert.ok(d >= DIM.minPlotSpacing, `${a.name} e ${b.name} a ${d.toFixed(1)} studs`);
-    }
-  }
-  // espalhados: há lotes nos quatro quadrantes da ilha
-  for (const [sx, sz] of [
-    [1, 1],
-    [1, -1],
-    [-1, 1],
-    [-1, -1],
-  ]) {
-    assert.ok(
-      PLOTS.some((p) => Math.sign(p.x) === sx && Math.sign(p.z) === sz),
-      `nenhum lote no quadrante ${sx},${sz}`,
-    );
-  }
-});
-
-test('cada fundação fica inteira sobre a grama (com folga em volta)', () => {
-  const m = DIM.plotSize / 2 + 2;
-  for (const p of PLOTS) {
-    for (let x = p.x - m; x <= p.x + m; x += 2) {
-      for (let z = p.z - m; z <= p.z + m; z += 2) {
-        assert.equal(terrainAt(x, z), T.GRASS, `${p.name}: (${x}, ${z}) não é grama`);
-      }
-    }
-  }
-});
-
-test('o Lobby fica na grama, com a estátua e um único spawn sobre o piso', () => {
-  for (let x = -PLAZA.reach; x <= PLAZA.reach; x += 4) {
-    for (let z = -PLAZA.reach; z <= PLAZA.reach; z += 4) assert.equal(terrainAt(x, z), T.GRASS, `praça (${x}, ${z})`);
-  }
+test('Lobby no centro: praça de pedra com faixas, estrado e spawn sobre a praça', () => {
+  assert.equal(surfaceAt(0, 30) === 'pedra' || surfaceAt(0, 30) === 'pedraEscura', true, 'praça de pedra no centro');
+  assert.equal(heightAt(0, 0), DIM.land + 1, 'estrado no meio da praça');
+  assert.ok(count((p) => p.name === 'Faixa da Praça') >= 10, 'praça sem as faixas escuras');
   const spawns = parts.filter((p) => p.className === 'SpawnLocation');
-  assert.equal(spawns.length, 1);
+  assert.equal(spawns.length, 1, 'um único spawn');
   const s = spawns[0];
-  assert.ok(Math.abs(s.position[1] - s.size[1] / 2 - PLAZA.top) < 1e-6, 'spawn apoiado no piso do Lobby');
-  assert.ok(Math.hypot(s.position[0], s.position[2]) < DIM.plazaHalf, 'spawn dentro do Lobby');
-  const fonte = parts.filter((p) => p.model.startsWith('Lobby/Fonte'));
+  assert.ok(Math.abs(s.position[1] - s.size[1] / 2 - PLAZA.top) < 1e-6, 'spawn apoiado no piso da praça');
+  assert.ok(Math.hypot(s.position[0], s.position[2]) < DIM.plazaR - 8, 'spawn dentro da praça');
+});
+
+test('estátua de Luvitlua no estrado: boneco R6 oficial, pedestal e nome em letras de pixel', () => {
+  const st = parts.filter((p) => p.model.startsWith('Lobby/Estátua de Luvitlua'));
+  assert.ok(st.length >= 60, `estátua com só ${st.length} peças`);
+  const letters = new Set(st.filter((p) => p.name.startsWith('Letra ')).map((p) => p.name.slice(6)));
+  for (const ch of 'LUVITA') assert.ok(letters.has(ch), `placa sem a letra ${ch}`);
+  const topY = Math.max(...st.map((p) => p.position[1] + p.size[1] / 2));
+  assert.ok(topY >= DIM.land + 25, `estátua baixa (${topY})`);
+  for (const p of st) {
+    for (const i of [0, 2])
+      assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= 7.5 + 1e-6, `${p.name} fora do estrado`);
+  }
+  // proporções do R6 oficial: tronco 2×2×1, braços e pernas 1×2×1 (vinco de 0,02), mesma altura
+  const r6 = st.filter((p) => p.model.endsWith('/Boneco R6'));
+  const one = (name) => {
+    const p = r6.find((x) => x.name === name);
+    assert.ok(p, `boneco sem ${name}`);
+    return p.size;
+  };
+  const [tw, th, td] = one('Tronco');
+  assert.ok(Math.abs(tw - th) < 1e-6 && Math.abs(tw - 2 * td) < 1e-6, 'tronco fora do 2×2×1');
+  for (const n of ['Braço Esquerdo', 'Braço Direito', 'Perna Esquerda', 'Perna Direita']) {
+    const [w, h, d] = one(n);
+    assert.ok(Math.abs(h - th) < 1e-6, `${n} com altura diferente do tronco`);
+    assert.ok(Math.abs(w - tw / 2) <= tw * 0.02 && Math.abs(d - td) <= td * 0.05, `${n} fora do 1×2×1`);
+  }
+  assert.ok(r6.filter((p) => p.name === 'Cabeça').length >= 1, 'boneco sem cabeça');
   assert.ok(
-    fonte.some((p) => p.name === 'Logo'),
-    'a estátua não ergue o logo do Roblox',
+    r6.every((p) => p.color.join() === r6[0].color.join()),
+    'estátua em mais de uma cor',
   );
+  // só o corpo do R6: nada de armadura, roupa, arma ou item (pedido do dono do jogo)
+  const body = new Set(['Cabeça', 'Tronco', 'Braço Esquerdo', 'Braço Direito', 'Perna Esquerda', 'Perna Direita']);
+  const extra = r6.filter((p) => !body.has(p.name)).map((p) => p.name);
+  assert.deepEqual(extra, [], `boneco com peças além do corpo R6: ${extra.join(', ')}`);
+  const sub = new Set(st.map((p) => p.model.split('/').slice(2).join('/')));
+  for (const m of sub) assert.ok(['Pedestal', 'Pedestal/Nome', 'Boneco R6'].includes(m), `estátua com ${m}`);
   assert.ok(
-    fonte.some((p) => p.name.startsWith('Água') && !p.canCollide),
-    'fonte sem água',
+    st.every((p) => !p.light && p.material !== 'Neon'),
+    'estátua com brilho ou luz',
   );
-  assert.ok(count((p) => p.model === 'Lobby' && p.name === 'Estandarte') >= 4, 'Lobby sem estandartes');
 });
 
-test('estradas ligam todos os lotes ao Lobby (malha contínua de estrada, ponte e escadaria)', () => {
-  const net = parts.filter(
-    (p) =>
-      p.model === 'Estradas' ||
-      (p.model.startsWith('Pontes/') && p.name === 'Tabuleiro') ||
-      (p.model.startsWith('Lotes/') && p.name === 'Fundação') ||
-      ['Base do Lobby', 'Piso do Lobby', 'Degrau do Lobby'].includes(p.name),
+test('8 áreas de construção em volta da praça, planas e ligadas ao Lobby', () => {
+  assert.equal(PADS.length, DIM.pads);
+  for (const p of PADS) {
+    const bad = flatPad(p, ['area']);
+    assert.equal(bad, null, `${p.name}: ${bad}`);
+  }
+  assert.ok(world.padsConnected.every(Boolean), 'área sem estrada até o Lobby');
+});
+
+test('cada loja segue a planta do seu prédio: formatos e tamanhos diferentes, sem igreja nem castelo', () => {
+  const shops = new Set(PADS.map((p) => p.plan));
+  assert.equal(shops.size, PADS.length, 'cada área em volta da praça é de um prédio diferente');
+  for (const p of PADS) assert.equal(PLANS[p.plan].group, 'loja', `${p.name}: só lojas no mapa`);
+  assert.ok(!Object.keys(PLANS).includes('capela'), 'sem igreja (pedido do dono)');
+  assert.ok(
+    Object.values(PLANS).every((q) => q.group === 'loja'),
+    'sem plantas de castelo',
   );
-  const bx = net.map(aabb);
-  const parent = net.map((_, i) => i);
-  const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
-  const touch = (a, b) => [0, 1, 2].every((k) => a.min[k] <= b.max[k] + 0.01 && b.min[k] <= a.max[k] + 0.01);
-  for (let i = 0; i < net.length; i++) {
-    for (let j = i + 1; j < net.length; j++) if (touch(bx[i], bx[j])) parent[find(i)] = find(j);
-  }
-  const plaza = find(net.findIndex((p) => p.name === 'Piso do Lobby'));
-  const lost = net.filter((p, i) => p.name === 'Fundação' && find(i) !== plaza).map((p) => p.model);
-  assert.deepEqual(lost, [], `lotes sem estrada até o Lobby: ${lost.join(', ')}`);
+  // tamanho real: cada loja ocupa a área inteira de 48×48, com formato e área próprios
+  const sizes = new Set(PADS.map((p) => world.footprint(p).length));
+  assert.equal(sizes.size, PADS.length, `lojas com áreas repetidas (${[...sizes].join(', ')} células)`);
+  for (const p of PADS) assert.ok(world.footprint(p).length >= 60, `${p.name}: loja pequena demais`);
+  const square = PADS.filter((p) => world.footprint(p).length === (p.size / DIM.cell) ** 2).length;
+  assert.equal(square, 0, `${square} plantas são quadrados cheios`);
 });
 
-test('estradas só sobre a grama e pontes só onde há rio', () => {
-  for (const p of parts.filter((x) => x.model === 'Estradas')) {
-    const { min, max } = aabb(p);
-    for (let x = min[0]; x <= max[0]; x += 2) {
-      for (let z = min[2]; z <= max[2]; z += 2) {
-        const t = terrainAt(Math.min(x, max[0] - 0.01), Math.min(z, max[2] - 0.01));
-        assert.equal(t, T.GRASS, `Estrada @ [${p.position}] passa por terreno ${t} em (${x}, ${z})`);
-      }
-    }
-  }
-  assert.ok(MAP_INFO.bridges >= 1, 'nenhuma ponte sobre o rio');
-  for (const p of parts.filter((x) => x.name === 'Tabuleiro')) {
-    const { min, max } = aabb(p);
-    let wet = false;
-    for (let x = min[0]; x <= max[0]; x += 1) {
-      for (let z = min[2]; z <= max[2]; z += 1) if (terrainAt(x, z) === T.RIVER) wet = true;
-    }
-    assert.ok(wet, `${p.model} não cruza o rio`);
-  }
+test('estradas de terra ligam o Lobby a todas as lojas (sem pular degrau nem água)', () => {
+  assert.ok(world.padsConnected.every(Boolean), 'loja sem estrada até o Lobby');
+  assert.ok(count((p) => p.name === 'Terra da Estrada') >= 100, 'poucas estradas');
+  assert.ok(count((p) => p.name === 'Terra Batida') >= 20, 'estrada sem as manchas de terra batida');
 });
 
-test('natureza variada: vários tipos de árvore, coqueiros na praia, montanhas altas e colinas', () => {
-  const trunks = (m) => count((p) => p.name === 'Tronco' && p.model === `Vegetação/${m}`);
-  const kinds = [
-    'Carvalhos',
-    'Pinheiros',
-    'Bétulas',
-    'Cerejeiras',
-    'Árvores Redondas',
-    'Bosque de Outono',
-    'Coqueiros',
-  ];
-  for (const k of kinds) assert.ok(trunks(k) >= 5, `só ${trunks(k)} árvores em ${k}`);
-  assert.ok(count((p) => p.name === 'Tronco' && p.model.startsWith('Vegetação/')) >= 350, 'poucas árvores');
-  assert.ok(landmarks.mountains.length >= 6, `só ${landmarks.mountains.length} montanhas`);
-  assert.ok(Math.max(...landmarks.mountains.map((m) => m[2])) >= 50, 'montanhas baixas demais');
-  assert.ok(landmarks.hills.length >= 4, `só ${landmarks.hills.length} colinas`);
-  // montanhas naturais: cada uma tem vários blocos por camada, nunca uma caixa só
-  for (const m of new Set(parts.filter((p) => p.model.startsWith('Relevo/Montanha')).map((p) => p.model))) {
-    assert.ok(count((p) => p.model === m && p.name === 'Rocha') >= 8, `${m} parece uma caixa`);
-  }
-  assert.ok(count((p) => p.model === 'Relevo/Pedras') >= 60, 'poucas pedras soltas');
-  assert.ok(count((p) => p.model === 'Vegetação/Flores') >= 30, 'poucas flores');
-  // biomas: região seca (areia firme, coqueiros, rocha avermelhada), floresta escura e falésias na costa
-  assert.ok(count((p) => p.name === 'Areia do Deserto') >= 5, 'sem região seca');
-  assert.ok(count((p) => p.name === 'Falésia') >= 3, 'costa sem falésias');
-  assert.ok(trunks('Pinheiros') >= 80, `floresta escura rala (${trunks('Pinheiros')} pinheiros)`);
-  assert.ok(trunks('Coqueiros') >= 20, `poucos coqueiros (${trunks('Coqueiros')})`);
+test('relevo do vale: penhascos altos em blocos, terraços de grama e lagoa', () => {
+  assert.ok(landmarks.cliffMax >= DIM.land + 40, `penhasco baixo demais (${landmarks.cliffMax})`);
+  assert.ok(count((p) => p.name === 'Rocha') >= 200, 'penhascos feitos de poucos blocos');
+  assert.ok(landmarks.terraces >= 40, `poucos terraços de grama (${landmarks.terraces} células)`);
+  assert.ok(PONDS.length >= 1, 'sem lagoa');
+  assert.ok(count((p) => p.name === 'Grama Escura') >= 100, 'grama sem as manchas escuras');
 });
 
-test('vida no reino: vilas com casas, campos, jazidas, torres de vigia, acampamentos e cais', () => {
-  assert.ok(landmarks.villages.length >= 2, `só ${landmarks.villages.length} vilas`);
-  for (const [, , n] of landmarks.villages) assert.ok(n >= 4, `vila com só ${n} construções`);
-  assert.ok(count((p) => p.model.startsWith('Vila/') && p.model.includes('/Casa')) > 0, 'vilas sem casas');
-  // vila como cidade: rua de pedra, praça com poço, largo e casas com calçada até a rua
-  landmarks.villages.forEach((_, i) => {
-    const V = `Vila/Vila ${i + 1}`;
-    const inV = (p) => p.model.startsWith(`${V}/`);
-    for (const n of ['Rua da Vila', 'Praça da Vila', 'Largo da Vila']) {
-      assert.ok(
-        parts.some((p) => inV(p) && p.name === n),
-        `${V} sem "${n}"`,
-      );
-    }
-    assert.ok(count((p) => inV(p) && p.name === 'Calçada') >= 3, `${V}: casas sem calçada até a rua`);
-    assert.ok(count((p) => inV(p) && p.name === 'Cerca') >= 3, `${V}: quintais sem cerca`);
-  });
-  assert.ok(landmarks.groundCover >= 900, `pouco mato e pedrinhas no chão (${landmarks.groundCover})`);
-  assert.ok(landmarks.outcrops.length >= 8, `só ${landmarks.outcrops.length} afloramentos de rocha`);
-  assert.ok(landmarks.farms.length >= 4, `só ${landmarks.farms.length} campos de trigo`);
-  const mines = (k) => landmarks.mines.filter((m) => m[2] === k).length;
-  assert.ok(mines('ouro') >= 2 && mines('pedra') >= 2, `jazidas: ${mines('ouro')} de ouro, ${mines('pedra')} de pedra`);
-  assert.ok(landmarks.towers.length >= 2, `só ${landmarks.towers.length} torres de vigia`);
-  // regiões de fazenda: 6 campos cercados com culturas, espantalho e sede
-  assert.ok(landmarks.farmDistricts.length >= 1, 'nenhuma região de fazenda');
-  for (const [, , fields, houses] of landmarks.farmDistricts) {
-    assert.equal(fields, 6, 'fazenda com campos faltando');
-    assert.ok(houses >= 2, 'fazenda sem sede');
+test('borda do vale variada: parte penhasco, parte planalto sobre o mar', () => {
+  let cliff = 0;
+  let open = 0;
+  for (let k = 0; k < 72; k++) {
+    const a = (k / 72) * Math.PI * 2;
+    let r = 120;
+    while (r < DIM.half && terrainAt(Math.cos(a) * r, Math.sin(a) * r) === T.GROUND) r += 4;
+    if (terrainAt(Math.cos(a) * r, Math.sin(a) * r) === T.CLIFF) cliff++;
+    else open++;
   }
-  assert.ok(landmarks.camps.length >= 1, 'nenhum acampamento');
-  assert.ok(landmarks.docks.length >= 1, 'nenhum cais na praia');
+  assert.ok(cliff >= 18, `pouco penhasco na borda (${cliff}/72)`);
+  assert.ok(open >= 8, `nenhuma borda aberta para o mar (${open}/72)`);
 });
 
-test('trilhas ligam cada lugar à malha de estradas (nada solto no meio do mato)', () => {
-  const net = parts.filter(
-    (p) =>
-      p.model === 'Estradas' ||
-      p.model === 'Trilhas' ||
-      // a rua da vila faz parte da malha (liga na estrada pela trilha da vila)
-      (p.model.startsWith('Vila/') && ['Rua da Vila', 'Praça da Vila', 'Largo da Vila'].includes(p.name)) ||
-      (p.model.startsWith('Pontes/') && p.name === 'Tabuleiro') ||
-      ['Base do Lobby', 'Piso do Lobby', 'Degrau do Lobby'].includes(p.name),
-  );
-  const bx = net.map(aabb);
-  const parent = net.map((_, i) => i);
-  const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
-  const touch = (a, b) => [0, 1, 2].every((k) => a.min[k] <= b.max[k] + 0.01 && b.min[k] <= a.max[k] + 0.01);
-  for (let i = 0; i < net.length; i++) {
-    for (let j = i + 1; j < net.length; j++) if (touch(bx[i], bx[j])) parent[find(i)] = find(j);
-  }
-  const lobby = find(net.findIndex((p) => p.name === 'Piso do Lobby'));
-  const loose = net.filter((p, i) => p.model === 'Trilhas' && find(i) !== lobby);
+const under = (root) => parts.filter((p) => p.model === root || p.model.startsWith(`${root}/`));
+
+/** Toda peça da loja fica na planta da área (placas e lanternas da fachada saem no máximo 2 studs). */
+function outsidePlan(p, list) {
+  return list
+    .filter((q) => {
+      const [x0, z0, x1, z1] = [
+        q.position[0] - q.size[0] / 2 + 0.01,
+        q.position[2] - q.size[2] / 2 + 0.01,
+        q.position[0] + q.size[0] / 2 - 0.01,
+        q.position[2] + q.size[2] / 2 - 0.01,
+      ];
+      return [
+        [x0, z0],
+        [x0, z1],
+        [x1, z0],
+        [x1, z1],
+      ].some(([x, z]) => !inPlan(p, x, z, 2.1));
+    })
+    .map((q) => `${q.model}/${q.name}`);
+}
+
+test('construções com interior: todo móvel coube no lugar (nada pulado)', () => {
   assert.deepEqual(
-    loose.map((p) => p.position.join(',')),
+    [...new Set(SKIPPED)],
     [],
-    'trilhas soltas',
+    `móveis fora do piso livre ou na passagem: ${[...new Set(SKIPPED)].join(', ')}`,
   );
-  // regiões de fazenda entram em landmarks.farms (uma trilha cada), além dos campos soltos
-  const places = ['villages', 'farms', 'mines', 'towers', 'camps'].reduce((n, k) => n + landmarks[k].length, 0);
-  assert.equal(landmarks.trails, places, 'cada vila, campo, jazida, torre e acampamento tem a sua trilha');
 });
 
-test('estradas não atravessam outros lotes', () => {
-  for (const p of parts.filter((x) => x.model === 'Estradas')) {
-    const { min, max } = aabb(p);
-    const crossed = PLOTS.filter((q) => {
-      const h = DIM.plotSize / 2;
-      // a estrada entra no próprio lote (até o centro); atravessar um lote de ponta a ponta é proibido
-      return min[0] < q.x - h && max[0] > q.x + h && min[2] < q.z + h && max[2] > q.z - h;
-    }).concat(
-      PLOTS.filter((q) => {
-        const h = DIM.plotSize / 2;
-        return min[2] < q.z - h && max[2] > q.z + h && min[0] < q.x + h && max[0] > q.x - h;
-      }),
-    );
-    assert.deepEqual(
-      crossed.map((q) => q.name),
-      [],
-      `Estrada @ [${p.position}] atravessa lote`,
-    );
+test('8 lojas grandes: paredes, porta, janelas, telhado, luz por dentro e na fachada e interior mobiliado', () => {
+  for (const p of PADS) {
+    const root = `Construções/${SHOPS[p.plan].model}`;
+    const ps = under(root);
+    const names = new Set(ps.map((q) => q.name));
+    for (const n of ['Piso', 'Parede', 'Base da Parede', 'Janela', 'Telhado', 'Lanterna da Fachada'])
+      assert.ok(names.has(n), `${root} sem ${n}`);
+    const lights = ps.filter((q) => q.light);
+    assert.equal(lights.length, 3, `${root}: 1 luz por dentro e 2 na fachada (tem ${lights.length})`);
+    const inside = ps.filter((q) => q.model.includes('/Interior/')).length;
+    assert.ok(inside >= 20, `${root}: interior com só ${inside} peças`);
+    assert.deepEqual(outsidePlan(p, ps), [], `${root}: peças fora da planta`);
+    // tamanho real: pé-direito de pelo menos 12 studs (o boneco R6 tem 5)
+    const wallTop = Math.max(...ps.filter((q) => q.name === 'Parede').map((q) => q.position[1] + q.size[1] / 2));
+    assert.ok(wallTop - DIM.land >= 12, `${root}: paredes baixas (${wallTop - DIM.land})`);
   }
 });
 
-test('Lobby elevado: 4 escadarias de degraus de 1 stud até o piso, com mureta na borda', () => {
-  const top = (p) => p.position[1] + p.size[1] / 2;
-  for (const side of ['Leste', 'Oeste', 'Sul', 'Norte']) {
-    const m = `Lobby/Escadaria ${side}`;
-    const steps = parts.filter((p) => p.model === m && p.name === 'Degrau do Lobby').sort((a, b) => top(a) - top(b));
-    assert.equal(steps.length, DIM.lobbyRise, `${m}: ${steps.length} degraus`);
-    let prev = DIM.land;
-    for (const s of steps) {
-      assert.ok(top(s) - prev <= 1 + 1e-9, `${m}: degrau sobe ${(top(s) - prev).toFixed(2)} studs`);
-      prev = top(s);
-    }
-    assert.equal(prev, PLAZA.top, `${m}: a escada não chega ao piso do Lobby`);
-    assert.equal(parts.filter((p) => p.model === m && p.name === 'Corrimão').length, 2, `${m}: sem corrimão`);
-  }
-  assert.ok(count((p) => p.name === 'Mureta') >= 8, 'mureta na borda do Lobby');
-});
-
-test('Lobby vivo como nas referências: mercado com toldos, caixotes, canteiros e colunas antigas', () => {
-  const models = (prefix) => new Set(parts.filter((p) => p.model.startsWith(prefix)).map((p) => p.model)).size;
-  assert.equal(models('Lobby/Barraca '), 4, 'mercado com 4 barracas');
-  assert.ok(models('Lobby/Caixotes ') >= 4, 'caixotes do mercado');
-  assert.ok(models('Lobby/Canteiro ') >= 4, 'canteiros de flores');
-  assert.ok(models('Lobby/Coluna Antiga ') >= 6, 'colunas antigas');
-  for (let n = 1; n <= 4; n++) {
-    const names = new Set(parts.filter((p) => p.model === `Lobby/Barraca ${n}`).map((p) => p.name));
-    for (const k of ['Balcão', 'Tampo do Balcão', 'Poste da Barraca', 'Toldo', 'Franja']) {
-      assert.ok(names.has(k), `Barraca ${n} sem "${k}"`);
-    }
-  }
-});
-
-test('peças inclinadas e copas não colidem; o que colide e é girado só gira em Y', () => {
-  for (const p of parts.filter((x) => x.rotation)) {
-    const [rx, , rz] = p.rotation;
-    if (rx !== 0 || rz !== 0) assert.equal(p.canCollide, false, `${p.model}/${p.name} inclinada com colisão`);
-  }
-  for (const n of ['Copa', 'Galho', 'Arbusto', 'Pedra', 'Trigo', 'Bandeira', 'Estandarte']) {
-    for (const p of parts.filter((x) => x.name === n)) assert.equal(p.canCollide, false, `${p.model}/${n} colide`);
-  }
+test('noite no Lobby: postes de luz acesos na praça', () => {
+  const lamps = parts.filter((q) => q.name === 'Lanterna do Poste');
+  assert.ok(lamps.length >= 8, `só ${lamps.length} postes de luz na praça`);
+  assert.ok(
+    lamps.every((q) => q.light && q.canCollide === false),
+    'poste sem luz ou lanterna com colisão',
+  );
 });

@@ -32,10 +32,11 @@ test('somente Part clássico (Block, Cylinder ou Ball) e SpawnLocation', () => {
   }
 });
 
-test('materiais: Plastic em tudo; Neon só em lâmpada sem colisão e com luz', () => {
+test('materiais: SmoothPlastic em tudo (blocos lisos); Neon só em lâmpada sem colisão e com luz, ou janela acesa', () => {
   for (const p of parts) {
-    assert.ok(['Plastic', 'Neon'].includes(p.material), `${p.name}: material ${p.material}`);
-    if (p.material === 'Neon') {
+    assert.ok(['SmoothPlastic', 'Neon'].includes(p.material), `${p.name}: material ${p.material}`);
+    // janela acesa de noite: vidraça Neon presa na parede (a luz vem do lampião de dentro)
+    if (p.material === 'Neon' && p.name !== 'Janela') {
       assert.equal(p.canCollide, false, `${p.name}: Neon não deve colidir`);
       assert.ok(p.light, `${p.model}/${p.name}: Neon sem luz é lâmpada falsa`);
     }
@@ -56,18 +57,10 @@ test('cores neutras: toda cor vem da paleta e nenhuma é berrante (saturação H
     assert.ok(PALETTE.has(p.color.join(',')), `${p.model}/${p.name}: cor fora da paleta ${p.color}`);
 });
 
-test('relevo clássico (Inlet/Weld/Universal) só em peças opacas de Plastic', () => {
-  for (const p of parts.filter((x) => x.surface)) {
-    assert.ok(['Inlet', 'Weld', 'Universal'].includes(p.surface), `${p.name}: superfície ${p.surface}`);
-    assert.equal(p.material, 'Plastic', `${p.name}: relevo em ${p.material}`);
-    assert.equal(p.transparency, 0, `${p.name}: relevo em peça transparente`);
-  }
-});
-
-test('estilo clássico: studs no topo de tudo, menos no mar e na água', () => {
+test('estilo voxel liso: nenhuma peça com studs, inlet ou relevo nas faces', () => {
   for (const p of parts) {
-    const wet = p.name === 'Mar' || p.name.startsWith('Água');
-    assert.equal(p.studs, !wet, `${p.model}/${p.name}: studs = ${p.studs}`);
+    assert.equal(p.studs, false, `${p.model}/${p.name}: studs`);
+    assert.equal(p.surface, null, `${p.model}/${p.name}: relevo ${p.surface}`);
   }
 });
 

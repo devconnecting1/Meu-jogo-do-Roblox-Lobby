@@ -2,9 +2,10 @@
 // Documentação do formato: https://rojo.space/docs/v7/sync-details/#json-models
 
 import { rotationMatrix } from './builder.js';
+import { MATERIAL_ENUM } from './materials.js';
 
 export const ENUM = Object.freeze({
-  Material: { Plastic: 256, Neon: 288 },
+  Material: MATERIAL_ENUM,
   PartType: { Ball: 0, Block: 1, Cylinder: 2 },
   SurfaceType: { Smooth: 0, Weld: 2, Studs: 3, Inlet: 4, Universal: 5 },
   NormalId: { Bottom: 4 },

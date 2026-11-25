@@ -1,5 +1,6 @@
 // Ferramentas genéricas para descrever Parts como dados puros.
 // Nada aqui sabe sobre o mapa: é reaproveitável e testado em tests/.
+import { materialFor } from './materials.js';
 
 /** Arredonda para 3 casas (evita lixo de ponto flutuante nos arquivos gerados). */
 export const round = (v) => {
@@ -12,7 +13,8 @@ export const round = (v) => {
  * Cada Part é um objeto simples com: model (caminho "A/B/C"), name, position (centro),
  * size, color [r,g,b] 0-255, transparency, canCollide, rotation [rx,ry,rz] graus|null,
  * light {type:'Point'|'Surface', range, brightness, color}|null, className, shape,
- * material ('Plastic'|'Neon'), studs (TopSurface = Studs), surface ('Inlet'|'Weld'|'Universal' nas faces
+ * material (nome do Enum.Material; sem `material`, sai da cor por materialFor), studs (TopSurface = Studs,
+ * só em Plastic), surface ('Inlet'|'Weld'|'Universal' nas faces
  * laterais e no topo, relevo clássico do Roblox), group (camada do visualizador).
  */
 export function makeBuilder() {
@@ -21,6 +23,9 @@ export function makeBuilder() {
     parts,
     /** Caixa pelo centro e tamanho. */
     box(model, name, center, size, color, opts = {}) {
+      // textura nativa do Roblox pela cor; studs e relevo clássico só aparecem em Plastic
+      const material = opts.material ?? materialFor(color);
+      const plastic = material === 'Plastic';
       const part = {
         model,
         name,
@@ -33,9 +38,9 @@ export function makeBuilder() {
         light: opts.light ?? null,
         className: opts.className ?? 'Part',
         shape: opts.shape ?? 'Block',
-        material: opts.material ?? 'Plastic',
-        studs: opts.studs ?? false,
-        surface: opts.surface ?? null,
+        material,
+        studs: plastic && (opts.studs ?? false),
+        surface: plastic ? (opts.surface ?? null) : null,
         group: opts.group ?? model.split('/')[0],
       };
       parts.push(part);

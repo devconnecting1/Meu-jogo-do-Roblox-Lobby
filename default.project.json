@@ -14,77 +14,46 @@
         "Technology": {
           "Enum": 4
         },
-        "ClockTime": 14.6,
+        "ClockTime": 22.5,
         "GeographicLatitude": 32,
-        "Brightness": 2.4,
-        "Ambient": [0.27, 0.27, 0.29],
-        "OutdoorAmbient": [0.48, 0.49, 0.52],
-        "EnvironmentDiffuseScale": 0.9,
-        "EnvironmentSpecularScale": 0.5,
-        "ExposureCompensation": 0.05,
-        "ShadowSoftness": 0.18,
+        "Brightness": 1.2,
+        "Ambient": [0.14, 0.15, 0.2],
+        "OutdoorAmbient": [0.3, 0.33, 0.42],
+        "EnvironmentDiffuseScale": 1,
+        "EnvironmentSpecularScale": 1,
+        "ExposureCompensation": 0.2,
+        "ShadowSoftness": 0.2,
         "GlobalShadows": true,
-        "ColorShift_Top": [0.08, 0.06, 0.03],
+        "ColorShift_Top": [0.06, 0.07, 0.12],
         "ColorShift_Bottom": [0, 0, 0]
       },
       "Correcao de Cor": {
         "$className": "ColorCorrectionEffect",
         "$properties": {
-          "Brightness": 0.01,
+          "Brightness": 0.03,
           "Contrast": 0.1,
-          "Saturation": -0.04,
-          "TintColor": [1, 0.985, 0.96]
+          "Saturation": 0,
+          "TintColor": [0.96, 0.97, 1]
         }
       },
       "Brilho": {
         "$className": "BloomEffect",
         "$properties": {
-          "Intensity": 0.22,
+          "Intensity": 0.3,
           "Size": 28,
-          "Threshold": 1.7
+          "Threshold": 1.1
         }
       },
       "Neblina Leve": {
         "$className": "Atmosphere",
         "$properties": {
-          "Density": 0.3,
-          "Offset": 0.22,
-          "Color": [0.79, 0.85, 0.91],
-          "Decay": [0.56, 0.63, 0.73],
-          "Glare": 0.15,
-          "Haze": 1.1
+          "Density": 0.28,
+          "Offset": 0.2,
+          "Color": [0.2, 0.24, 0.34],
+          "Decay": [0.12, 0.14, 0.2],
+          "Glare": 0,
+          "Haze": 1.2
         }
-      },
-      "Raios de Sol": {
-        "$className": "SunRaysEffect",
-        "$properties": {
-          "Intensity": 0.04,
-          "Spread": 0.55
-        }
-      }
-    },
-    "ServerStorage": {
-      "$className": "ServerStorage",
-      "Mapas": {
-        "$className": "Folder",
-        "Semente 101": {
-          "$path": "build/Mapas/Semente 101.model.json"
-        },
-        "Semente 2027": {
-          "$path": "build/Mapas/Semente 2027.model.json"
-        },
-        "Semente 4242": {
-          "$path": "build/Mapas/Semente 4242.model.json"
-        },
-        "Semente 77777": {
-          "$path": "build/Mapas/Semente 77777.model.json"
-        }
-      }
-    },
-    "ServerScriptService": {
-      "$className": "ServerScriptService",
-      "EscolherMapa": {
-        "$path": "src/game/escolher-mapa.server.luau"
       }
     }
   }

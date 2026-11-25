@@ -74,7 +74,9 @@ export const C = Object.freeze({
   roofRed: [150, 84, 72],
   roofSlate: [96, 104, 118],
   roofThatch: [184, 160, 110],
+  roofGreen: [88, 112, 92], // telhado da taverna (verde-musgo fosco)
   statueDark: [128, 128, 124],
+  iron: [64, 66, 72], // ferro escuro (lampião, bigorna, ferragens)
 
   // Bandeiras e toldos
   banner: [164, 84, 76],
@@ -82,6 +84,45 @@ export const C = Object.freeze({
   awningBlue: [96, 120, 150],
   awningOlive: [150, 146, 96],
   cloth: [226, 222, 210],
+
+  // Terreno do Vale (estilo voxel pixelado, blocos lisos): tons quentes e foscos
+  pxGrass: [108, 156, 72],
+  pxGrassDark: [88, 132, 60],
+  pxDirt: [120, 84, 56], // estradas de terra
+  pxDirtDark: [96, 66, 46],
+  pxSoil: [92, 64, 44], // lateral do chão (terra por baixo da grama)
+  pxStone: [204, 184, 148], // pedra clara da praça
+  pxStoneDark: [150, 128, 98],
+  pxPad: [150, 112, 78], // piso das áreas de construção e dos lotes
+  pxPadEdge: [118, 108, 94], // borda de pedra das áreas e lotes
+  pxCliff: [146, 98, 66], // penhascos de rocha
+  pxCliffDark: [112, 74, 52],
+  pxCliffLight: [168, 118, 82],
+  pxMoss: [92, 128, 62],
+  pxWater: [86, 150, 170],
+
+  // Construções do Vale (voxel liso): madeira, reboco, pedra de muro, telhados, ferro, tecidos e luz
+  pxWood: [128, 88, 58],
+  pxWoodDark: [92, 62, 44],
+  pxWoodLight: [164, 122, 82],
+  pxPlaster: [214, 198, 168],
+  pxStoneWall: [140, 132, 120],
+  pxStoneWallDark: [104, 98, 90],
+  pxRoofRed: [148, 82, 68],
+  pxRoofSlate: [76, 88, 98],
+  pxRoofTeal: [64, 104, 104],
+  pxThatch: [196, 160, 98],
+  pxIron: [70, 70, 76],
+  pxGold: [200, 168, 92],
+  pxClothRed: [146, 80, 68],
+  pxClothBlue: [78, 98, 140],
+  pxCream: [228, 214, 186],
+  pxWindowLit: [236, 206, 124], // janela acesa (cor quente, sem Neon)
+  pxFire: [232, 150, 106], // chama (Neon com luz, só em lareira/forja/tocha)
+  pxBook: [120, 70, 60],
+  pxHay: [206, 176, 104],
+  pxStatue: [186, 184, 180], // boneco R6 da estátua de Luvitlua (cinza claro, como o R6 sem roupa)
+  pxEngrave: [58, 60, 70], // letras escuras da placa da estátua
 });
 
 /** Saturação HSV (0..1) de uma cor [r,g,b]. */
