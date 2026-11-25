@@ -258,7 +258,10 @@ test('Lobby como praça de cidade: 4 lojas de verdade, arcos, bancos, lampiões,
   assert.ok(models('Lobby/Caixotes ') >= 4, 'caixotes ao lado das lojas');
   assert.ok(models('Lobby/Canteiro ') >= 4, 'vasos com árvore');
   assert.ok(models('Lobby/Coluna Antiga ') >= 6, 'colunas antigas');
-  assert.ok(parts.some((p) => p.model === 'Lobby/Spawn' && p.name === 'Mosaico do Spawn'), 'spawn sem mosaico próprio');
+  assert.ok(
+    parts.some((p) => p.model === 'Lobby/Spawn' && p.name === 'Mosaico do Spawn'),
+    'spawn sem mosaico próprio',
+  );
   for (let n = 1; n <= 4; n++) {
     const names = new Set(parts.filter((p) => p.model === `Lobby/Loja ${n}`).map((p) => p.name));
     assert.ok(names.size >= 15, `Loja ${n} simples demais (${names.size} tipos de peça)`);
