@@ -10,7 +10,7 @@ O mesmo arquivo gera:
 - o lugar do Roblox (`src/rojo.js` → Rojo → `.rbxl` → Open Cloud);
 - o visualizador 3D (`viewer/main.js`, Three.js) e as capturas do CI.
 
-**Fase atual: o Terreno do Vale.** Um terreno vazio em estilo voxel pixelado (blocos lisos, bordas "em escada"), com o Lobby no centro, áreas de construção, 30 lotes de castelo (20 jogadores + 10 bots), estradas, penhascos, terraços e lagoas. As construções vêm depois, em cima dele. Inspiração de estilo: mapas voxel pixelados de RPG no Roblox (paleta quente, blocos lisos, caminhos de terra serrilhados, penhascos de rocha em camadas); o vale é original, nunca a cópia do mapa de outro jogo.
+**Fase atual: o Vale com as construções.** Terreno em estilo voxel pixelado (blocos lisos, bordas "em escada"), com o Lobby no centro (estátua de Luvitlua), os 8 prédios do Lobby e os 30 castelos (20 jogadores + 10 bots) mobiliados por dentro, estradas, penhascos, terraços e lagoas. **O mapa é fixo** (decisão do dono): uma semente só, igual em todo servidor. Inspiração de estilo: mapas voxel pixelados de RPG no Roblox (paleta quente, blocos lisos, caminhos de terra serrilhados, penhascos de rocha em camadas); o vale é original, nunca a cópia do mapa de outro jogo.
 
 **Arquivos guardados (não renderizados nem publicados):**
 
@@ -23,15 +23,18 @@ Nada deles volta para o mapa sem pedido do dono do projeto.
 
 1. **Nada roda localmente.** Testes, build, capturas e publicação rodam no GitHub Actions (`.github/workflows/ci.yml`, `ubuntu-latest`). Para validar uma mudança: commit → push → ler os comentários que o CI posta no PR.
 2. **Fonte única:** o mapa vive em `src/map.js`. Nunca edite o lugar no Roblox Studio, porque a próxima publicação sobrescreve tudo.
-3. **Part simples:** `Part` (Block) e um `SpawnLocation` por mapa. Proibido: MeshPart, Union, Decal, Texture, SurfaceGui, BillboardGui, Humanoid, LocalScript, ModuleScript e `Sky` customizado (testado no `verify-place`). **Única exceção de script:** `EscolherMapa` (`src/game/escolher-mapa.server.luau`, ServerScriptService), que só sorteia a variante do mapa do servidor.
-3b. **Um mapa diferente por servidor (procedural):** `createWorld(semente)` gera o formato do vale (elipse girada, lóbulos, borda com ruído), os setores com penhasco, as lagoas, os lotes, as estradas e os terraços. A semente padrão `SEED` é o mapa principal; as de `src/variants.js` viram `ServerStorage/Mapas/Semente N` e o `EscolherMapa` sorteia entre elas. Cada variante passa pelos mesmos testes (`tests/variants.test.mjs`) e aparece nas capturas (`variante-N.png`). Visualizador com `#seed=N` mostra qualquer semente.
+3. **Part simples:** `Part` (Block) e um `SpawnLocation` por mapa. Proibido: MeshPart, Union, Decal, Texture, SurfaceGui, BillboardGui, Humanoid, scripts e `Sky` customizado (testado no `verify-place`).
+3b. **Mapa fixo (decisão do dono do projeto):** nada de geração procedural por servidor. `createWorld(SEED)` monta sempre o mesmo vale; variantes, o script de sorteio e o fuzz de sementes foram removidos (o histórico está no git). A semente só existe para o desenho do vale continuar determinístico.
 4. **Estilo voxel liso (decisão do dono do projeto):** toda peça em `SmoothPlastic`, **sem studs, sem inlet, sem relevo** nas faces (`materialFor` devolve SmoothPlastic; testado). `Neon` só em lâmpada que emite luz. Histórico: o Plastic com studs ficou no `arquivo/reino-classico`; as texturas "realistas" (Grass, Cobblestone…) foram rejeitadas.
 5. **Cores:** só `src/palette.js` (grupo `px…` para o Vale), saturação HSV ≤ 0,55 (testado). Tons quentes e foscos: grama verde, terra marrom, pedra bege, rocha marrom-avermelhada, musgo.
 6. **Mapa determinístico:** a mesma semente gera o mesmo mapa (testado).
 7. **Tudo se sustenta:** nenhuma peça flutua (cadeia de contato até o `Mar`), nenhuma face visível faz z-fighting e nada com colisão invade as zonas livres (`clearanceZones()`: pisos dos lotes e das áreas, caminho do spawn e spawn). O **manual de montagem** (`src/manual.js`) precisa montar cada peça sobre algo já montado.
 8. **Grade de pixels:** o terreno é uma grade de células de **4 studs** (`DIM.cell`) em x,z ∈ [−400, 400]. Lotes e áreas têm lado múltiplo de 8 e centro na grade, para o piso cobrir células inteiras. Cada célula tem tipo (mar, chão, água, penhasco), topo e superfície. As peças saem da grade: em cada linha, células seguidas iguais viram um bloco só (corpo de terra embaixo + camada de 1 stud em cima). Por isso as bordas de estradas, praça e lagoas ficam "em escada", como pixel art, e nunca há duas peças deitadas no mesmo plano.
 9. **Lobby:** praça circular de pedra clara (raio 46) no centro, com faixas escuras pixeladas (dois anéis e um losango), **estrado** de 1 stud no meio (raio 10) com a **estátua de Luvitlua** (o perfil do dono do jogo): pedestal de pedra em degraus, placa com o nome em letras de pixel e o **boneco R6 oficial do Roblox** (pedido do dono: nada de personagem inventado), com as proporções exatas do R6 em escala 3,6 (tronco 2×2×1, braços e pernas 1×2×1, cabeça de cantos quebrados), numa cor só de estátua e **sem armadura, roupa, arma ou item** (só o corpo do R6; `src/props/estatua.js`, testado) e o **spawn** no lado sul (0, 4, 24). Em volta, um anel de terra (52 a 62) e **8 áreas de construção** (raio 88, entre as 4 saídas), uma para cada prédio do Lobby, com a planta dele.
-10. **Lotes:** 30 lotes de castelo (cabem em 32×32) de terra clara com borda de pedra, a pelo menos 56 studs um do outro (64 quando cabe), longe da praça, das áreas e das lagoas, nos 4 quadrantes (fuzz: 3). Numerados do centro para fora: os 20 primeiros são de jogadores (`owner: 'jogador'`), o resto de bots.
+10. **Lotes:** 30 lotes de castelo (cabem em 32×32) de terra clara com borda de pedra, a pelo menos 56 studs um do outro (64 quando cabe), longe da praça, das áreas e das lagoas, nos 4 quadrantes. Numerados do centro para fora: os 20 primeiros são de jogadores (`owner: 'jogador'`), o resto de bots.
+10c. **Prédios do Lobby com interior (`src/props/lojas.js`, `SHOPS`):** cada prédio na sua planta, montado pela casca comum (`buildShell` em `src/props/oficina.js`): piso, paredes em camadas (base de pedra, janelas acesas, porta de 6 studs com verga), telhado em degraus (a planta encolhida camada a camada) e **exatamente 1 luz** (lampião, brasa da forja ou bola de cristal). Móveis pelo `makeKit`: só entram se a pegada inteira cair no piso livre e, com colisão, fora da zona da porta; nada pode ser pulado (testado). Nas peças, a planta "Salão da Guilda" se chama **"Salão do Clã"** (a sílaba "gui" é proibida pelo teste de estilo). O Banco tem o salão em v ≤ 4 com piso a 1,2 e a escadaria com colunas e pórtico na frente.
+10d. **Castelos com interior (`src/props/castelos.js`, `KEEPS`):** muralha no contorno da planta (base escura, ameias alternadas, portão de 6 × 8 com verga; na Fortaleza as torres redondas sobem +4), pátio de pedra com poço, boneco de treino, barris, caixotes e feno (só o que couber), e a **torre de menagem** (retângulo por planta, porta alinhada ao portão) com janelas, telhado em degraus, estandartes na fachada e bandeira no topo. Dentro: trono no estrado, tapete, estandartes, baú, lareira, cavalete de lanças, mesas nos salões largos e **1 lampião** (a única luz). Cores do dono: jogador = ardósia + azul, bot = telha + vermelho (testado). Zona de passagem do lado de fora do portão até 3 studs dentro da torre.
+10e. **Regras de desenho das construções:** paredes, pisos e telhados na grade local de 1 stud (inteiros); móveis em coordenadas quebradas (x,1 a x,9) para nunca cair no plano de uma parede; peças de cores diferentes só se encostam por faces opostas; tudo dentro da planta (placas e bandeiras saem no máximo 1 stud, testado); nada girado.
 10b. **Plantas de verdade (`PLANS`, `inPlan`, `planRects`, `footprint`):** cada área de construção tem o formato do prédio que vai receber, nunca um quadrado igual para tudo. Prédios do Lobby (8, um de cada, ordem sorteada por servidor): Taverna (L), Ferraria (oficina + forja), Mercado Coberto (salão + alpendre), Capela (cruz), Torre do Mago (redonda), Estábulo (U em volta do picadeiro), Banco (cofre + escadaria) e Salão da Guilda (octógono). Castelos (7 plantas em rodízio): Fortaleza com Torres, Castelo em L, Castelo Redondo, Castelo com Pátio, Cidadela em Cruz, Castelo em U e Forte em T. Plantas em coordenadas locais com a frente (+z) virada para o Lobby; bordas em múltiplos de 4 para cobrir células inteiras; o piso é a planta e a borda de pedra é 1 célula em volta. Testado: 8 prédios diferentes na praça, ≥ 6 plantas de castelo, ≥ 10 tamanhos e quase nenhum quadrado cheio.
 11. **Estradas:** terra (10 de largura, borda serrilhada por ruído, manchas de terra batida). Quatro saídas retas da praça e cada área/lote ligado à malha por um "L" (dois trechos retos) até um dos 80 pontos mais perto ou, se nenhum servir, por um "Z" (três trechos) que desvia pelos corredores; nunca atravessa outro lote nem área. Sobre a lagoa vira passagem de pedra. **Toda** área e todo lote ligam no Lobby (busca em largura na grade, testado).
 12. **Relevo:** **penhascos** em blocos (degraus de 6 studs, até ~80 de altura, cores de rocha alternadas e musgo no topo) cercando boa parte do vale; no resto, o planalto acaba numa borda sobre o mar (testado: as duas coisas existem). **Terraços** de grama (+2 e +4) só longe de estradas, lotes, áreas, água e borda. **Lagoas** (1 ou 2) com leito e água sem colisão. Grama com **manchas escuras** em blocos de 8 studs.
@@ -46,16 +49,17 @@ Nada deles volta para o mapa sem pedido do dono do projeto.
 | `src/materials.js` | `MATERIAL_ENUM` do Rojo; `materialFor` devolve SmoothPlastic |
 | `src/builder.js` | `makeBuilder()` (`box`/`span`), `rotationMatrix`, `aabb`, `stats` |
 | `src/map.js` | **Mapa** (`createWorld`, `buildMap`), `DIM`, `T`, `PLAZA`, `PLOTS`, `PADS`, `PONDS`, `terrainAt`/`heightAt`/`surfaceAt`, `clearanceZones`, `ENVELOPE` |
+| `src/props/oficina.js`, `src/props/moveis.js` | Base das construções: planta em grade de 1 stud (`Mask`), `buildShell` (piso, paredes, porta, janelas, telhado), `makeKit` (móveis com checagem) e os móveis |
+| `src/props/lojas.js`, `src/props/castelos.js`, `src/props/estatua.js`, `src/props/frame.js` | Prédios do Lobby, castelos, estátua de Luvitlua e o referencial local das construções |
 | `src/checks.js` | Verificações: flutuação, z-fighting, passagens e limites |
 | `src/rojo.js` | Parts → `.model.json` do Rojo |
 | `src/manual.js` | Manual de montagem: fases (mar, chão, Lobby, estradas, áreas, lotes, penhascos, lagoas), etapas de até 8 peças |
-| `src/invariants.js` | Invariantes por semente para o fuzz: `layoutProblems(w)` e `fullProblems(w, built)` |
-| `src/variants.js`, `src/game/escolher-mapa.server.luau` | Sementes das variantes e o script que sorteia o mapa do servidor |
-| `default.project.json` | Projeto Rojo: Workspace, ServerStorage/Mapas, ServerScriptService e **Lighting** |
+| `src/invariants.js` | Invariantes do mapa: `layoutProblems(w)` e `fullProblems(w, built)` |
+| `default.project.json` | Projeto Rojo: Workspace e **Lighting** |
 | `tests/*.test.mjs` | Regras de geometria, mapa, estilo, Rojo, manual, variantes e invariantes (node:test, sem dependências) |
 | `tools/build-place.mjs`, `tools/publish.mjs` | Gera os modelos do Rojo e publica o `.rbxl` via Open Cloud |
 | `tools/screenshots.mjs`, `tools/manual.mjs` | Capturas do visualizador (Playwright) e o manual |
-| `tools/fuzz.mjs`, `tools/ci/*` | Fuzz de sementes, verificação do lugar, branch `ci-previews` e comentários no PR |
+| `tools/ci/*` | Verificação do lugar, branch `ci-previews` e comentários no PR |
 | `viewer/main.js`, `viewer/surfaces.js`, `index.html` | Visualizador Three.js (tudo instanciado; aparência por material em `surfaces.js`) |
 
 ## 4. Como construir (receita)
@@ -84,12 +88,12 @@ Nada deles volta para o mapa sem pedido do dono do projeto.
 | relevo | penhasco baixo (< 40 acima do chão) ou de poucos blocos, poucos terraços, sem lagoa, grama sem manchas; borda só de penhasco ou só aberta |
 | estilo | classe, material (SmoothPlastic; Neon só com luz), studs ou relevo nas faces, campos desconhecidos (UI/NPC/script), cor fora da paleta |
 | orçamento | mais de `DIM.maxParts` (32000) Parts ou 60 luzes |
+| construções | móvel pulado (fora do piso livre ou na passagem), prédio sem piso/parede/janela/telhado, mais ou menos de 1 luz por prédio ou castelo, interior vazio, castelo sem ameia/pátio/trono/bandeira, bandeira fora da cor do dono, peça fora da planta |
+| estátua | estátua sem pedestal/placa/letras, baixa, fora do estrado, fora das proporções do R6, com mais de uma cor, com armadura/item/luz |
 | determinismo | resultado diferente entre duas montagens |
 | manual de montagem | peça que não se apoia em nada já montado, etapa com mais de 8 peças, fases fora de ordem |
 | Rojo/projeto | enums errados, Lighting fora de Future ou de noite, serviços extras (scripts/UI) |
 | `verify-place` (CI) | o `.rbxlx` real com contagem errada, instância proibida, material inesperado ou spawn faltando |
-| variantes | variante com lote sem estrada, problema físico, mais de um spawn, estouro de orçamento; duas sementes com o mesmo vale (< 8% da terra diferente) |
-| fuzz de sementes (`tests/invariants.test.mjs` em todo PR; `fuzz.yml` com 100 mil) | qualquer semente com lote/área faltando, perto demais, piso torto, sem estrada, estrada diagonal ou fora do chão, borda da grade sem mar, Lobby fora do chão, sem penhasco ou sem lagoa; na amostra com Parts: apoio, z-fighting, passagens, limites, spawn, manual, orçamento e marcos (lotes, áreas, lagoas, estradas, terraços) |
 
 Quando um teste falhar, a mensagem lista a peça (`Modelo/Nome @ [x, y, z]`). Corrija a geometria, não o teste. Só mude um teste quando a **regra** mudar, e registre isso aqui.
 
@@ -145,7 +149,6 @@ Cada item já derrubou o CI uma vez (na prisão ou no Reino clássico; as regras
 | `render` | depois de `test` (sem forks) | Playwright gera as capturas das vistas, das variantes e dos estágios da montagem; `tools/manual.mjs` gera o manual; tudo vai para o branch `ci-previews` e para um comentário no PR |
 | `publish` | PR do próprio repo, push na `main` ou manual | Open Cloud publica o `.rbxl` (fila única `roblox-publish`) |
 | `pages` | push na `main` | visualizador no GitHub Pages |
-| `fuzz.yml` (workflow separado) | manual (Run workflow) e toda segunda às 04:17 UTC | 100 mil sementes em 40 fatias paralelas + resumo agrupado por tipo de falha (seção 10) |
 
 Credenciais (Settings → Secrets and variables → Actions):
 
@@ -164,12 +167,6 @@ Credenciais (Settings → Secrets and variables → Actions):
 
 O catálogo de peças (props, `src/catalog.js`, `viewer/catalog.html`, `tools/catalog-shots.mjs`) foi guardado com o Reino clássico no branch `arquivo/reino-classico`. Quando as construções do Vale começarem, ele volta com as peças novas (estilo liso): cada peça reaproveitável sozinha no seu chão, fotografada normal e com a colisão em vermelho, com teste de cobertura.
 
-## 10. Fuzz de 100 mil mapas
+## 10. Fuzz de sementes (removido)
 
-Detalhes em [`docs/FUZZ.md`](docs/FUZZ.md).
-
-- **Duas camadas** (`src/invariants.js`): `layoutProblems(createWorld(semente))` é barata (sem Parts) e roda em **toda** semente; `fullProblems(w, w.buildMap())` monta as Parts e roda numa amostra (sementes múltiplas de `full_every`). Cada problema é `tipo: detalhe`, no máximo 20 por verificação.
-- **Em todo PR:** `tests/invariants.test.mjs` (job `test` do CI normal) roda o layout na semente padrão e nas sementes 1 a 25, e a construção completa em `SEED`, 7 e 12345.
-- **O grande:** `.github/workflows/fuzz.yml` ("Fuzz de mapas (100 mil sementes)"): Actions → Fuzz de mapas → Run workflow (`total`, `shards`, `full_every`, `first`), e toda segunda-feira sozinho. O resumo do Actions agrupa as falhas por tipo, com as 50 primeiras sementes de cada.
-- **Regra:** semente que falha se corrige **no gerador** (`src/map.js`), nunca pulando a semente nem afrouxando a invariante. Depois de corrigir, rode o fuzz de novo e registre a lição na tabela 6.1.
-- **Marcos obrigatórios:** lotes, áreas de construção, lagoas, estradas e terraços. No fuzz bastam lotes em 3 dos 4 quadrantes; a semente padrão continua exigindo os 4 (`tests/map.test.mjs`).
+Com o mapa fixo (regra 3b), o fuzz de 100 mil sementes, as variantes e o `EscolherMapa` saíram do projeto. `tests/invariants.test.mjs` continua rodando as invariantes de layout e da construção completa na semente única (`SEED`).

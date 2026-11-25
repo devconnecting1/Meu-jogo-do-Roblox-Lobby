@@ -16,7 +16,12 @@ import {
   terrainAt,
   heightAt,
   surfaceAt,
+  inPlan,
 } from '../src/map.js';
+import { SHOPS } from '../src/props/lojas.js';
+import { KEEPS } from '../src/props/castelos.js';
+import { SKIPPED } from '../src/props/oficina.js';
+import { C } from '../src/palette.js';
 
 const { parts, landmarks } = buildMap();
 const world = createWorld(SEED);
@@ -155,4 +160,62 @@ test('borda do vale variada: parte penhasco, parte planalto sobre o mar', () => 
   }
   assert.ok(cliff >= 18, `pouco penhasco na borda (${cliff}/72)`);
   assert.ok(open >= 8, `nenhuma borda aberta para o mar (${open}/72)`);
+});
+
+const under = (root) => parts.filter((p) => p.model === root || p.model.startsWith(`${root}/`));
+
+/** Toda peça da construção fica na planta da área/lote (sinais e bandeiras podem sair até 1 stud). */
+function outsidePlan(p, list) {
+  return list
+    .filter((q) => {
+      const [x0, z0, x1, z1] = [
+        q.position[0] - q.size[0] / 2 + 0.01,
+        q.position[2] - q.size[2] / 2 + 0.01,
+        q.position[0] + q.size[0] / 2 - 0.01,
+        q.position[2] + q.size[2] / 2 - 0.01,
+      ];
+      return [
+        [x0, z0],
+        [x0, z1],
+        [x1, z0],
+        [x1, z1],
+      ].some(([x, z]) => !inPlan(p, x, z, 1.05));
+    })
+    .map((q) => `${q.model}/${q.name}`);
+}
+
+test('construções com interior: todo móvel coube no lugar (nada pulado)', () => {
+  assert.deepEqual([...new Set(SKIPPED)], [], `móveis fora do piso livre ou na passagem: ${[...new Set(SKIPPED)].join(', ')}`);
+});
+
+test('8 prédios do Lobby: paredes, porta, janelas, telhado, uma luz e interior mobiliado, dentro da planta', () => {
+  for (const p of PADS) {
+    const root = `Construções/${SHOPS[p.plan].model}`;
+    const ps = under(root);
+    const names = new Set(ps.map((q) => q.name));
+    for (const n of ['Piso', 'Parede', 'Base da Parede', 'Janela', 'Telhado'])
+      assert.ok(names.has(n), `${root} sem ${n}`);
+    assert.equal(ps.filter((q) => q.light).length, 1, `${root}: precisa de exatamente 1 luz`);
+    const inside = ps.filter((q) => q.model.includes('/Interior/')).length;
+    assert.ok(inside >= 20, `${root}: interior com só ${inside} peças`);
+    assert.deepEqual(outsidePlan(p, ps), [], `${root}: peças fora da planta`);
+  }
+});
+
+test('30 castelos: muralha com ameias e portão, pátio, torre de menagem com trono, cores do dono e uma luz', () => {
+  for (const p of PLOTS) {
+    const root = `Construções/${p.name}`;
+    const ps = under(root);
+    const names = new Set(ps.map((q) => q.name));
+    for (const n of ['Parede', 'Ameia', 'Pátio', 'Piso', 'Telhado', 'Janela', 'Assento do Trono', 'Bandeira'])
+      assert.ok(names.has(n), `${root} (${p.plan}) sem ${n}`);
+    assert.equal(ps.filter((q) => q.light).length, 1, `${root}: precisa de exatamente 1 luz`);
+    const inside = ps.filter((q) => q.model.startsWith(`${root}/Torre de Menagem/Interior/`)).length;
+    assert.ok(inside >= 15, `${root}: salão com só ${inside} peças`);
+    const cloth = p.owner === 'bot' ? C.pxClothRed : C.pxClothBlue;
+    const flag = ps.find((q) => q.name === 'Bandeira');
+    assert.deepEqual(flag.color, cloth, `${root}: bandeira fora da cor do dono (${p.owner})`);
+    assert.ok(KEEPS[p.plan], `${root}: planta sem torre de menagem`);
+    assert.deepEqual(outsidePlan(p, ps), [], `${root}: peças fora da planta`);
+  }
 });

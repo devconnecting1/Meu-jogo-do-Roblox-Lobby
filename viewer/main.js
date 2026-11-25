@@ -2,7 +2,9 @@
 // Usado no navegador (GitHub Pages / prévia do PR) e pelo CI para gerar as capturas.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { createWorld, SEED, DIM, PLANS, doorPoint } from '../src/map.js';
+import { createWorld, SEED, DIM, PLANS, doorPoint, planPoint } from '../src/map.js';
+import { SHOP_DOORS } from '../src/props/lojas.js';
+import { KEEPS } from '../src/props/castelos.js';
 import { stats as countStats } from '../src/builder.js';
 import { buildManual } from '../src/manual.js';
 import { isWet, surfaceMaterial } from './surfaces.js';
@@ -150,18 +152,36 @@ const facade = (p, dist, h) => {
   const len = Math.hypot(fx, fz) || 1;
   return { pos: [p.x + (fx / len) * dist, h, p.z + (fz / len) * dist], target: [p.x, 9, p.z] };
 };
-const inside = (p) => {
-  const [dx, dz] = doorPoint(p);
-  return { pos: [dx, DIM.land + 5.5, dz], target: [p.x, DIM.land + 3.5, p.z] };
+// vistas de dentro: do lado de dentro da porta, olhando para o fundo do prédio ou do salão do castelo
+const inward = (p, du, dv, back, y0, y1) => {
+  const [px, pz] = planPoint(p, du, dv);
+  const [tx, tz] = planPoint(p, du, back);
+  return { pos: [px, DIM.land + y0, pz], target: [tx, DIM.land + y1, tz] };
 };
 for (const p of PADS) {
+  const { door, floorTop } = SHOP_DOORS[p.plan];
   add({ id: `predio-${p.plan}`, title: `${PLANS[p.plan].name} (fachada)`, ...facade(p, 40, 22) });
-  add({ id: `predio-${p.plan}-dentro`, title: `${PLANS[p.plan].name} (interior, da porta)`, ...inside(p) });
+  add({
+    id: `predio-${p.plan}-dentro`,
+    title: `${PLANS[p.plan].name} (interior)`,
+    ...inward(p, door[0], door[1] - 1.6, door[1] - 14, floorTop + 4.2, floorTop + 1.2),
+  });
 }
 for (const plan of new Set(PLOTS.map((p) => p.plan))) {
   const p = PLOTS.find((q) => q.plan === plan);
+  const [du, dv] = PLANS[plan].door;
+  const [, b0, , b1] = KEEPS[plan].keep;
   add({ id: `castelo-${plan}`, title: `${p.name}: ${PLANS[plan].name} (fachada)`, ...facade(p, 52, 30) });
-  add({ id: `castelo-${plan}-dentro`, title: `${p.name}: ${PLANS[plan].name} (interior, do portão)`, ...inside(p) });
+  add({
+    id: `castelo-${plan}-patio`,
+    title: `${p.name}: ${PLANS[plan].name} (pátio, do portão)`,
+    ...inward(p, du, dv + 1, b1, 6, 4),
+  });
+  add({
+    id: `castelo-${plan}-dentro`,
+    title: `${p.name}: ${PLANS[plan].name} (salão do trono)`,
+    ...inward(p, du, b1 - 1.4, b0, 4.6, 1.8),
+  });
 }
 if (PONDS.length) {
   const [p] = PONDS;

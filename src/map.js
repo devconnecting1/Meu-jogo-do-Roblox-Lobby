@@ -284,6 +284,12 @@ export function planRects(p) {
   });
 }
 
+/** Ponto local (u, v) da planta da construção p no mundo (u = lado, v = frente/fundo). */
+export function planPoint(p, u, v) {
+  const [dx, dz] = rot90(u, v, p.rot);
+  return [p.x + dx, p.z + dz];
+}
+
 /** Ponto do mundo logo na frente da porta principal (1 célula para fora da planta): a estrada chega ali. */
 export function doorPoint(p) {
   const [u, v] = PLANS[p.plan].door;
