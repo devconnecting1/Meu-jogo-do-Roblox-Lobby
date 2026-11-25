@@ -1,0 +1,103 @@
+{
+  "views": [
+    {
+      "id": "overview",
+      "title": "Visão geral do Vale"
+    },
+    {
+      "id": "top",
+      "title": "Vale visto de cima (Lobby, áreas, 30 lotes, estradas e lagoas)"
+    },
+    {
+      "id": "lobby",
+      "title": "Lobby: praça de pedra com o estrado no meio"
+    },
+    {
+      "id": "lobby-walk",
+      "title": "Chegando na praça (altura do jogador)"
+    },
+    {
+      "id": "pads",
+      "title": "Áreas de construção em volta da praça"
+    },
+    {
+      "id": "plot",
+      "title": "Lote 01: lote do castelo"
+    },
+    {
+      "id": "road",
+      "title": "Estrada de terra (altura do jogador)"
+    },
+    {
+      "id": "cliffs",
+      "title": "Penhascos de rocha em blocos cercando o vale"
+    },
+    {
+      "id": "pond",
+      "title": "Lagoa com passagem de pedra"
+    },
+    {
+      "id": "build-25",
+      "title": "Montagem — 25% das etapas"
+    },
+    {
+      "id": "build-50",
+      "title": "Montagem — 50% das etapas"
+    },
+    {
+      "id": "build-75",
+      "title": "Montagem — 75% das etapas"
+    },
+    {
+      "id": "variante-101",
+      "title": "Variante do servidor (semente 101): vista de cima"
+    },
+    {
+      "id": "variante-101-geral",
+      "title": "Variante do servidor (semente 101): visão geral"
+    },
+    {
+      "id": "variante-2027",
+      "title": "Variante do servidor (semente 2027): vista de cima"
+    },
+    {
+      "id": "variante-2027-geral",
+      "title": "Variante do servidor (semente 2027): visão geral"
+    },
+    {
+      "id": "variante-4242",
+      "title": "Variante do servidor (semente 4242): vista de cima"
+    },
+    {
+      "id": "variante-4242-geral",
+      "title": "Variante do servidor (semente 4242): visão geral"
+    },
+    {
+      "id": "variante-77777",
+      "title": "Variante do servidor (semente 77777): vista de cima"
+    },
+    {
+      "id": "variante-77777-geral",
+      "title": "Variante do servidor (semente 77777): visão geral"
+    }
+  ],
+  "stats": {
+    "total": 9141,
+    "lights": 0,
+    "groups": {
+      "Mar": 1,
+      "Penhascos": 4476,
+      "Terreno": 2606,
+      "Estradas": 925,
+      "Lotes": 780,
+      "Áreas": 160,
+      "Lobby": 171,
+      "Água": 22
+    }
+  },
+  "manual": {
+    "parts": 9141,
+    "steps": 1146,
+    "connections": 56938
+  }
+}

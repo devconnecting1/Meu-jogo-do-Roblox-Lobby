@@ -2,99 +2,39 @@
   "views": [
     {
       "id": "overview",
-      "title": "Visão geral do reino"
+      "title": "Visão geral do Vale"
     },
     {
       "id": "top",
-      "title": "Mapa visto de cima (30 lotes, estradas, rio e lago)"
+      "title": "Vale visto de cima (Lobby, áreas, 30 lotes, estradas e lagoas)"
     },
     {
       "id": "lobby",
-      "title": "Lobby: fonte com a estátua clássica, mercado e colunas antigas"
+      "title": "Lobby: praça de pedra com o estrado no meio"
     },
     {
-      "id": "market",
-      "title": "Lojas do Lobby (altura do jogador)"
+      "id": "lobby-walk",
+      "title": "Chegando na praça (altura do jogador)"
     },
     {
-      "id": "lobby-stairs",
-      "title": "Escadaria de madeira do Lobby"
-    },
-    {
-      "id": "fountain",
-      "title": "Fonte do Lobby: estátua do boneco clássico com o logo"
+      "id": "pads",
+      "title": "Áreas de construção em volta da praça"
     },
     {
       "id": "plot",
-      "title": "Lote 27: fundação do castelo"
+      "title": "Lote 01: lote do castelo"
     },
     {
-      "id": "plots",
-      "title": "Lotes espalhados pelo mapa"
+      "id": "road",
+      "title": "Estrada de terra (altura do jogador)"
     },
     {
-      "id": "bridge",
-      "title": "Ponte de madeira sobre o rio"
+      "id": "cliffs",
+      "title": "Penhascos de rocha em blocos cercando o vale"
     },
     {
-      "id": "bridge-walk",
-      "title": "Atravessando a ponte (altura do jogador)"
-    },
-    {
-      "id": "lake",
-      "title": "Lago e rio"
-    },
-    {
-      "id": "forest",
-      "title": "Floresta"
-    },
-    {
-      "id": "autumn",
-      "title": "Bosque de outono"
-    },
-    {
-      "id": "mountain",
-      "title": "Montanha com neve e pinheiros"
-    },
-    {
-      "id": "hill",
-      "title": "Colina em terraços"
-    },
-    {
-      "id": "village",
-      "title": "Vila: casas, poço, celeiro e moinho"
-    },
-    {
-      "id": "village-walk",
-      "title": "Rua da vila (altura do jogador)"
-    },
-    {
-      "id": "farmland",
-      "title": "Região de fazenda: campos, espantalho e sede"
-    },
-    {
-      "id": "tower",
-      "title": "Torre de vigia na beira da estrada"
-    },
-    {
-      "id": "camp",
-      "title": "Acampamento na floresta"
-    },
-    {
-      "id": "farm",
-      "title": "Campo de trigo"
-    },
-    {
-      "id": "mine",
-      "title": "Jazida de ouro"
-    },
-    {
-      "id": "dock",
-      "title": "Cais e barco na praia"
-    },
-    {
-      "id": "beach",
-      "title": "Praia com coqueiros"
+      "id": "pond",
+      "title": "Lagoa com passagem de pedra"
     },
     {
       "id": "build-25",
@@ -142,29 +82,22 @@
     }
   ],
   "stats": {
-    "total": 25827,
+    "total": 9141,
     "lights": 0,
     "groups": {
       "Mar": 1,
-      "Terreno": 580,
-      "Lobby": 1078,
-      "Estradas": 44,
-      "Pontes": 41,
-      "Lotes": 330,
-      "Trilhas": 46,
-      "Vila": 1135,
-      "Vegetação": 16655,
-      "Fazendas": 487,
-      "Relevo": 5027,
-      "Recursos": 116,
-      "Costa": 45,
-      "Torres de Vigia": 170,
-      "Acampamentos": 72
+      "Penhascos": 4476,
+      "Terreno": 2606,
+      "Estradas": 925,
+      "Lotes": 780,
+      "Áreas": 160,
+      "Lobby": 171,
+      "Água": 22
     }
   },
   "manual": {
-    "parts": 25827,
-    "steps": 3824,
-    "connections": 70887
+    "parts": 9141,
+    "steps": 1146,
+    "connections": 56938
   }
 }
