@@ -173,7 +173,7 @@ function windowCells(occ, wall, door, period, phase) {
     for (let dj = -2; dj <= 2; dj++) for (let di = -2; di <= 2; di++) if (door.has(i + di, j + dj)) return true;
     return false;
   };
-  const beat = (x) => ((((x + phase) % period) + period) % period) < 2;
+  const beat = (x) => (((x + phase) % period) + period) % period < 2;
   const interior = (i, j) => occ.has(i, j) && !wall.has(i, j) && !door.has(i, j);
   const across = wall.map((i, j) => {
     if (!wall.has(i, j) || nearDoor(i, j) || !wall.has(i - 1, j) || !wall.has(i + 1, j)) return false;

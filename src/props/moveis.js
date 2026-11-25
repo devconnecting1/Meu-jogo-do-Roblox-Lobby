@@ -54,9 +54,7 @@ export const saco = (u, v) => [['Saco', [u - 0.45, 0, v - 0.35], [u + 0.45, 0.9,
 export const fardo = (u0, v0, u1, v1, y = 0) => [['Fardo de Feno', [u0, y, v0], [u1, y + 0.9, v1], C.pxHay]];
 
 /** Tapete (sem colisão, 0,1 de altura). */
-export const tapete = (u0, v0, u1, v1, color) => [
-  ['Tapete', [u0, 0, v0], [u1, 0.1, v1], color, { canCollide: false }],
-];
+export const tapete = (u0, v0, u1, v1, color) => [['Tapete', [u0, 0, v0], [u1, 0.1, v1], color, { canCollide: false }]];
 
 /** Balcão: corpo escuro e tampo claro. */
 export const balcao = (u0, v0, u1, v1, h = 1.6) => [

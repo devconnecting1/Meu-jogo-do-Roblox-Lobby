@@ -116,7 +116,13 @@ export function buildCastle(b, plot, floorY) {
 
   const occ = planMask(plan.parts, half);
   const [a0, b0, a1, b1] = spec.keep;
-  const keepOcc = Mask.from((u, v) => u > a0 && u < a1 && v > b0 && v < b1, occ.u0, occ.v0, occ.u0 + occ.w, occ.v0 + occ.h);
+  const keepOcc = Mask.from(
+    (u, v) => u > a0 && u < a1 && v > b0 && v < b1,
+    occ.u0,
+    occ.v0,
+    occ.u0 + occ.w,
+    occ.v0 + occ.h,
+  );
   const [du, dv] = plan.door;
 
   // torres (só na Fortaleza: anel dentro dos círculos e fora do quadrado do meio)

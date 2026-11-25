@@ -185,7 +185,11 @@ function outsidePlan(p, list) {
 }
 
 test('construções com interior: todo móvel coube no lugar (nada pulado)', () => {
-  assert.deepEqual([...new Set(SKIPPED)], [], `móveis fora do piso livre ou na passagem: ${[...new Set(SKIPPED)].join(', ')}`);
+  assert.deepEqual(
+    [...new Set(SKIPPED)],
+    [],
+    `móveis fora do piso livre ou na passagem: ${[...new Set(SKIPPED)].join(', ')}`,
+  );
 });
 
 test('8 prédios do Lobby: paredes, porta, janelas, telhado, uma luz e interior mobiliado, dentro da planta', () => {
