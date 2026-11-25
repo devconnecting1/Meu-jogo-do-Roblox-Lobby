@@ -41,7 +41,7 @@ for (const { parts, prop, cx, y, cz } of CASES) {
   });
 
   test(`fonte ${where}: tudo dentro do quadrado de ±FOUNTAIN_HALF e abaixo de 40 studs`, () => {
-    assert.ok(FOUNTAIN_HALF <= 12, `FOUNTAIN_HALF = ${FOUNTAIN_HALF}`);
+    assert.ok(FOUNTAIN_HALF <= 14, `FOUNTAIN_HALF = ${FOUNTAIN_HALF}`);
     const out = [];
     for (const p of prop) {
       const { min, max } = aabb(p);
@@ -104,6 +104,36 @@ test('fonte: tem água sem colisão e transparente, e a mureta colide', () => {
   for (const p of walls) assert.equal(p.canCollide, true, `${label(p)}: mureta sem colisão`);
   for (const p of prop.filter((q) => q.name === 'Borda'))
     assert.ok(aabb(p).max[1] <= y + 2.5 + EPS, `${label(p)}: borda acima de 2,5 (tapa a vista)`);
+});
+
+test('fonte bem feita: tanque octogonal, borda larga para sentar, taça de cima com água e 8 filetes caindo', () => {
+  const named = (n) => prop.filter((p) => p.name === n);
+  // octógono = cruz de 2 caixas + 4 cantos girados 45° em Y (só em Y: podem colidir)
+  const walls = named('Mureta');
+  assert.equal(walls.length, 8, 'mureta octogonal (4 lados retos + 4 cantos)');
+  assert.equal(walls.filter((p) => p.rotation && p.rotation[1] !== 0).length, 4, 'cantos da mureta girados');
+  const rim = named('Borda');
+  assert.equal(rim.length, 8, 'borda octogonal');
+  for (const p of rim.filter((q) => !q.rotation)) {
+    const thin = Math.min(p.size[0], p.size[2]);
+    assert.ok(thin >= 1.5, `${label(p)}: borda estreita demais para sentar (${thin})`);
+  }
+  // duas águas: tanque de baixo e taça de cima, a de cima mais alta
+  const low = named('Água da Fonte');
+  const high = named('Água da Taça');
+  assert.ok(low.length > 0 && high.length > 0, 'falta água no tanque ou na taça');
+  const top = (list) => Math.max(...list.map((p) => aabb(p).max[1]));
+  assert.ok(top(high) > top(low) + 2, 'a taça de cima não está acima do tanque');
+  // filetes: 8, finos, saindo da altura da taça e entrando na água de baixo
+  const jets = named('Água da Bica');
+  assert.equal(jets.length, 8, 'a fonte tem 8 filetes de água');
+  assert.equal(named('Bica').length, 8, 'a fonte tem 8 bicas');
+  for (const p of jets) {
+    const bb = aabb(p);
+    assert.ok(Math.max(p.size[0], p.size[2]) <= 0.5, `${label(p)}: filete grosso demais`);
+    assert.ok(bb.min[1] < top(low) && bb.min[1] > y + 0.8, `${label(p)}: filete não termina na água do tanque`);
+    assert.ok(bb.max[1] > top(low) + 2, `${label(p)}: filete não sai da taça`);
+  }
 });
 
 test('fonte: estátua R6 com braço levantado segurando o logo (4 barras giradas, sem colisão)', () => {

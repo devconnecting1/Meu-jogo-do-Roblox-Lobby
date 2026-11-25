@@ -44,9 +44,9 @@ const pick = (rand, list) => list[Math.min(list.length - 1, Math.floor(rand() * 
 /**
  * Referencial local de uma construção. `box`/`span` recebem (u, y, v) relativos ao centro e ao
  * chão; `rot: ['u' | 'v' | 'y', graus]` gira em torno de um eixo local; `wheel: true` faz um
- * cilindro com o eixo ao longo de u (roda).
+ * cilindro com o eixo ao longo de u (roda). Exportado para as lojas do Lobby (src/props/lobby.js).
  */
-function localFrame(b, model, x, y, z, face) {
+export function localFrame(b, model, x, y, z, face) {
   const swap = face === 'e' || face === 'w';
   const toWorld = {
     s: (u, v) => [x + u, z + v],

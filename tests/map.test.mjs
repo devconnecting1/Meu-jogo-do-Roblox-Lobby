@@ -248,17 +248,20 @@ test('Lobby elevado: 4 escadarias de degraus de 1 stud até o piso, com mureta n
   assert.ok(count((p) => p.name === 'Mureta') >= 8, 'mureta na borda do Lobby');
 });
 
-test('Lobby vivo como nas referências: mercado com toldos, caixotes, canteiros e colunas antigas', () => {
+test('Lobby como praça de cidade: 4 lojas de verdade, arcos, bancos, lampiões, vasos, caixotes e colunas', () => {
   const models = (prefix) => new Set(parts.filter((p) => p.model.startsWith(prefix)).map((p) => p.model)).size;
-  assert.equal(models('Lobby/Barraca '), 4, 'mercado com 4 barracas');
-  assert.ok(models('Lobby/Caixotes ') >= 4, 'caixotes do mercado');
-  assert.ok(models('Lobby/Canteiro ') >= 4, 'canteiros de flores');
+  assert.equal(models('Lobby/Barraca '), 0, 'barracas foram trocadas por lojas');
+  assert.equal(models('Lobby/Loja '), 4, '4 lojas no Lobby');
+  assert.ok(models('Lobby/Arco ') >= 4, 'arco no alto de cada escadaria');
+  assert.ok(models('Lobby/Banco ') >= 8, 'bancos de praça');
+  assert.ok(models('Lobby/Lampião ') >= 8, 'lampiões nos caminhos');
+  assert.ok(models('Lobby/Caixotes ') >= 4, 'caixotes ao lado das lojas');
+  assert.ok(models('Lobby/Canteiro ') >= 4, 'vasos com árvore');
   assert.ok(models('Lobby/Coluna Antiga ') >= 6, 'colunas antigas');
+  assert.ok(parts.some((p) => p.model === 'Lobby/Spawn' && p.name === 'Mosaico do Spawn'), 'spawn sem mosaico próprio');
   for (let n = 1; n <= 4; n++) {
-    const names = new Set(parts.filter((p) => p.model === `Lobby/Barraca ${n}`).map((p) => p.name));
-    for (const k of ['Balcão', 'Tampo do Balcão', 'Poste da Barraca', 'Toldo', 'Franja']) {
-      assert.ok(names.has(k), `Barraca ${n} sem "${k}"`);
-    }
+    const names = new Set(parts.filter((p) => p.model === `Lobby/Loja ${n}`).map((p) => p.name));
+    assert.ok(names.size >= 15, `Loja ${n} simples demais (${names.size} tipos de peça)`);
   }
 });
 

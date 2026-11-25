@@ -1,4 +1,5 @@
-// Catálogo de peças: cada peça reaproveitável (estátua, árvores, arbustos, flores e construções)
+// Catálogo de peças: cada peça reaproveitável (estátua, árvores, arbustos, flores, construções
+// e as peças do Lobby: lojas, banco, vaso, arco e lampião)
 // montada sozinha sobre um chão de studs, para revisar acabamento, escala e colisão.
 // Dados puros (sem DOM). Usado por tests/catalog.test.mjs, viewer/catalog.js (visualizador)
 // e tools/catalog-shots.mjs (capturas do CI).
@@ -11,9 +12,10 @@ import { C } from './palette.js';
 import { fountainStatue } from './props/statue.js';
 import { TREE_KINDS, plantTree, bush, flowerPatch } from './props/trees.js';
 import { BUILDINGS, building } from './props/buildings.js';
+import { SHOPS, shop, bench, planter, archGate, lampPost } from './props/lobby.js';
 
 /** Grupos do catálogo, na ordem em que aparecem no visualizador. */
-export const GROUPS = Object.freeze(['Estátua', 'Árvores', 'Construções', 'Mapa']);
+export const GROUPS = Object.freeze(['Estátua', 'Árvores', 'Construções', 'Lobby', 'Mapa']);
 
 /** Arranjo da grade: colunas, célula mínima, folga em volta da peça e meia largura mínima do chão. */
 export const CATALOG_LAYOUT = Object.freeze({ cols: 6, minCell: 60, margin: 4, minHalf: 12, padDepth: 2 });
@@ -37,6 +39,13 @@ const BUILDING_TITLES = Object.freeze({
   torre: 'Torre de vigia',
   feno: 'Monte de feno',
   tenda: 'Tenda',
+});
+
+const SHOP_TITLES = Object.freeze({
+  padaria: 'Padaria',
+  ferreiro: 'Ferreiro',
+  armazem: 'Armazém',
+  taverna: 'Taverna',
 });
 
 /**
@@ -77,6 +86,15 @@ export const CATALOG = Object.freeze([
       (b, m, x, y, z, rand) => building(b, m, k, x, y, z, 's', rand),
     ),
   ),
+  ...Object.keys(SHOPS).map((k) =>
+    entry(`loja-${k}`, SHOP_TITLES[k] ?? `Loja (${k})`, 'Lobby', 'shop', k, (b, m, x, y, z, rand) =>
+      shop(b, m, k, x, y, z, 's', rand),
+    ),
+  ),
+  entry('banco', 'Banco de praça', 'Lobby', 'bench', null, (b, m, x, y, z, rand) => bench(b, m, x, y, z, 's', rand)),
+  entry('vaso', 'Vaso com árvore', 'Lobby', 'planter', null, planter),
+  entry('arco', 'Arco de pedra', 'Lobby', 'archGate', null, (b, m, x, y, z) => archGate(b, m, x, y, z, 'x', 10)),
+  entry('lampiao', 'Lampião', 'Lobby', 'lampPost', null, (b, m, x, y, z) => lampPost(b, m, x, y, z)),
 ]);
 
 /** Sorteio determinístico (o mesmo algoritmo do mapa). */

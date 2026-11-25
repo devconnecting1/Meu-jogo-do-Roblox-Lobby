@@ -182,7 +182,7 @@ const VIEWS = [
     title: 'Lobby: fonte com a estátua clássica, mercado e colunas antigas',
     ...look(0, 0, 78, 48, 96, 10),
   },
-  { id: 'market', title: 'Mercado do Lobby (altura do jogador)', pos: [0, 17, 40], target: [0, 13, 0] },
+  { id: 'market', title: 'Lojas do Lobby (altura do jogador)', pos: [2, 16, 6], target: [30, 14, 30] },
   { id: 'lobby-stairs', title: 'Escadaria de madeira do Lobby', pos: [74, 17, 26], target: [44, 8, 0] },
   {
     id: 'fountain',

@@ -9,12 +9,13 @@ import { C } from '../src/palette.js';
 import { CATALOG, GROUPS, buildCatalog } from '../src/catalog.js';
 import { TREE_KINDS } from '../src/props/trees.js';
 import { BUILDINGS } from '../src/props/buildings.js';
+import { SHOPS } from '../src/props/lobby.js';
 
 const PROPS_DIR = new URL('../src/props/', import.meta.url);
 // funções exportadas que não montam peça (só ajudam a posicionar)
-const HELPERS = new Set(['footprint']);
+const HELPERS = new Set(['footprint', 'shopFootprint', 'localFrame']);
 // funções que recebem um tipo: cada tipo precisa de exatamente uma entrada
-const KINDS = { plantTree: TREE_KINDS, building: Object.keys(BUILDINGS) };
+const KINDS = { plantTree: TREE_KINDS, building: Object.keys(BUILDINGS), shop: Object.keys(SHOPS) };
 
 const PALETTE = new Set(Object.values(C).map((c) => c.join(',')));
 const BANNED = /npc|dummy|humanoid|gui|decal|texture|script/i;
@@ -62,13 +63,15 @@ test('catálogo cobre toda peça exportada em src/props/ (exatamente uma entrada
   assert.deepEqual(problems, []);
 });
 
-test('tipos conhecidos: estátua, 8 árvores, arbusto, canteiro e todas as construções', () => {
+test('tipos conhecidos: estátua, 8 árvores, arbusto, canteiro, construções e peças do Lobby', () => {
   const count = (prop, kind = null) => CATALOG.filter((e) => e.prop === prop && e.kind === kind).length;
   assert.equal(count('fountainStatue'), 1, 'fonte');
   assert.equal(count('bush'), 1, 'arbusto');
   assert.equal(count('flowerPatch'), 1, 'canteiro');
   for (const k of TREE_KINDS) assert.equal(count('plantTree', k), 1, `árvore ${k}`);
   for (const k of Object.keys(BUILDINGS)) assert.equal(count('building', k), 1, `construção ${k}`);
+  for (const k of Object.keys(SHOPS)) assert.equal(count('shop', k), 1, `loja ${k}`);
+  for (const p of ['bench', 'planter', 'archGate', 'lampPost']) assert.equal(count(p), 1, p);
 });
 
 test('ids únicos (usados nos nomes das imagens), títulos e grupos válidos', () => {

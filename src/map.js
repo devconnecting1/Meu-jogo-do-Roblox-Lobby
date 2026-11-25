@@ -17,6 +17,7 @@
 import { makeBuilder } from './builder.js';
 import { C } from './palette.js';
 import { fountainStatue, FOUNTAIN_HALF } from './props/statue.js';
+import { shop, bench, planter, archGate, lampPost } from './props/lobby.js';
 import { plantTree, bush, flowerPatch } from './props/trees.js';
 import { building, footprint } from './props/buildings.js';
 
@@ -546,7 +547,8 @@ export function createWorld(seed = SEED) {
       let h = 0;
       for (const [px, pz, w] of peaks) {
         const d = Math.hypot(x - px, z - pz) / R;
-        if (d < 1) h = Math.max(h, w * Math.pow(1 - d, 1.25));
+        // meio cone, meio domo: ombros largos em vez de agulha (o pico continua em w)
+        if (d < 1) h = Math.max(h, w * (0.5 * Math.pow(1 - d, 1.1) + 0.5 * (1 - d * d)));
       }
       const fade = Math.max(0, 1 - Math.hypot(x - cx, z - cz) / R);
       const ridges = nz(x, z, R * 0.45, salt) * 0.55 + nz(x, z, R * 0.18, salt + 1) * 0.3;
@@ -747,74 +749,71 @@ export function createWorld(seed = SEED) {
     b.box(PR, 'Mosaico', [0, pt + 0.05, 0], [30, 0.1, 30], C.plazaDark, { ...deco, rotation: [0, 45, 0] });
     // fonte com a estátua do boneco clássico (R6) erguendo o logo do Roblox, sobre o mosaico
     fountainStatue(b, `${PR}/Fonte`, 0, pt + 0.1, 0);
+    // Lobby como praça de cidade: uma loja de verdade em cada canto (girando em volta da fonte,
+    // cada uma de frente para um caminho), arcos de pedra no alto das escadarias, lampiões nas
+    // bordas dos caminhos, bancos virados para eles, vasos com árvore, caixotes ao lado das lojas,
+    // colunas antigas e o spawn sobre um mosaico próprio. Sorteio separado (lrand) para não
+    // mudar o resto do mapa.
+    const lrand = mulberry32(seed ^ 0x10bb);
     // estandartes nos cantos da praça
     for (const [x, z] of [
-      [40, 40],
-      [-40, 40],
-      [40, -40],
-      [-40, -40],
+      [41.5, 41.5],
+      [-41.5, 41.5],
+      [41.5, -41.5],
+      [-41.5, -41.5],
     ]) {
       b.box(PR, 'Mastro', [x, pt + 7, z], [0.6, 14, 0.6], C.woodDark);
       b.span(PR, 'Estandarte', [x + 0.3, pt + 7.5, z - 1.6], [x + 0.5, pt + 13, z + 1.6], C.banner, deco);
     }
-    // mercado: 4 barracas com toldo listrado viradas para os caminhos da praça
-    const STALLS = [
-      [30, 18, C.banner],
-      [-30, 18, C.awningBlue],
-      [30, -18, C.awningOlive],
-      [-30, -18, C.banner],
+    // quadrante (sx, sz): loja no canto, porta virada para o caminho seguinte (catavento)
+    const LOJAS = [
+      [1, 1, 'padaria', 'w'],
+      [-1, 1, 'taverna', 'n'],
+      [-1, -1, 'ferreiro', 'e'],
+      [1, -1, 'armazem', 's'],
     ];
-    STALLS.forEach(([cx, cz, color], n) => {
-      const M = `${PR}/Barraca ${n + 1}`;
-      const front = -Math.sign(cz); // a frente olha para o caminho central (z = 0)
-      b.span(M, 'Balcão', [cx - 5, pt, cz - 1.5], [cx + 5, pt + 3, cz + 1.5], C.wood);
-      b.span(M, 'Tampo do Balcão', [cx - 5.3, pt + 3, cz - 1.8], [cx + 5.3, pt + 3.4, cz + 1.8], C.woodDark);
-      [-3, 0, 3].forEach((dx, k) => {
-        const ware = [C.wheat, C.gold, C.cloth][k];
-        b.span(M, 'Mercadoria', [cx + dx - 0.6, pt + 3.4, cz - 0.6], [cx + dx + 0.6, pt + 4.4, cz + 0.6], ware, deco);
-      });
-      for (const dx of [-4.7, 4.7]) {
-        for (const dz of [-2.7, 2.7]) {
-          const [x, z] = [cx + dx, cz + dz];
-          b.span(M, 'Poste da Barraca', [x - 0.3, pt, z - 0.3], [x + 0.3, pt + 8, z + 0.3], C.woodDark);
+    LOJAS.forEach(([sx, sz, kind, face], n) => {
+      shop(b, `${PR}/Loja ${n + 1}`, kind, sx * 30, pt, sz * 30, face, lrand);
+      // caixotes encostados na lateral da loja (um em cima, meio torto)
+      const C1 = `${PR}/Caixotes ${n + 1}`;
+      const alongX = face === 'w' || face === 'e';
+      const [cx, cz] = alongX ? [sx * 24, sz * 16.5] : [sx * 16.5, sz * 24];
+      const a = alongX ? [cx - 2.4, cz - 1.2] : [cx - 1.2, cz - 2.4];
+      const c = alongX ? [cx + 2.4, cz + 1.2] : [cx + 1.2, cz + 2.4];
+      b.span(C1, 'Caixote', [a[0], pt, a[1]], alongX ? [cx, pt + 2.4, c[1]] : [c[0], pt + 2.4, cz], C.crate);
+      b.span(C1, 'Caixote', alongX ? [cx, pt, a[1]] : [a[0], pt, cz], [c[0], pt + 2.4, c[1]], C.crate);
+      b.box(C1, 'Caixote', [cx, pt + 3.4, cz], [2, 2, 2], C.wood, { rotation: [0, 20, 0] });
+    });
+    // canteiros: vasos com árvore nas diagonais, entre a fonte e as lojas
+    [
+      [16, 16],
+      [-16, 16],
+      [-16, -16],
+      [16, -16],
+    ].forEach(([x, z], n) => planter(b, `${PR}/Canteiro ${n + 1}`, x, pt, z, lrand));
+    // bancos de praça virados para os caminhos
+    let nb = 0;
+    for (const s of [-1, 1]) {
+      for (const k of [-1, 1]) {
+        bench(b, `${PR}/Banco ${++nb}`, s * 8, pt, k * 30, s > 0 ? 'w' : 'e', lrand);
+        bench(b, `${PR}/Banco ${++nb}`, k * 30, pt, s * 8, s > 0 ? 'n' : 's', lrand);
+      }
+    }
+    // lampiões nas duas bordas de cada caminho
+    let nl = 0;
+    for (const s of [-1, 1]) {
+      for (const t of [17, 35]) {
+        for (const k of [-1, 1]) {
+          lampPost(b, `${PR}/Lampião ${++nl}`, s * 5.5, pt, k * t);
+          lampPost(b, `${PR}/Lampião ${++nl}`, k * t, pt, s * 5.5);
         }
       }
-      const fz = cz + front * 3.5;
-      for (let k = 0; k < 11; k++) {
-        const x0 = cx - 5.5 + k;
-        b.span(M, 'Toldo', [x0, pt + 8, cz - 3.5], [x0 + 1, pt + 8.5, cz + 3.5], k % 2 ? C.cloth : color, deco);
-        b.span(M, 'Franja', [x0, pt + 7.4, fz - 0.1], [x0 + 1, pt + 8, fz + 0.1], k % 2 ? color : C.cloth, deco);
-      }
-      // caixotes atrás da barraca (um em cima, meio torto)
-      const bz = cz - front * 6;
-      const C1 = `${PR}/Caixotes ${n + 1}`;
-      b.span(C1, 'Caixote', [cx - 4, pt, bz - 1.2], [cx - 1.6, pt + 2.4, bz + 1.2], C.crate);
-      b.span(C1, 'Caixote', [cx - 1.6, pt, bz - 1.2], [cx + 0.8, pt + 2.4, bz + 1.2], C.crate);
-      b.box(C1, 'Caixote', [cx - 2.8, pt + 3.4, bz], [2, 2, 2], C.wood, { rotation: [0, 20, 0] });
-    });
-    // canteiros de flores entre a estátua e o mercado
-    [
-      [20, 20],
-      [-20, 20],
-      [20, -20],
-      [-20, -20],
-    ].forEach(([x, z], n) => {
-      const M = `${PR}/Canteiro ${n + 1}`;
-      b.span(M, 'Canteiro', [x - 3, pt, z - 3], [x + 3, pt + 1.2, z + 3], C.plazaDark);
-      b.span(M, 'Terra do Canteiro', [x - 2.6, pt + 0.8, z - 2.6], [x + 2.6, pt + 1.3, z + 2.6], C.soil);
-      [
-        [-1.5, -1.5],
-        [1.5, -1.5],
-        [0, 0],
-        [-1.5, 1.5],
-        [1.5, 1.5],
-      ].forEach(([dx, dz], k) => {
-        const [fx, fz] = [x + dx, z + dz];
-        b.span(M, 'Caule', [fx - 0.15, pt + 1.3, fz - 0.15], [fx + 0.15, pt + 2.6, fz + 0.15], C.leafDark, deco);
-        const bloom = (k + n) % 2 ? C.flowerYellow : C.flowerRed;
-        b.span(M, 'Flor', [fx - 0.45, pt + 2.6, fz - 0.45], [fx + 0.45, pt + 3.3, fz + 0.45], bloom, deco);
-      });
-    });
+    }
+    // arcos de pedra no alto das 4 escadarias
+    archGate(b, `${PR}/Arco Leste`, 40, pt, 0, 'x', 10);
+    archGate(b, `${PR}/Arco Oeste`, -40, pt, 0, 'x', 10);
+    archGate(b, `${PR}/Arco Sul`, 0, pt, 40, 'z', 10);
+    archGate(b, `${PR}/Arco Norte`, 0, pt, -40, 'z', 10);
     // colunas antigas em volta da praça (restos do reino antigo; algumas partidas)
     [
       [40, 14],
@@ -834,10 +833,16 @@ export function createWorld(seed = SEED) {
       if (!broken) {
         b.span(M, 'Capitel', [x - 2, pt + 1 + h, z - 2], [x + 2, pt + 2 + h, z + 2], C.statue);
       } else {
-        // o pedaço que caiu está no chão, ao lado (sem colisão)
-        const [px, pz] = Math.abs(x) > Math.abs(z) ? [x, z - Math.sign(z) * 4.5] : [x - Math.sign(x) * 4.5, z];
+        // o pedaço que caiu está no chão, ao lado (sem colisão), para fora do caminho
+        const [px, pz] = Math.abs(x) > Math.abs(z) ? [x - Math.sign(x) * 4.5, z] : [x, z - Math.sign(z) * 4.5];
         b.box(M, 'Pedaço da Coluna', [px, pt + 1, pz], [2.6, 3.4, 2.6], C.statue, { ...deco, rotation: [0, 30, 80] });
       }
+    });
+    // spawn sobre um mosaico em estrela (como o da fonte), no caminho sul
+    b.box(`${PR}/Spawn`, 'Mosaico do Spawn', [0, pt + 0.05, 24], [12, 0.1, 12], C.plazaDark);
+    b.box(`${PR}/Spawn`, 'Mosaico do Spawn', [0, pt + 0.05, 24], [12, 0.1, 12], C.plazaDark, {
+      ...deco,
+      rotation: [0, 45, 0],
     });
     b.box(PR, 'SpawnLocation', [0, pt + 0.5, 24], [8, 1, 8], C.plotStone, { className: 'SpawnLocation', studs: true });
 

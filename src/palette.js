@@ -74,7 +74,9 @@ export const C = Object.freeze({
   roofRed: [150, 84, 72],
   roofSlate: [96, 104, 118],
   roofThatch: [184, 160, 110],
+  roofGreen: [88, 112, 92], // telhado da taverna (verde-musgo fosco)
   statueDark: [128, 128, 124],
+  iron: [64, 66, 72], // ferro escuro (lampião, bigorna, ferragens)
 
   // Bandeiras e toldos
   banner: [164, 84, 76],
