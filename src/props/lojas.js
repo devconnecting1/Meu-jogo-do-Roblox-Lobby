@@ -268,8 +268,7 @@ export const SHOPS = {
       for (const side of [-1, 1]) {
         const [w0, w1] = side < 0 ? [-11, -6.6] : [6.6, 11];
         const wallU = side < 0 ? -11 : 11;
-        for (const v of [0.15, 4.15])
-          add('Divisória', [['Divisória', [w0, 0, v], [w1, 2.2, v + 0.3], C.pxWoodDark]]);
+        for (const v of [0.15, 4.15]) add('Divisória', [['Divisória', [w0, 0, v], [w1, 2.2, v + 0.3], C.pxWoodDark]]);
         for (const v of [0.45, 4.45]) {
           const [h0, h1] = side < 0 ? [wallU + 0.3, wallU + 1.7] : [wallU - 1.7, wallU - 0.3];
           const [t0, t1] = side < 0 ? [wallU + 0.2, wallU + 0.8] : [wallU - 0.8, wallU - 0.2];

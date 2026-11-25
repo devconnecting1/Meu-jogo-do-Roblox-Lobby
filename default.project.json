@@ -17,31 +17,15 @@
         "ClockTime": 22.5,
         "GeographicLatitude": 32,
         "Brightness": 1.2,
-        "Ambient": [
-          0.14,
-          0.15,
-          0.2
-        ],
-        "OutdoorAmbient": [
-          0.3,
-          0.33,
-          0.42
-        ],
+        "Ambient": [0.14, 0.15, 0.2],
+        "OutdoorAmbient": [0.3, 0.33, 0.42],
         "EnvironmentDiffuseScale": 1,
         "EnvironmentSpecularScale": 1,
         "ExposureCompensation": 0.2,
         "ShadowSoftness": 0.2,
         "GlobalShadows": true,
-        "ColorShift_Top": [
-          0.06,
-          0.07,
-          0.12
-        ],
-        "ColorShift_Bottom": [
-          0,
-          0,
-          0
-        ]
+        "ColorShift_Top": [0.06, 0.07, 0.12],
+        "ColorShift_Bottom": [0, 0, 0]
       },
       "Correcao de Cor": {
         "$className": "ColorCorrectionEffect",
@@ -49,11 +33,7 @@
           "Brightness": 0.03,
           "Contrast": 0.1,
           "Saturation": 0,
-          "TintColor": [
-            0.96,
-            0.97,
-            1
-          ]
+          "TintColor": [0.96, 0.97, 1]
         }
       },
       "Brilho": {
@@ -69,16 +49,8 @@
         "$properties": {
           "Density": 0.28,
           "Offset": 0.2,
-          "Color": [
-            0.2,
-            0.24,
-            0.34
-          ],
-          "Decay": [
-            0.12,
-            0.14,
-            0.2
-          ],
+          "Color": [0.2, 0.24, 0.34],
+          "Decay": [0.12, 0.14, 0.2],
           "Glare": 0,
           "Haze": 1.2
         }

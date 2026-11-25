@@ -102,7 +102,10 @@ test('cada loja segue a planta do seu prédio: formatos e tamanhos diferentes, s
   assert.equal(shops.size, PADS.length, 'cada área em volta da praça é de um prédio diferente');
   for (const p of PADS) assert.equal(PLANS[p.plan].group, 'loja', `${p.name}: só lojas no mapa`);
   assert.ok(!Object.keys(PLANS).includes('capela'), 'sem igreja (pedido do dono)');
-  assert.ok(Object.values(PLANS).every((q) => q.group === 'loja'), 'sem plantas de castelo');
+  assert.ok(
+    Object.values(PLANS).every((q) => q.group === 'loja'),
+    'sem plantas de castelo',
+  );
   // tamanho real: cada loja ocupa a área inteira de 48×48, com formato e área próprios
   const sizes = new Set(PADS.map((p) => world.footprint(p).length));
   assert.equal(sizes.size, PADS.length, `lojas com áreas repetidas (${[...sizes].join(', ')} células)`);
@@ -190,5 +193,8 @@ test('8 lojas grandes: paredes, porta, janelas, telhado, luz por dentro e na fac
 test('noite no Lobby: postes de luz acesos na praça', () => {
   const lamps = parts.filter((q) => q.name === 'Lanterna do Poste');
   assert.ok(lamps.length >= 8, `só ${lamps.length} postes de luz na praça`);
-  assert.ok(lamps.every((q) => q.light && q.canCollide === false), 'poste sem luz ou lanterna com colisão');
+  assert.ok(
+    lamps.every((q) => q.light && q.canCollide === false),
+    'poste sem luz ou lanterna com colisão',
+  );
 });

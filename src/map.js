@@ -671,9 +671,7 @@ export function createWorld(seed = SEED) {
   function buildingZones() {
     if (!cachedZones) {
       const scratch = makeBuilder();
-      cachedZones = [
-        ...PADS.flatMap((p) => buildShop(scratch, p, land)),
-      ];
+      cachedZones = [...PADS.flatMap((p) => buildShop(scratch, p, land))];
     }
     return cachedZones;
   }

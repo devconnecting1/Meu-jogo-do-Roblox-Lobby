@@ -105,7 +105,9 @@ const LIGHT_POOL = Array.from({ length: 8 }, () => {
 });
 function placeLights([tx, , tz]) {
   const near = [...MAP_LIGHTS]
-    .sort((a, b) => Math.hypot(a.position[0] - tx, a.position[2] - tz) - Math.hypot(b.position[0] - tx, b.position[2] - tz))
+    .sort(
+      (a, b) => Math.hypot(a.position[0] - tx, a.position[2] - tz) - Math.hypot(b.position[0] - tx, b.position[2] - tz),
+    )
     .slice(0, LIGHT_POOL.length);
   LIGHT_POOL.forEach((l, k) => {
     const p = near[k];

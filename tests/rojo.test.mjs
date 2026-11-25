@@ -60,7 +60,10 @@ test('projeto: Lighting Future, noite com a cidade iluminada e efeitos sutis', (
   assert.equal(P.Technology.Enum, 4, 'Technology = Future');
   assert.ok(P.ClockTime >= 20 || P.ClockTime <= 4, `ClockTime ${P.ClockTime} não é noite (o mapa é sempre de noite)`);
   assert.ok(P.Brightness >= 0.5 && P.Brightness <= 2, `Brightness ${P.Brightness}`);
-  assert.ok(P.OutdoorAmbient.every((v) => v >= 0.2), 'noite escura demais: o mapa precisa continuar visível');
+  assert.ok(
+    P.OutdoorAmbient.every((v) => v >= 0.2),
+    'noite escura demais: o mapa precisa continuar visível',
+  );
   for (const k of ['Ambient', 'OutdoorAmbient']) {
     for (const v of P[k]) assert.ok(v <= 0.6, `${k} = ${P[k]} (máximo 0,6: nada estoura com gráficos baixos)`);
   }
