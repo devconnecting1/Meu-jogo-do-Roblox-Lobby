@@ -1616,7 +1616,8 @@ export function createWorld(seed = SEED) {
     for (let attempt = 0; attempt < 40000 && reeds < 160; attempt++) {
       const x = Math.round((rand() * 2 - 1) * 580 * 10) / 10;
       const z = Math.round((rand() * 2 - 1) * 580 * 10) / 10;
-      if (terrainAt(x, z) !== T.GRASS || !nearWater(x, z)) continue;
+      // a touceira inteira fica na grama (cada junco sai até 0,8 do centro); a água fica a 6 studs
+      if (!allGrass(x - 1.5, x + 1.5, z - 1.5, z + 1.5, 0.75) || !nearWater(x, z)) continue;
       if (distToRoads(x, z) < 9 || !awayFromPlots(x, z, 6) || !free({ x0: x, x1: x, z0: z, z1: z }, 1.5)) continue;
       blocked.push({ x0: x - 1, x1: x + 1, z0: z - 1, z1: z + 1 });
       for (let k = 0; k < 3; k++) {
