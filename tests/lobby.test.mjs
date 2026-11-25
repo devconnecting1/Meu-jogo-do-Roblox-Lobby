@@ -158,7 +158,10 @@ test('vitrine aberta: o balcão sai pela janela e nada tapa o vão acima da merc
     const wallFront = Math.max(...own.filter((p) => p.name === 'Parede').map((p) => aabb(p).max[2]));
     assert.ok(counter.max[2] > wallFront + 0.3, `${kind}: o balcão não sai pela janela`);
     // vão livre entre a mercadoria do balcão e a prateleira, do fundo do nicho até a fachada
-    const gap = { min: [counter.min[0] + 0.1, counter.max[1] + 1, counter.min[2] + 0.1], max: [counter.max[0] - 0.1, 4.95, wallFront - 0.1] };
+    const gap = {
+      min: [counter.min[0] + 0.1, counter.max[1] + 1, counter.min[2] + 0.1],
+      max: [counter.max[0] - 0.1, 4.95, wallFront - 0.1],
+    };
     const blocking = own.filter((p) => intersects(gap, aabb(p)));
     assert.deepEqual(blocking.map(label), [], `${kind}: vitrine tapada`);
   }
@@ -209,7 +212,8 @@ test('banco de praça: de pé nos 4 lados, sentável (assento a ~1,7) e com enco
       if (!own.some((p) => p.name === 'Ripa do Encosto')) out.push(`[banco ${face}] sem encosto`);
       for (const p of own) {
         const { min, max } = aabb(p);
-        if (Math.max(-min[0], max[0], -min[2], max[2]) > 2.2 + EPS) out.push(`[banco ${face}] fora de 4,4: ${label(p)}`);
+        if (Math.max(-min[0], max[0], -min[2], max[2]) > 2.2 + EPS)
+          out.push(`[banco ${face}] fora de 4,4: ${label(p)}`);
       }
     }
   }
@@ -259,8 +263,10 @@ test('arco de pedra: de pé, verga acima de 9 e passagem livre (nada com colisã
           axis === 'x'
             ? { min: [x - 4, y, z - h], max: [x + 4, y + 8, z + h] }
             : { min: [x - h, y, z - 4], max: [x + h, y + 8, z + 4] };
-        for (const p of own) if (p.canCollide && intersects(zone, aabb(p))) out.push(`${tag} bloqueia a passagem: ${label(p)}`);
-        if (own.filter((p) => p.name === 'Pilar do Arco' && p.canCollide).length !== 2) out.push(`${tag} sem 2 pilares`);
+        for (const p of own)
+          if (p.canCollide && intersects(zone, aabb(p))) out.push(`${tag} bloqueia a passagem: ${label(p)}`);
+        if (own.filter((p) => p.name === 'Pilar do Arco' && p.canCollide).length !== 2)
+          out.push(`${tag} sem 2 pilares`);
       }
     }
   }

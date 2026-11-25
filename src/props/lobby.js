@@ -170,7 +170,8 @@ function roofAlongV(f, color, y0, hu0, v0, v1) {
 /** Barril de pé: corpo, 2 aros de ferro e tampa. */
 function barrel(f, u, v) {
   f.span('Barril', [u - 0.8, -0.1, v - 0.8], [u + 0.8, 2.1, v + 0.8], C.wood);
-  for (const h of [0.35, 1.45]) f.span('Aro do Barril', [u - 0.86, h, v - 0.86], [u + 0.86, h + 0.2, v + 0.86], C.iron, deco);
+  for (const h of [0.35, 1.45])
+    f.span('Aro do Barril', [u - 0.86, h, v - 0.86], [u + 0.86, h + 0.2, v + 0.86], C.iron, deco);
   f.span('Tampa do Barril', [u - 0.65, 2.1, v - 0.65], [u + 0.65, 2.2, v + 0.65], C.woodDark, deco);
 }
 
