@@ -11,6 +11,7 @@ import {
   PADS,
   PONDS,
   createWorld,
+  PLANS,
   SEED,
   terrainAt,
   heightAt,
@@ -21,14 +22,13 @@ const { parts, landmarks } = buildMap();
 const world = createWorld(SEED);
 const count = (fn) => parts.filter(fn).length;
 
-/** Todas as células do retângulo têm a superfície esperada e estão no nível do chão. */
+/** Todas as células da planta (o piso do prédio) têm a superfície esperada e estão no nível do chão. */
 function flatPad(p, kinds) {
-  const h = p.size / 2;
-  for (let x = p.x - h + 1; x < p.x + h; x += 2) {
-    for (let z = p.z - h + 1; z < p.z + h; z += 2) {
-      if (terrainAt(x, z) !== T.GROUND || heightAt(x, z) !== DIM.land) return `(${x}, ${z}) fora do chão plano`;
-      if (!kinds.includes(surfaceAt(x, z))) return `(${x}, ${z}) com superfície ${surfaceAt(x, z)}`;
-    }
+  const cells = world.footprint(p);
+  if (cells.length < 12) return `planta com só ${cells.length} células`;
+  for (const [x, z] of cells) {
+    if (terrainAt(x, z) !== T.GROUND || heightAt(x, z) !== DIM.land) return `(${x}, ${z}) fora do chão plano`;
+    if (!kinds.includes(surfaceAt(x, z))) return `(${x}, ${z}) com superfície ${surfaceAt(x, z)}`;
   }
   return null;
 }
@@ -70,6 +70,20 @@ test('8 áreas de construção em volta da praça, planas e ligadas ao Lobby', (
     assert.equal(bad, null, `${p.name}: ${bad}`);
   }
   assert.ok(world.padsConnected.every(Boolean), 'área sem estrada até o Lobby');
+});
+
+test('cada área segue a planta do seu prédio: formatos variados, não só quadrados', () => {
+  const shops = new Set(PADS.map((p) => p.plan));
+  assert.equal(shops.size, PADS.length, 'cada área em volta da praça é de um prédio diferente');
+  for (const p of PADS) assert.equal(PLANS[p.plan].group, 'loja', `${p.name}: planta de castelo na praça`);
+  const castles = new Set(PLOTS.map((p) => p.plan));
+  assert.ok(castles.size >= 6, `só ${castles.size} plantas de castelo diferentes`);
+  for (const p of PLOTS) assert.equal(PLANS[p.plan].group, 'castelo', `${p.name}: planta de loja num lote`);
+  // formatos de verdade: áreas (número de células) e contornos diferentes
+  const sizes = new Set([...PADS, ...PLOTS].map((p) => world.footprint(p).length));
+  assert.ok(sizes.size >= 10, `só ${sizes.size} tamanhos de planta`);
+  const square = [...PADS, ...PLOTS].filter((p) => world.footprint(p).length === (p.size / DIM.cell) ** 2).length;
+  assert.ok(square <= 3, `${square} plantas são quadrados cheios`);
 });
 
 test('estradas de terra ligam o Lobby a todos os lotes (sem pular degrau nem água)', () => {

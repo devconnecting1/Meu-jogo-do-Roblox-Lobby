@@ -15,7 +15,7 @@ Mapa base de um jogo de estratégia no estilo **Lords Mobile** no Roblox. **Fase
 
 - **Vale procedural:** um planalto de até 720×720 studs com o vale no meio. Cada servidor sorteia uma semente: o formato do vale, os penhascos, as lagoas, os lotes, as estradas e os terraços mudam.
 - **Lobby** no centro: praça de pedra clara com faixas escuras pixeladas, estrado no meio (lugar da futura construção central) e o spawn.
-- **8 áreas de construção** em volta da praça, para as lojas futuras, e **30 lotes de castelo** (20 para jogadores e 10 para bots) pelo vale, todos planos e com borda de pedra.
+- **Áreas com a planta do prédio:** 8 áreas em volta da praça, cada uma com o formato da construção que vai receber (taverna em L, capela em cruz, torre redonda, estábulo em U, mercado com alpendre…), e **30 lotes de castelo** (20 jogadores e 10 bots) com 7 plantas diferentes (fortaleza com torres, castelo em L, redondo, com pátio, em cruz, em U e em T), todos planos, com borda de pedra e a frente virada para o Lobby.
 - **Estradas de terra** com borda serrilhada ligando a praça a todas as áreas e lotes; passagem de pedra sobre as lagoas.
 - **Relevo:** penhascos de rocha em blocos com musgo no topo cercando boa parte do vale, borda aberta sobre o mar no resto, terraços de grama e lagoas.
 - **Estilo voxel liso:** SmoothPlastic sem studs, grama com manchas escuras em blocos, paleta quente (`src/palette.js`, grupo `px…`).

@@ -64,15 +64,14 @@ function legSamples([a, b], step = 2) {
 // Camada barata: sem Parts
 // ---------------------------------------------------------------------------
 
-/** Células do retângulo de um lote/área que não são chão plano com a superfície esperada. */
+/** Células da planta de um lote/área que não são chão plano com a superfície esperada. */
 function padIssue(w, p, kinds) {
   const { DIM, T } = w;
-  const h = p.size / 2;
-  for (let x = p.x - h + 1; x < p.x + h; x += 2) {
-    for (let z = p.z - h + 1; z < p.z + h; z += 2) {
-      if (w.terrainAt(x, z) !== T.GROUND || w.heightAt(x, z) !== DIM.land) return `${pt(x, z)} fora do chão plano`;
-      if (!kinds.includes(w.surfaceAt(x, z))) return `${pt(x, z)} com superfície ${w.surfaceAt(x, z)}`;
-    }
+  const cells = w.footprint ? w.footprint(p) : [];
+  if (cells.length < 12) return `planta com só ${cells.length} células`;
+  for (const [x, z] of cells) {
+    if (w.terrainAt(x, z) !== T.GROUND || w.heightAt(x, z) !== DIM.land) return `${pt(x, z)} fora do chão plano`;
+    if (!kinds.includes(w.surfaceAt(x, z))) return `${pt(x, z)} com superfície ${w.surfaceAt(x, z)}`;
   }
   return null;
 }

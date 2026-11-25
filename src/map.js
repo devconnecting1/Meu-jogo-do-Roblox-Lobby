@@ -118,6 +118,71 @@ const PATH_SURF = new Set([
 const KEEP_SURF = new Set(['pedra', 'pedraEscura', 'lote', 'loteBorda', 'area', 'areaBorda']);
 
 /**
+ * Plantas das construções: cada área de construção tem o formato do prédio que vai receber, como
+ * as construções reais (nada de quadrado igual para tudo). Coordenadas locais em studs, com a frente
+ * (porta, alpendre, portão) para +z; partes são retângulos [x0, z0, x1, z1] e círculos { c: [x, z], r }.
+ * Lojas em volta do Lobby cabem em 24×24; castelos cabem em 32×32.
+ */
+export const PLANS = Object.freeze({
+  // prédios do Lobby (lojas e serviços); bordas em múltiplos de 4 para cobrir células inteiras
+  taverna: { name: 'Taverna', group: 'loja', parts: [[-12, -12, 12, 0], [-12, 0, 0, 12]] }, // salão + ala em L
+  ferraria: { name: 'Ferraria', group: 'loja', parts: [[-12, -8, 4, 8], [4, -4, 12, 4]] }, // oficina + forja
+  mercado: { name: 'Mercado Coberto', group: 'loja', parts: [[-12, -8, 12, 4], [-4, 4, 4, 12]] }, // salão + alpendre
+  capela: { name: 'Capela', group: 'loja', parts: [[-4, -12, 4, 12], [-12, -8, 12, 0]] }, // nave + transepto
+  torreMago: { name: 'Torre do Mago', group: 'loja', parts: [{ c: [0, 0], r: 11 }] }, // torre redonda
+  estabulo: { name: 'Estábulo', group: 'loja', parts: [[-12, -12, 12, -4], [-12, -4, -4, 12], [4, -4, 12, 12]] }, // U
+  banco: { name: 'Banco', group: 'loja', parts: [[-8, -12, 8, 4], [-4, 4, 4, 12]] }, // cofre + escadaria
+  guilda: { name: 'Salão da Guilda', group: 'loja', parts: [[-12, -4, 12, 4], [-8, -8, 8, 8], [-4, -12, 4, 12]] },
+  // castelos dos jogadores e dos bots
+  fortaleza: {
+    name: 'Fortaleza com Torres',
+    group: 'castelo',
+    parts: [[-8, -8, 8, 8], { c: [-8, -8], r: 8 }, { c: [8, -8], r: 8 }, { c: [-8, 8], r: 8 }, { c: [8, 8], r: 8 }],
+  },
+  casteloL: { name: 'Castelo em L', group: 'castelo', parts: [[-16, -16, 16, 0], [-16, 0, 0, 16]] },
+  casteloRedondo: { name: 'Castelo Redondo', group: 'castelo', parts: [{ c: [0, 0], r: 16 }] },
+  castelaoPatio: { name: 'Castelo com Pátio', group: 'castelo', parts: [[-16, -12, 16, 8], [-4, 8, 4, 16]] },
+  cidadela: { name: 'Cidadela em Cruz', group: 'castelo', parts: [[-16, -8, 16, 8], [-8, -16, 8, 16]] },
+  casteloU: { name: 'Castelo em U', group: 'castelo', parts: [[-16, -16, 16, -4], [-16, -4, -4, 16], [4, -4, 16, 16]] },
+  forteT: { name: 'Forte em T', group: 'castelo', parts: [[-16, -16, 16, -4], [-8, -4, 8, 16]] },
+});
+const SHOP_PLANS = Object.keys(PLANS).filter((k) => PLANS[k].group === 'loja');
+const CASTLE_PLANS = Object.keys(PLANS).filter((k) => PLANS[k].group === 'castelo');
+
+/** Gira (x, z) em passos de 90° (k = 0..3): a frente +z vai para +z, −x, −z e +x. */
+const rot90 = (x, z, k) => [
+  [x, z],
+  [-z, x],
+  [-x, -z],
+  [z, -x],
+][k & 3];
+
+/** O ponto (x, z) do mundo está na planta da construção p (com folga `m` em volta)? */
+export function inPlan(p, x, z, m = 0) {
+  const [lx, lz] = rot90(x - p.x, z - p.z, 4 - p.rot);
+  return PLANS[p.plan].parts.some((q) =>
+    Array.isArray(q)
+      ? lx > q[0] - m && lx < q[2] + m && lz > q[1] - m && lz < q[3] + m
+      : Math.hypot(lx - q.c[0], lz - q.c[1]) < q.r + m,
+  );
+}
+
+/** Retângulos do mundo que cobrem a planta (círculos viram o quadrado inscrito). */
+export function planRects(p) {
+  return PLANS[p.plan].parts.map((q) => {
+    const [x0, z0, x1, z1] = Array.isArray(q)
+      ? q
+      : [q.c[0] - q.r * 0.7, q.c[1] - q.r * 0.7, q.c[0] + q.r * 0.7, q.c[1] + q.r * 0.7];
+    const [ax, az] = rot90(x0, z0, p.rot);
+    const [bx, bz] = rot90(x1, z1, p.rot);
+    return [p.x + Math.min(ax, bx), p.z + Math.min(az, bz), p.x + Math.max(ax, bx), p.z + Math.max(az, bz)];
+  });
+}
+
+/** Giro que vira a frente (+z) da construção em (x, z) para o centro do vale (o Lobby). */
+const faceCenter = (x, z) => (Math.abs(x) > Math.abs(z) ? (x > 0 ? 1 : 3) : z > 0 ? 2 : 0);
+
+/**
  * Cria um mundo a partir de uma semente. A mesma semente gera sempre o mesmo vale; sementes
  * diferentes geram vales, lotes, estradas, terraços e lagoas diferentes (um por servidor).
  */
@@ -224,12 +289,20 @@ export function createWorld(seed = SEED) {
   const inPond = (x, z) => PONDS.some((p) => Math.hypot(x - p.x, z - p.z) < p.r * (0.85 + 0.3 * nz(x, z, 14, 15)));
 
   // --- Áreas de construção em volta da praça (lojas futuras), entre as 4 saídas ---
+  // cada servidor sorteia a ordem dos prédios em volta da praça
+  const shopOrder = [...SHOP_PLANS];
+  for (let k = shopOrder.length - 1; k > 0; k--) {
+    const r = Math.floor(rand() * (k + 1));
+    [shopOrder[k], shopOrder[r]] = [shopOrder[r], shopOrder[k]];
+  }
   const PADS = [];
   for (let k = 0; k < DIM.pads; k++) {
     const a = (k / DIM.pads) * Math.PI * 2 + Math.PI / DIM.pads;
     const x = Math.round((Math.cos(a) * DIM.padRing) / DIM.cell) * DIM.cell;
     const z = Math.round((Math.sin(a) * DIM.padRing) / DIM.cell) * DIM.cell;
-    PADS.push(Object.freeze({ name: `Área ${k + 1}`, x, z, size: DIM.padSize }));
+    const plan = shopOrder[k % shopOrder.length];
+    const name = `Área ${k + 1}: ${PLANS[plan].name}`;
+    PADS.push(Object.freeze({ name, x, z, size: DIM.padSize, plan, rot: faceCenter(x, z) }));
   }
 
   // --- Lotes de castelo pelo vale ---
@@ -240,6 +313,12 @@ export function createWorld(seed = SEED) {
   const PLOTS = [];
   {
     const half = DIM.plotSize / 2;
+    // plantas de castelo em rodízio (ordem sorteada): todo vale tem os 7 tipos, misturados
+    const castleOrder = [...CASTLE_PLANS];
+    for (let k = castleOrder.length - 1; k > 0; k--) {
+      const r = Math.floor(rand() * (k + 1));
+      [castleOrder[k], castleOrder[r]] = [castleOrder[r], castleOrder[k]];
+    }
     let spacing = DIM.plotSpacing;
     for (let attempt = 0; attempt < 60000 && PLOTS.length < DIM.plots; attempt++) {
       if (attempt > 0 && attempt % 10000 === 0) spacing = Math.max(DIM.minPlotSpacing, spacing - 4);
@@ -247,13 +326,15 @@ export function createWorld(seed = SEED) {
       const z = Math.round(((rand() * 2 - 1) * DIM.valleyMax) / DIM.cell) * DIM.cell;
       if (!plotFits(x, z, half)) continue;
       if (PLOTS.some((p) => Math.hypot(p.x - x, p.z - z) < spacing)) continue;
-      PLOTS.push({ x, z, size: DIM.plotSize });
+      const plan = castleOrder[PLOTS.length % castleOrder.length];
+      PLOTS.push({ x, z, size: DIM.plotSize, plan, rot: faceCenter(x, z) });
     }
     // numera do centro para fora: os 20 primeiros são de jogadores, o resto de bots
     PLOTS.sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.z) || a.x - b.x || a.z - b.z);
     PLOTS.forEach((p, k) => {
       p.name = `Lote ${String(k + 1).padStart(2, '0')}`;
       p.owner = k < DIM.players ? 'jogador' : 'bot';
+      p.planName = PLANS[p.plan].name;
       Object.freeze(p);
     });
   }
@@ -281,11 +362,13 @@ export function createWorld(seed = SEED) {
     }
   });
   // áreas de construção e lotes: piso de terra clara com borda de pedra
+  // cada área segue a planta do seu prédio: piso de terra clara e uma borda de pedra de 1 célula
   const padCells = (list, base, edge) => {
     for (const p of list) {
-      const h = p.size / 2;
-      paint(p.x - h - DIM.cell, p.x + h + DIM.cell, p.z - h - DIM.cell, p.z + h + DIM.cell, (i, j, x, z) => {
-        surf[j][i] = Math.abs(x - p.x) < h && Math.abs(z - p.z) < h ? base : edge;
+      const h = p.size / 2 + 2 * DIM.cell;
+      paint(p.x - h, p.x + h, p.z - h, p.z + h, (i, j, x, z) => {
+        if (inPlan(p, x, z)) surf[j][i] = base;
+        else if (inPlan(p, x, z, DIM.cell)) surf[j][i] = edge;
       });
     }
   };
@@ -303,8 +386,7 @@ export function createWorld(seed = SEED) {
   const ROADS = []; // trechos retos [[x0, z0], [x1, z1]]
   const halfW = DIM.road / 2;
   const blockedBy = (x, z, own) =>
-    PLOTS.some((p) => p !== own && Math.abs(x - p.x) < p.size / 2 + 8 && Math.abs(z - p.z) < p.size / 2 + 8) ||
-    PADS.some((p) => p !== own && Math.abs(x - p.x) < p.size / 2 + 8 && Math.abs(z - p.z) < p.size / 2 + 8);
+    PLOTS.some((p) => p !== own && inPlan(p, x, z, 8)) || PADS.some((p) => p !== own && inPlan(p, x, z, 8));
   const legOk = ([ax, az], [bx, bz], own) => {
     const len = Math.hypot(bx - ax, bz - az);
     if (len < 1) return true;
@@ -522,6 +604,18 @@ export function createWorld(seed = SEED) {
   const plotsConnected = PLOTS.map((p, k) => plotsLinked[k] && reached(p));
   const padsConnected = PADS.map((p, k) => padsLinked[k] && reached(p));
 
+  /** Centros das células do piso de uma área ou lote (dentro da planta). */
+  function footprint(p) {
+    const out = [];
+    const h = p.size / 2 + DIM.cell;
+    for (let j = cellOf(p.z - h); j <= cellOf(p.z + h); j++) {
+      for (let i = cellOf(p.x - h); i <= cellOf(p.x + h); i++) {
+        if (inGrid(i, j) && inPlan(p, cellCenter(i), cellCenter(j))) out.push([cellCenter(i), cellCenter(j)]);
+      }
+    }
+    return out;
+  }
+
   /** Tipo do terreno no ponto (x, z). */
   function terrainAt(x, z) {
     const i = cellOf(x);
@@ -546,8 +640,7 @@ export function createWorld(seed = SEED) {
     const zones = [];
     const box = (name, x0, x1, z0, z1, y0, h) => zones.push({ name, min: [x0, y0, z0], max: [x1, land + h, z1] });
     for (const p of [...PLOTS, ...PADS]) {
-      const h = p.size / 2;
-      box(p.name, p.x - h, p.x + h, p.z - h, p.z + h, land + 0.05, 14);
+      for (const [x0, z0, x1, z1] of planRects(p)) box(p.name, x0, x1, z0, z1, land + 0.05, 14);
     }
     // acima do piso de spawn (1 stud de altura): o jogador nasce e sai andando para o sul
     box('Caminho do Spawn', -4, 4, DIM.daisR + 1, DIM.ringRoad[0], land + 1.05, 10);
@@ -673,6 +766,7 @@ export function createWorld(seed = SEED) {
     plotsConnected,
     padsConnected,
     valleyR,
+    footprint,
     terrainAt,
     heightAt,
     surfaceAt,
