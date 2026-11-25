@@ -1,18 +1,13 @@
-// Visualizador Three.js da prisão. Lê o mesmo src/prison.js que gera o lugar do Roblox.
+// Visualizador Three.js do Reino. Lê o mesmo src/map.js que gera o lugar do Roblox.
 // Usado no navegador (GitHub Pages / prévia do PR) e pelo CI para gerar as capturas.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { buildPrison, cellCenterX } from '../src/prison.js';
+import { createWorld, SEED, DIM } from '../src/map.js';
 import { stats as countStats } from '../src/builder.js';
 import { buildManual } from '../src/manual.js';
 
 // ---------------------------------------------------------------------------
-// Cena (ambiente interno: não existe exterior)
+// Cena: dia claro, sol com sombra e neblina leve (como o Lighting do Roblox)
 // ---------------------------------------------------------------------------
 const app = document.getElementById('app');
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -22,50 +17,50 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.95;
+renderer.toneMappingExposure = 1.0;
 app.appendChild(renderer.domElement);
 
+const SKY = 0xaecbe0;
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x121315);
+scene.background = new THREE.Color(SKY);
+scene.fog = new THREE.FogExp2(0xc4d6e2, 0.00062);
 
-const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.2, 1000);
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.5, 6000);
 
-scene.add(new THREE.HemisphereLight(0xf4f1ea, 0x4a4845, 0.65));
-scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-// "Luz de teto" difusa vinda de cima (o teto não projeta sombra no visualizador).
-const ceilingLight = new THREE.DirectionalLight(0xfff6e8, 1.15);
-ceilingLight.position.set(-2, 200, 70);
-ceilingLight.target.position.set(-32, 0, 0);
-scene.add(ceilingLight.target);
-ceilingLight.castShadow = true;
-ceilingLight.shadow.mapSize.set(4096, 4096);
-Object.assign(ceilingLight.shadow.camera, { left: -140, right: 140, top: 110, bottom: -110, near: 10, far: 500 });
-ceilingLight.shadow.bias = -0.0004;
-ceilingLight.shadow.normalBias = 0.4;
-scene.add(ceilingLight);
+scene.add(new THREE.HemisphereLight(0xe4eef6, 0x6e6654, 1.15));
+const sun = new THREE.DirectionalLight(0xfff3e0, 2.1);
+sun.position.set(380, 620, 260);
+sun.target.position.set(0, 0, 0);
+sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, { left: -720, right: 720, top: 720, bottom: -720, near: 50, far: 1800 });
+sun.shadow.bias = -0.0006;
+sun.shadow.normalBias = 0.6;
+scene.add(sun, sun.target);
 
-// Simula a superfície Studs do Roblox (só no navegador).
+// Studs clássicos no topo das peças: textura de 1 stud aplicada em coordenadas de mundo
+// (assim tudo continua instanciado e o CI renderiza rápido).
 function studTexture() {
   const n = 64;
   const c = document.createElement('canvas');
   c.width = c.height = n;
   const g = c.getContext('2d');
-  g.fillStyle = '#e8e8e8';
+  g.fillStyle = '#f2f2f2';
   g.fillRect(0, 0, n, n);
-  const cx = n / 2,
-    r = n * 0.3;
-  g.fillStyle = '#b8b8b8';
-  g.beginPath();
-  g.arc(cx + 3, cx + 3, r, 0, Math.PI * 2);
-  g.fill();
-  g.fillStyle = '#ffffff';
-  g.beginPath();
-  g.arc(cx - 2, cx - 2, r, 0, Math.PI * 2);
-  g.fill();
-  g.fillStyle = '#dcdcdc';
-  g.beginPath();
-  g.arc(cx, cx, r * 0.92, 0, Math.PI * 2);
-  g.fill();
+  g.strokeStyle = '#d6d6d6';
+  g.lineWidth = 2;
+  g.strokeRect(1, 1, n - 2, n - 2);
+  const cx = n / 2;
+  const r = n * 0.28;
+  const disc = (dx, dy, color, rr = r) => {
+    g.fillStyle = color;
+    g.beginPath();
+    g.arc(cx + dx, cx + dy, rr, 0, Math.PI * 2);
+    g.fill();
+  };
+  disc(3, 3, '#a9a9a9');
+  disc(-2, -2, '#ffffff');
+  disc(0, 0, '#e4e4e4', r * 0.9);
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.colorSpace = THREE.SRGBColorSpace;
@@ -74,85 +69,80 @@ function studTexture() {
 }
 const STUD_TEX = studTexture();
 
-// ---------------------------------------------------------------------------
-// Parts -> malhas
-// ---------------------------------------------------------------------------
-const { parts } = buildPrison();
-const unitBox = new THREE.BoxGeometry(1, 1, 1);
-const unitCyl = new THREE.CylinderGeometry(0.5, 0.5, 1, 40).rotateZ(Math.PI / 2); // eixo X, como no Roblox
-const groups = new Map();
-const cache = new Map();
-const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
-const NO_SHADOW_GROUPS = new Set(['Teto', 'Iluminação']);
-
-function material(p, studs = false) {
-  const k = `${p.color}|${p.transparency}|${p.material}|${studs}`;
-  if (cache.has(k)) return cache.get(k);
-  const color = srgb(p.color);
-  const neon = p.material === 'Neon';
-  const m = new THREE.MeshStandardMaterial({
-    color,
-    map: studs ? STUD_TEX : null,
-    roughness: 0.78,
-    metalness: 0,
-    transparent: p.transparency > 0,
-    opacity: 1 - p.transparency,
-    depthWrite: p.transparency === 0,
-    emissive: neon ? color : new THREE.Color(0),
-    emissiveIntensity: neon ? 1.6 : 0,
-  });
-  cache.set(k, m);
+function addStuds(m) {
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.studMap = { value: STUD_TEX };
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 vStudUv;\nvarying float vStudTop;')
+      .replace(
+        '#include <begin_vertex>',
+        [
+          '#include <begin_vertex>',
+          'vec4 studWorld = vec4(transformed, 1.0);',
+          '#ifdef USE_INSTANCING',
+          '  studWorld = instanceMatrix * studWorld;',
+          '#endif',
+          'studWorld = modelMatrix * studWorld;',
+          'vStudUv = studWorld.xz;',
+          'vStudTop = normal.y;',
+        ].join('\n'),
+      );
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform sampler2D studMap;\nvarying vec2 vStudUv;\nvarying float vStudTop;',
+      )
+      .replace(
+        '#include <map_fragment>',
+        '#include <map_fragment>\nif (vStudTop > 0.5) diffuseColor.rgb *= texture2D(studMap, vStudUv).rgb;',
+      );
+  };
+  m.customProgramCacheKey = () => 'studs';
   return m;
 }
 
-function groupNode(name) {
-  if (!groups.has(name)) {
-    const g = new THREE.Group();
-    g.name = name;
-    scene.add(g);
-    groups.set(name, g);
-  }
-  return groups.get(name);
-}
+// ---------------------------------------------------------------------------
+// Parts -> malhas instanciadas (uma por grupo + cor + aparência)
+// ---------------------------------------------------------------------------
+// #seed=123 mostra outra variante do mapa (cada servidor do jogo usa uma semente)
+const params = new URLSearchParams(location.hash.slice(1));
+const seed = Number(params.get('seed')) || SEED;
+const world = createWorld(seed);
+const { PLOTS, LAKE } = world;
+const { parts, landmarks } = world.buildMap();
+const unitBox = new THREE.BoxGeometry(1, 1, 1);
+const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
+const cache = new Map();
 
-function studGeometry([sx, , sz]) {
-  const g = unitBox.clone();
-  const uv = g.attributes.uv;
-  for (let i = 8; i < 12; i++) uv.setXY(i, uv.getX(i) * sx, uv.getY(i) * sz); // face +Y
-  return g;
+function material(p) {
+  const k = `${p.color}|${p.transparency}|${p.material}|${p.studs}|${p.name === 'Mar'}`;
+  if (cache.has(k)) return cache.get(k);
+  const wet = p.name === 'Mar' || p.name.startsWith('Água');
+  const m = new THREE.MeshStandardMaterial({
+    color: srgb(p.color),
+    roughness: wet ? 0.3 : 0.82,
+    metalness: wet ? 0.05 : 0,
+    transparent: p.transparency > 0,
+    opacity: 1 - p.transparency,
+    depthWrite: p.transparency === 0,
+  });
+  if (p.studs) addStuds(m);
+  cache.set(k, m);
+  return m;
 }
 
 const manual = buildManual(parts);
 const stepOf = new Array(parts.length);
 for (const st of manual.steps) for (const i of st.parts) stepOf[i] = st.n;
-const singles = []; // { mesh, i }
-const instanced = []; // { mesh, items: [{ i, matrix }] }
 
-const castsShadow = (p) => p.transparency < 0.5 && p.material !== 'Neon' && !NO_SHADOW_GROUPS.has(p.group);
 const buckets = new Map();
-const tmp = new THREE.Object3D();
-parts.forEach((p, pi) => {
-  if (p.rotation || p.studs || p.shape === 'Cylinder') {
-    let geo = p.shape === 'Cylinder' ? unitCyl : unitBox;
-    let mat = material(p);
-    if (p.studs) {
-      geo = studGeometry(p.size);
-      mat = [mat, mat, material(p, true), mat, mat, mat];
-    }
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.fromArray(p.position);
-    mesh.scale.fromArray(p.size);
-    if (p.rotation) mesh.rotation.set(...p.rotation.map(THREE.MathUtils.degToRad), 'XYZ');
-    mesh.castShadow = castsShadow(p);
-    mesh.receiveShadow = true;
-    groupNode(p.group).add(mesh);
-    singles.push({ mesh, i: pi });
-    return;
-  }
-  const k = `${p.group}|${p.color}|${p.transparency}|${p.material}`;
+parts.forEach((p, i) => {
+  const k = `${p.group}|${p.color}|${p.transparency}|${p.material}|${p.studs}`;
   if (!buckets.has(k)) buckets.set(k, []);
-  buckets.get(k).push({ p, i: pi });
+  buckets.get(k).push({ p, i });
 });
+const instanced = []; // { mesh, items: [{ i, matrix }] }
+const tmp = new THREE.Object3D();
 for (const list of buckets.values()) {
   const p0 = list[0].p;
   const mesh = new THREE.InstancedMesh(unitBox, material(p0), list.length);
@@ -160,70 +150,128 @@ for (const list of buckets.values()) {
   list.forEach(({ p, i }, k) => {
     tmp.position.fromArray(p.position);
     tmp.scale.fromArray(p.size);
+    tmp.rotation.set(...(p.rotation ?? [0, 0, 0]).map(THREE.MathUtils.degToRad), 'XYZ');
     tmp.updateMatrix();
     mesh.setMatrixAt(k, tmp.matrix);
     entry.items.push({ i, matrix: tmp.matrix.clone() });
   });
-  instanced.push(entry);
-  mesh.castShadow = castsShadow(p0);
+  mesh.castShadow = p0.transparency === 0 && p0.name !== 'Mar';
   mesh.receiveShadow = true;
   if (p0.transparency > 0) mesh.renderOrder = 2;
-  groupNode(p0.group).add(mesh);
+  mesh.frustumCulled = false; // a caixa de cada lote de instâncias cobre o mapa inteiro
+  scene.add(mesh);
+  instanced.push(entry);
 }
-
-// Luzes reais só nas luminárias do teto (átrio, hall e galerias); o resto é ambiente + emissivo.
-for (const p of parts) {
-  if (!p.light || !/Iluminação\/(Átrio|Hall|Galeria)/.test(p.model)) continue;
-  const l = new THREE.PointLight(srgb(p.light.color), 70, p.light.range * 1.2, 1.4);
-  l.position.set(p.position[0], p.position[1] - 1, p.position[2]);
-  scene.add(l);
-}
-
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.35, 0.95));
-composer.addPass(new OutputPass());
 
 // ---------------------------------------------------------------------------
 // Vistas (também usadas pelo CI para as capturas)
 // ---------------------------------------------------------------------------
 const orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
-orbit.maxDistance = 400;
+orbit.maxDistance = 2200;
+orbit.maxPolarAngle = Math.PI * 0.49;
 
-const c2 = cellCenterX(2);
-const OVERVIEW = { pos: [-95, 240, 215], target: [-32, 0, 0], cut: true };
+const look = (x, z, dx, h, dz, ty = 4) => ({ pos: [x + dx, h, z + dz], target: [x, ty, z] });
+const OVERVIEW = { pos: [560, 540, 760], target: [-20, 0, 40] };
+const plot = [...PLOTS].sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.z))[0];
 const VIEWS = [
-  { id: 'overview', title: 'Visão geral (corte, sem teto)', ...OVERVIEW },
-  { id: 'hall', title: 'Hall de entrada e posto de guarda', pos: [-62, 8, -26], target: [-88, 6, 4] },
-  { id: 'atrium', title: 'Átrio e vão de pé-direito duplo', pos: [-84, 9, 0], target: [10, 12, 0] },
+  { id: 'overview', title: 'Visão geral do reino', ...OVERVIEW },
+  { id: 'top', title: 'Mapa visto de cima (30 lotes, estradas, rio e lago)', pos: [0, 1300, 140], target: [0, 0, 0] },
   {
-    id: 'corridor',
-    title: 'Corredor das celas (térreo, aberto até o teto)',
-    pos: [-64, 6, 29.5],
-    target: [40, 8, 30.5],
+    id: 'lobby',
+    title: 'Lobby: fonte com a estátua clássica, mercado e colunas antigas',
+    ...look(0, 0, 78, 48, 96, 10),
   },
-  { id: 'upper', title: 'Galeria do 2º andar (sobre as celas do térreo)', pos: [-64, 23, 39], target: [40, 21, 39.5] },
-  { id: 'gallery-view', title: 'Vista da galeria para o vão', pos: [-40, 23.5, 37], target: [0, 4, -10] },
-  { id: 'cells', title: 'Fachada das celas', pos: [c2 + 2, 7, -18], target: [c2 - 3, 8, -38] },
-  { id: 'cell', title: 'Interior de uma cela', pos: [c2 + 3.8, 5.5, -35.8], target: [c2 - 3.5, 2.5, -48] },
-  { id: 'service', title: 'Ala oeste: corredor de serviço', pos: [-91, 6.5, -3.5], target: [-150, 5, 2] },
-  { id: 'cafeteria', title: 'Ala oeste: refeitório', pos: [-92, 11, 9], target: [-140, 3, 40] },
-  { id: 'storeroom', title: 'Ala oeste: almoxarifado', pos: [-134, 8, -9], target: [-134, 3, -56] },
-  { id: 'infirmary', title: 'Ala oeste: enfermaria', pos: [-92, 8, -10], target: [-106, 2.5, -58] },
-  { id: 'guards', title: 'Sala dos guardas', pos: [-62, 8, 37], target: [-84, 3, 57] },
-  { id: 'stairs', title: 'Escada para o mezanino', pos: [22, 7, 3], target: [52, 10, 0] },
-  { id: 'visits', title: 'Sala de visitas', pos: [68, 6.5, -22], target: [78, 3.5, 8] },
-  { id: 'mezzanine', title: '2º andar: salas do mezanino', pos: [30, 27, -6], target: [80, 22, 4] },
-  { id: 'control', title: 'Sala de controle (vidraça para o vão)', pos: [86, 23.5, -10], target: [72, 21, 3] },
-  { id: 'office', title: 'Diretoria', pos: [86, 23.5, 30], target: [74, 19, 16] },
-  { id: 'rest', title: 'Sala de descanso dos guardas', pos: [62, 23.5, 46], target: [84, 18.5, 56] },
-  { id: 'library', title: 'Biblioteca (2º andar)', pos: [-62, 23.5, 46], target: [-82, 19, 57] },
-  { id: 'classroom', title: 'Sala de aula (2º andar)', pos: [-62, 23.5, -46], target: [-86, 19, -52] },
+  { id: 'market', title: 'Mercado do Lobby (altura do jogador)', pos: [0, 17, 40], target: [0, 13, 0] },
+  { id: 'lobby-stairs', title: 'Escadaria de madeira do Lobby', pos: [74, 17, 26], target: [44, 8, 0] },
+  {
+    id: 'fountain',
+    title: 'Fonte do Lobby: estátua do boneco clássico com o logo',
+    pos: [22, 20, 30],
+    target: [0, 22, 0],
+  },
+  { id: 'plot', title: `${plot.name}: fundação do castelo`, ...look(plot.x, plot.z, 52, 34, 62, 5) },
+  {
+    id: 'plots',
+    title: 'Lotes espalhados pelo mapa',
+    pos: [plot.x * 0.3 + 220, 260, plot.z * 0.3 + 260],
+    target: [plot.x, 0, plot.z],
+  },
+];
+const add = (v) => v && VIEWS.push(v);
+if (landmarks.bridges.length) {
+  const [x, z, axis] = landmarks.bridges[0];
+  add({
+    id: 'bridge',
+    title: 'Ponte de madeira sobre o rio',
+    ...(axis === 'x' ? look(x, z, 18, 24, 46) : look(x, z, 46, 24, 18)),
+  });
+  add({
+    id: 'bridge-walk',
+    title: 'Atravessando a ponte (altura do jogador)',
+    pos: axis === 'x' ? [x - 26, 12, z] : [x, 12, z - 26],
+    target: axis === 'x' ? [x + 20, 7, z] : [x, 7, z + 20],
+  });
+}
+add({ id: 'lake', title: 'Lago e rio', ...look(LAKE.x, LAKE.z, 120, 80, -100, 0) });
+if (landmarks.groves.green) {
+  const [x, z] = landmarks.groves.green;
+  add({ id: 'forest', title: 'Floresta', ...look(x, z, 62, 40, 62, 8) });
+}
+if (landmarks.groves.autumn) {
+  const [x, z] = landmarks.groves.autumn;
+  add({ id: 'autumn', title: 'Bosque de outono', ...look(x, z, 62, 40, 62, 8) });
+}
+const tallest = [...landmarks.mountains].sort((p, q) => q[2] - p[2])[0];
+if (tallest) {
+  const [x, z, peak, R] = tallest;
+  add({
+    id: 'mountain',
+    title: 'Montanha com neve e pinheiros',
+    ...look(x, z, R * 2.2, peak * 0.9, R * 2.2, peak * 0.4),
+  });
+}
+if (landmarks.hills.length) {
+  const [x, z, peak, R] = landmarks.hills[0];
+  add({ id: 'hill', title: 'Colina em terraços', ...look(x, z, R * 2.2, peak + 18, R * 2, 8) });
+}
+if (landmarks.villages.length) {
+  const [x, z] = landmarks.villages[0];
+  add({ id: 'village', title: 'Vila: casas, poço, celeiro e moinho', ...look(x, z, 60, 42, 70, 6) });
+  add({ id: 'village-walk', title: 'Rua da vila (altura do jogador)', pos: [x + 34, 11, z + 6], target: [x, 8, z] });
+}
+if (landmarks.farmDistricts?.length) {
+  const [x, z] = landmarks.farmDistricts[0];
+  add({ id: 'farmland', title: 'Região de fazenda: campos, espantalho e sede', ...look(x, z + 10, 70, 55, 90, 4) });
+}
+if (landmarks.towers.length) {
+  const [x, z] = landmarks.towers[0];
+  add({ id: 'tower', title: 'Torre de vigia na beira da estrada', ...look(x, z, 30, 22, 34, 10) });
+}
+if (landmarks.camps.length) {
+  const [x, z] = landmarks.camps[0];
+  add({ id: 'camp', title: 'Acampamento na floresta', ...look(x, z, 26, 18, 30, 4) });
+}
+if (landmarks.farms.length) {
+  const [x, z] = landmarks.farms[0];
+  add({ id: 'farm', title: 'Campo de trigo', ...look(x, z, 34, 22, 38, 3) });
+}
+const mine = landmarks.mines.find((m) => m[2] === 'ouro') ?? landmarks.mines[0];
+if (mine) add({ id: 'mine', title: 'Jazida de ouro', ...look(mine[0], mine[1], 24, 18, 28, 4) });
+if (landmarks.docks.length) {
+  const [x, z, axis, dir] = landmarks.docks[0];
+  const out = (t) => (axis === 'x' ? [x + dir * t, z] : [x, z + dir * t]);
+  const [tx, tz] = out(20);
+  add({ id: 'dock', title: 'Cais e barco na praia', ...look(tx, tz, 34, 20, 34, 2) });
+}
+const palm = parts.find((p) => p.model === 'Vegetação/Coqueiros' && p.name === 'Tronco');
+if (palm)
+  add({ id: 'beach', title: 'Praia com coqueiros', ...look(palm.position[0], palm.position[2], 36, 18, 36, 6) });
+VIEWS.push(
   { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
   { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },
   { id: 'build-75', title: 'Montagem — 75% das etapas', ...OVERVIEW, step: 0.75 },
-];
+);
 
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
 const stepInput = document.getElementById('step');
@@ -231,7 +279,6 @@ const stepLabel = document.getElementById('step-label');
 stepInput.max = String(manual.steps.length);
 function setStep(n) {
   const k = Math.max(1, Math.min(manual.steps.length, Math.round(n)));
-  for (const { mesh, i } of singles) mesh.visible = stepOf[i] <= k;
   for (const { mesh, items } of instanced) {
     items.forEach(({ i, matrix }, idx) => mesh.setMatrixAt(idx, stepOf[i] <= k ? matrix : ZERO));
     mesh.instanceMatrix.needsUpdate = true;
@@ -242,26 +289,12 @@ function setStep(n) {
 }
 stepInput.oninput = () => setStep(Number(stepInput.value));
 
-function setGroupVisible(name, on) {
-  const g = groups.get(name);
-  if (g) g.visible = on;
-}
-let cutaway = false;
-function setCut(on) {
-  cutaway = on;
-  setGroupVisible('Teto', !on);
-  setGroupVisible('Iluminação', !on);
-  document.getElementById('cut')?.classList.toggle('on', on);
-}
-
 function setView(id) {
   const v = VIEWS.find((x) => x.id === id);
   if (!v) return;
-  exitWalk();
   camera.position.fromArray(v.pos);
   orbit.target.fromArray(v.target);
   orbit.update();
-  setCut(Boolean(v.cut));
   setStep(v.step ? v.step * manual.steps.length : manual.steps.length);
   document.querySelectorAll('#views button').forEach((b) => b.classList.toggle('on', b.dataset.view === id));
 }
@@ -270,166 +303,34 @@ const viewsEl = document.getElementById('views');
 for (const v of VIEWS.filter((x) => !x.step)) {
   const b = document.createElement('button');
   b.dataset.view = v.id;
-  b.textContent = v.title.split(' (')[0];
+  b.textContent = v.title.split(/ \(|:/)[0];
   b.onclick = () => setView(v.id);
   viewsEl.appendChild(b);
 }
-document.getElementById('cut').onclick = () => setCut(!cutaway);
 document.getElementById('toggle').onclick = () => document.getElementById('hud').classList.toggle('collapsed');
-
-// ---------------------------------------------------------------------------
-// Modo andar (física simples estilo Roblox: WalkSpeed 16, gravidade 196.2)
-// ---------------------------------------------------------------------------
-const colliders = parts
-  .filter((p) => p.canCollide && !p.rotation)
-  .map((p) => ({ min: p.position.map((c, i) => c - p.size[i] / 2), max: p.position.map((c, i) => c + p.size[i] / 2) }));
-const GRID = 8;
-const grid = new Map();
-colliders.forEach((c, i) => {
-  for (let gx = Math.floor(c.min[0] / GRID); gx <= Math.floor(c.max[0] / GRID); gx++)
-    for (let gz = Math.floor(c.min[2] / GRID); gz <= Math.floor(c.max[2] / GRID); gz++) {
-      const k = gx + ',' + gz;
-      if (!grid.has(k)) grid.set(k, []);
-      grid.get(k).push(i);
-    }
-});
-const SPAWN = [-76, 1, 0];
-const PLAYER = { half: 0.9, height: 5, eye: 4.5 };
-const player = { pos: new THREE.Vector3(...SPAWN), vel: new THREE.Vector3(), onGround: false };
-const keys = {};
-const look = new PointerLockControls(camera, document.body);
-let walking = false;
-
-function nearby(x, z) {
-  const set = new Set();
-  const gx = Math.floor(x / GRID),
-    gz = Math.floor(z / GRID);
-  for (let i = -1; i <= 1; i++)
-    for (let j = -1; j <= 1; j++) (grid.get(gx + i + ',' + (gz + j)) || []).forEach((n) => set.add(n));
-  return [...set].map((i) => colliders[i]);
-}
-function hits(pos, list) {
-  const a0 = [pos.x - PLAYER.half, pos.y, pos.z - PLAYER.half];
-  const a1 = [pos.x + PLAYER.half, pos.y + PLAYER.height, pos.z + PLAYER.half];
-  return list.filter(
-    (c) =>
-      a0[0] < c.max[0] &&
-      a1[0] > c.min[0] &&
-      a0[1] < c.max[1] &&
-      a1[1] > c.min[1] &&
-      a0[2] < c.max[2] &&
-      a1[2] > c.min[2],
-  );
-}
-function moveAxis(axis, delta, list) {
-  if (!delta) return;
-  player.pos[axis] += delta;
-  const hit = hits(player.pos, list);
-  if (!hit.length) return;
-  if (axis !== 'y') {
-    const topY = Math.max(...hit.map((c) => c.max[1]));
-    if (player.onGround && topY - player.pos.y <= 1.2) {
-      const y = player.pos.y;
-      player.pos.y = topY + 0.01;
-      if (!hits(player.pos, list).length) return;
-      player.pos.y = y;
-    }
-    player.pos[axis] -= delta;
-    return;
-  }
-  if (delta < 0) {
-    player.pos.y = Math.max(...hit.map((c) => c.max[1])) + 0.001;
-    player.onGround = true;
-  } else {
-    player.pos.y = Math.min(...hit.map((c) => c.min[1])) - PLAYER.height - 0.001;
-  }
-  player.vel.y = 0;
-}
-function stepWalk(dt) {
-  const speed = keys.ShiftLeft || keys.ShiftRight ? 28 : 16;
-  const fwd = new THREE.Vector3();
-  camera.getWorldDirection(fwd);
-  fwd.y = 0;
-  fwd.normalize();
-  const right = new THREE.Vector3().crossVectors(fwd, camera.up).normalize();
-  const wish = new THREE.Vector3();
-  if (keys.KeyW || keys.ArrowUp) wish.add(fwd);
-  if (keys.KeyS || keys.ArrowDown) wish.sub(fwd);
-  if (keys.KeyD || keys.ArrowRight) wish.add(right);
-  if (keys.KeyA || keys.ArrowLeft) wish.sub(right);
-  if (wish.lengthSq()) wish.normalize().multiplyScalar(speed);
-  if (keys.Space && player.onGround) {
-    player.vel.y = 50;
-    player.onGround = false;
-  }
-  player.vel.y -= 196.2 * dt;
-  const list = nearby(player.pos.x, player.pos.z);
-  moveAxis('x', wish.x * dt, list);
-  moveAxis('z', wish.z * dt, list);
-  player.onGround = false;
-  moveAxis('y', player.vel.y * dt, list);
-  if (player.pos.y < -20) player.pos.set(...SPAWN);
-  camera.position.set(player.pos.x, player.pos.y + PLAYER.eye, player.pos.z);
-}
-const walkBtn = document.getElementById('walk');
-function enterWalk() {
-  walking = true;
-  orbit.enabled = false;
-  walkBtn.classList.add('on');
-  document.getElementById('walkhint').style.display = 'block';
-  document.getElementById('cross').style.display = 'block';
-  player.pos.set(...SPAWN);
-  player.vel.set(0, 0, 0);
-  camera.position.set(SPAWN[0], SPAWN[1] + PLAYER.eye, SPAWN[2]);
-  camera.lookAt(0, SPAWN[1] + PLAYER.eye, 0);
-  setCut(false);
-  setStep(manual.steps.length);
-  look.lock();
-}
-function exitWalk() {
-  if (!walking) return;
-  walking = false;
-  orbit.enabled = true;
-  walkBtn.classList.remove('on');
-  document.getElementById('walkhint').style.display = 'none';
-  document.getElementById('cross').style.display = 'none';
-  if (look.isLocked) look.unlock();
-  const dir = new THREE.Vector3();
-  camera.getWorldDirection(dir);
-  orbit.target.copy(camera.position).addScaledVector(dir, 10);
-}
-walkBtn.onclick = () => (walking ? exitWalk() : enterWalk());
-look.addEventListener('unlock', () => exitWalk());
-addEventListener('keydown', (e) => {
-  keys[e.code] = true;
-  if (walking && e.code === 'Space') e.preventDefault();
-});
-addEventListener('keyup', (e) => (keys[e.code] = false));
 
 // ---------------------------------------------------------------------------
 // Painel e loop
 // ---------------------------------------------------------------------------
 const s = countStats(parts);
 document.getElementById('stats').textContent =
-  `${s.total} peças · ${manual.steps.length} etapas · ${manual.connections} conexões verificadas · ${s.lights} luzes`;
+  `${s.total} peças · ${manual.steps.length} etapas · ${manual.connections} conexões verificadas · ` +
+  `${PLOTS.length} lotes (${DIM.players} jogadores + ${DIM.bots} bots)`;
 
 addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  composer.setSize(window.innerWidth, window.innerHeight);
 });
-const clock = new THREE.Clock();
 renderer.setAnimationLoop(() => {
-  const dt = Math.min(clock.getDelta(), 0.05);
-  if (walking) stepWalk(dt);
-  else orbit.update();
-  composer.render();
+  orbit.update();
+  renderer.render(scene, camera);
 });
 
-setView(new URLSearchParams(location.hash.slice(1)).get('view') || 'atrium');
-window.__prison = {
+setView(params.get('view') || 'overview');
+window.__reino = {
   ready: true,
+  seed,
   views: VIEWS.map(({ id, title }) => ({ id, title })),
   setView,
   stats: s,

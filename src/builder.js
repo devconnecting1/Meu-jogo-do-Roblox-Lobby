@@ -1,5 +1,5 @@
 // Ferramentas genéricas para descrever Parts como dados puros.
-// Nada aqui sabe sobre a prisão: é reaproveitável e testado em tests/.
+// Nada aqui sabe sobre o mapa: é reaproveitável e testado em tests/.
 
 /** Arredonda para 3 casas (evita lixo de ponto flutuante nos arquivos gerados). */
 export const round = (v) => {
@@ -12,7 +12,8 @@ export const round = (v) => {
  * Cada Part é um objeto simples com: model (caminho "A/B/C"), name, position (centro),
  * size, color [r,g,b] 0-255, transparency, canCollide, rotation [rx,ry,rz] graus|null,
  * light {type:'Point'|'Surface', range, brightness, color}|null, className, shape,
- * material ('Plastic'|'Neon'), studs (TopSurface = Studs), group (camada do visualizador).
+ * material ('Plastic'|'Neon'), studs (TopSurface = Studs), surface ('Inlet'|'Weld'|'Universal' nas faces
+ * laterais e no topo, relevo clássico do Roblox), group (camada do visualizador).
  */
 export function makeBuilder() {
   const parts = [];
@@ -34,6 +35,7 @@ export function makeBuilder() {
         shape: opts.shape ?? 'Block',
         material: opts.material ?? 'Plastic',
         studs: opts.studs ?? false,
+        surface: opts.surface ?? null,
         group: opts.group ?? model.split('/')[0],
       };
       parts.push(part);

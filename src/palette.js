@@ -1,46 +1,87 @@
-// Paleta neutra da prisão. Regra (testada): saturação HSV <= 0.3 em todas as cores.
-// Mude tons aqui, nunca espalhe RGB solto pelo layout.
+// Paleta do Reino (estilo clássico do Roblox, como as referências, mas em tons neutros).
+// Regra (testada): toda Part usa uma cor desta paleta e a saturação HSV fica <= 0,55
+// (cores com vida, porém foscas: nada de verde-limão, rosa ou roxo berrante).
+// Mude tons aqui, nunca espalhe RGB solto.
 
 export const C = Object.freeze({
-  // Envoltória e paredes
-  wall: [234, 231, 224], // reboco claro, levemente quente
-  wallTrim: [168, 164, 156], // friso / faixa de parede
-  wainscot: [128, 126, 120], // rodapé alto
-  ceiling: [104, 106, 110], // teto de concreto
-  beam: [126, 128, 132], // vigas
-  column: [200, 198, 192],
-  columnBase: [120, 120, 122],
+  // Mar, rio e lago
+  sea: [78, 122, 160],
+  water: [92, 140, 172], // rio e lago (um pouco mais claro, transparente)
 
-  // Pisos
-  floor: [154, 154, 150], // laje de concreto
-  floorAtrium: [178, 178, 174], // piso do átrio (studs)
-  floorCorridor: [200, 198, 192],
-  floorCatwalk: [156, 158, 160],
-  curb: [86, 88, 92], // meio-fio / rodapé de vidro (studs)
+  // Terreno
+  grass: [86, 140, 70], // gramado
+  grassDark: [70, 120, 58],
+  dirt: [104, 112, 124], // corpo do terreno (rocha azulada, como nas referências)
+  sand: [214, 194, 146], // praia
+  rock: [112, 118, 132], // planaltos, penhascos e pedras
+  rockDark: [84, 90, 104],
 
-  // Metal e vidro
-  steel: [58, 60, 64],
-  steelLight: [162, 164, 168],
-  glass: [196, 206, 212],
-  mirror: [186, 192, 196],
+  // Estradas, praça e lotes
+  road: [124, 128, 138], // estrada de pedra
+  plaza: [196, 190, 180], // piso claro da praça (como o piso de studs das referências)
+  plazaDark: [150, 146, 138],
+  plotStone: [182, 178, 168], // fundação dos lotes de castelo
+  plotKerb: [126, 122, 114],
+  statue: [168, 166, 160], // estátua e pilares antigos
 
-  // Celas
-  facade: [124, 128, 134],
-  cellWall: [238, 236, 230],
-  cellBack: [164, 168, 172],
-  cellFloor: [198, 196, 190],
-  sheet: [226, 224, 218],
-  blanket: [110, 114, 120],
-  porcelain: [234, 234, 232],
+  // Madeira (pontes, cais, troncos, barracas)
+  wood: [128, 92, 62],
+  woodDark: [96, 68, 46],
+  trunk: [112, 80, 56],
+  crate: [150, 118, 86],
 
-  // Madeira e escada
-  wood: [128, 110, 92],
-  woodDark: [86, 74, 62],
-  stair: [138, 136, 130],
-  stairNose: [190, 182, 160],
+  // Vegetação
+  leaf: [66, 128, 62],
+  leafDark: [50, 104, 50],
+  leafLight: [96, 150, 78],
+  autumn: [196, 134, 92], // árvores de outono (laranja fosco)
+  autumnDark: [164, 110, 76],
+  bush: [74, 132, 64],
+  flowerRed: [168, 82, 76],
+  flowerYellow: [206, 182, 104],
 
-  // Luz
-  neon: [255, 246, 228], // branco quente das lâmpadas
+  // Recursos do mapa (futuros pontos de coleta)
+  soil: [116, 86, 60], // campo arado
+  wheat: [214, 186, 102],
+  gold: [210, 178, 100],
+  stoneOre: [150, 154, 164],
+
+  // Mais árvores
+  pine: [56, 98, 70], // pinheiros
+  pineDark: [42, 80, 56],
+  birchBark: [214, 210, 200], // bétula (tronco claro)
+  birchLeaf: [150, 176, 98],
+  blossom: [204, 160, 160], // cerejeira (rosa fosco)
+  blossomDark: [180, 136, 138],
+  palmLeaf: [104, 150, 84], // coqueiros da praia
+  palmTrunk: [150, 124, 92],
+  deadWood: [120, 108, 96], // árvore seca
+  hay: [206, 182, 110], // feno
+
+  // Biomas: região seca (areia de terra firme e rocha avermelhada) e falésias claras na costa
+  desertSand: [206, 182, 136],
+  rockDesert: [168, 132, 104],
+  cliff: [196, 190, 176],
+
+  // Montanhas e trilhas
+  snow: [232, 234, 236],
+  path: [150, 134, 110], // trilha de terra batida
+
+  // Construções da vila
+  plaster: [218, 210, 192], // parede rebocada
+  timber: [92, 70, 52], // enxaimel (vigas aparentes)
+  brick: [160, 110, 92],
+  roofRed: [150, 84, 72],
+  roofSlate: [96, 104, 118],
+  roofThatch: [184, 160, 110],
+  statueDark: [128, 128, 124],
+
+  // Bandeiras e toldos
+  banner: [164, 84, 76],
+  bannerDark: [124, 68, 62],
+  awningBlue: [96, 120, 150],
+  awningOlive: [150, 146, 96],
+  cloth: [226, 222, 210],
 });
 
 /** Saturação HSV (0..1) de uma cor [r,g,b]. */

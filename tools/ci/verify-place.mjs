@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 // Confere o lugar gerado pelo Rojo (versão XML) antes de publicar — roda no GitHub Actions.
-// Uso: node tools/ci/verify-place.mjs build/prisao.rbxlx
+// Uso: node tools/ci/verify-place.mjs build/reino.rbxlx
 
 import { readFileSync } from 'node:fs';
-import { buildPrison } from '../../src/prison.js';
+import { buildMap } from '../../src/map.js';
+import { VARIANT_SEEDS } from '../../src/variants.js';
 
 const xml = readFileSync(process.argv[2], 'utf8');
-const { parts } = buildPrison();
+const maps = [buildMap().parts, ...VARIANT_SEEDS.map((seed) => buildMap(seed).parts)];
+const parts = maps.flat();
 const count = (re) => (xml.match(re) || []).length;
 const problems = [];
 
@@ -23,7 +25,6 @@ for (const banned of [
   'SurfaceGui',
   'BillboardGui',
   'ScreenGui',
-  'Script',
   'LocalScript',
   'ModuleScript',
   'Humanoid',
@@ -33,6 +34,16 @@ for (const banned of [
 ]) {
   if (xml.includes(`<Item class="${banned}"`)) problems.push(`Instância proibida no lugar: ${banned}`);
 }
+if (!/<Item class="Atmosphere"/.test(xml)) problems.push('Faltando Atmosphere (neblina leve) no Lighting');
+const spawns = count(/<Item class="SpawnLocation"/g);
+if (spawns !== maps.length) problems.push(`SpawnLocations no lugar: ${spawns}, esperado ${maps.length} (um por mapa)`);
+// único script: o sorteio da variante do mapa (servidor, sem gameplay)
+const scripts = count(/<Item class="Script"/g);
+if (scripts !== 1) problems.push(`Scripts no lugar: ${scripts}, esperado 1 (EscolherMapa)`);
+if (!/<string name="Name">EscolherMapa<\/string>/.test(xml)) problems.push('Faltando o script EscolherMapa');
+const variants = VARIANT_SEEDS.filter((s) => xml.includes(`<string name="Name">Semente ${s}</string>`));
+if (variants.length !== VARIANT_SEEDS.length)
+  problems.push(`Variantes no ServerStorage: ${variants.length}/${VARIANT_SEEDS.length}`);
 if (!/<token name="Technology">4<\/token>/.test(xml)) problems.push('Lighting.Technology não está em Future (4)');
 for (const c of ['ColorCorrectionEffect', 'BloomEffect']) {
   if (!xml.includes(`<Item class="${c}"`)) problems.push(`Faltando ${c} no Lighting`);

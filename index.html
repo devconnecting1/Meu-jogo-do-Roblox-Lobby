@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prisão — Visualizador</title>
+    <title>Reino — Visualizador</title>
     <style>
       :root {
         --bg: #121315;
@@ -93,31 +93,6 @@
         border-top: 1px solid var(--line);
         padding-top: 8px;
       }
-      #walkhint {
-        position: fixed;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--panel);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-size: 12px;
-        display: none;
-      }
-      #cross {
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        width: 6px;
-        height: 6px;
-        margin: -3px;
-        border-radius: 50%;
-        background: #fff;
-        opacity: 0.7;
-        display: none;
-        pointer-events: none;
-      }
       #toggle {
         display: none;
       }
@@ -147,25 +122,19 @@
   </head>
   <body>
     <div id="app"></div>
-    <div id="cross"></div>
     <div id="hud">
       <button id="toggle" aria-label="Mostrar/ocultar painel">☰</button>
-      <h1>Prisão</h1>
-      <p>Part clássico · Plastic + Neon · cores neutras · ambiente fechado</p>
+      <h1>Reino</h1>
+      <p>Mapa base · Part clássico com studs · cores neutras · 30 lotes de castelo</p>
       <div class="body">
         <div class="row" id="views"></div>
         <div class="row step">
           <label for="step" id="step-label">Etapa</label>
           <input id="step" type="range" min="1" max="1" value="1" />
         </div>
-        <div class="row">
-          <button id="cut">Corte (sem teto)</button>
-          <button id="walk">Andar (WASD)</button>
-        </div>
         <div id="stats"></div>
       </div>
     </div>
-    <div id="walkhint">WASD mover · Espaço pular · Shift correr · Esc sair</div>
     <script type="module" src="viewer/main.js"></script>
   </body>
 </html>

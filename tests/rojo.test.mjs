@@ -1,12 +1,13 @@
-// O que vai para o Roblox: modelo Rojo e projeto (Lighting, sem scripts/UI).
+// O que vai para o Roblox: modelo Rojo e projeto (Lighting de dia, sem scripts/UI).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildPrison } from '../src/prison.js';
+import { buildMap } from '../src/map.js';
+import { VARIANT_SEEDS, variantName } from '../src/variants.js';
 import { toRojoModel, partJson, ENUM } from '../src/rojo.js';
 import { rotationMatrix } from '../src/builder.js';
 
-const { parts } = buildPrison();
+const { parts } = buildMap();
 const model = toRojoModel(parts);
 const project = JSON.parse(readFileSync(new URL('../default.project.json', import.meta.url), 'utf8'));
 
@@ -26,14 +27,18 @@ test('o modelo Rojo contém exatamente as Parts do mapa (+ luzes)', () => {
   for (const c of classes) assert.ok(['Part', 'SpawnLocation', 'PointLight', 'SurfaceLight'].includes(c), c);
 });
 
-test('propriedades Roblox corretas (material, shape, superfícies, ancorado)', () => {
+test('propriedades Roblox corretas (material, shape, studs em cima, inlet embaixo, ancorado)', () => {
   for (const p of parts) {
     const n = partJson(p);
     assert.equal(n.properties.Anchored, true);
     assert.equal(n.properties.Material.Enum, ENUM.Material[p.material]);
     assert.equal(n.properties.Shape.Enum, ENUM.PartType[p.shape]);
-    assert.equal(n.properties.TopSurface.Enum, p.studs ? 3 : 0);
-    assert.equal(n.properties.BottomSurface.Enum, 0);
+    const relief = ENUM.SurfaceType[p.surface ?? 'Smooth'];
+    assert.equal(n.properties.TopSurface.Enum, p.studs ? ENUM.SurfaceType.Studs : relief);
+    assert.equal(n.properties.BottomSurface.Enum, p.studs ? ENUM.SurfaceType.Inlet : ENUM.SurfaceType.Smooth);
+    for (const s of ['FrontSurface', 'BackSurface', 'LeftSurface', 'RightSurface']) {
+      assert.equal(n.properties[s].Enum, relief, `${p.name}: ${s}`);
+    }
     assert.equal(n.properties.CanCollide, p.canCollide);
     assert.deepEqual(n.properties.Size, p.size);
     assert.deepEqual(n.properties.CFrame.CFrame.position, p.position);
@@ -50,16 +55,55 @@ test('orientação do CFrame é uma rotação válida (ortonormal)', () => {
   }
 });
 
-test('projeto: Lighting Future, ambiente noturno/fechado e efeitos sutis', () => {
+test('projeto: Lighting Future, dia claro e efeitos sutis', () => {
   const L = project.tree.Lighting;
-  assert.equal(L.$properties.Technology.Enum, 4, 'Technology = Future');
-  assert.equal(L.$properties.Brightness, 0, 'sem sol (ambiente fechado)');
+  const P = L.$properties;
+  assert.equal(P.Technology.Enum, 4, 'Technology = Future');
+  assert.ok(P.ClockTime >= 9 && P.ClockTime <= 16, `ClockTime ${P.ClockTime} não é dia`);
+  assert.ok(P.Brightness >= 1 && P.Brightness <= 3, `Brightness ${P.Brightness}`);
+  for (const k of ['Ambient', 'OutdoorAmbient']) {
+    for (const v of P[k]) assert.ok(v <= 0.6, `${k} = ${P[k]} (máximo 0,6: nada estoura com gráficos baixos)`);
+  }
+  assert.ok(P.ExposureCompensation <= 0.2, `ExposureCompensation = ${P.ExposureCompensation}`);
   assert.equal(L['Correcao de Cor'].$className, 'ColorCorrectionEffect');
-  assert.equal(L['Brilho das Lampadas'].$className, 'BloomEffect');
+  assert.ok(L['Correcao de Cor'].$properties.Saturation <= 0, 'correção de cor não pode saturar (cores neutras)');
+  assert.equal(L['Brilho'].$className, 'BloomEffect');
+  assert.ok(L['Brilho'].$properties.Intensity <= 0.3, 'bloom forte demais');
+  assert.equal(L['Neblina Leve'].$className, 'Atmosphere');
+  assert.equal(L['Raios de Sol'].$className, 'SunRaysEffect');
+  assert.ok(L['Raios de Sol'].$properties.Intensity <= 0.1, 'raios de sol fortes demais');
+  const atm = L['Neblina Leve'].$properties;
+  assert.ok(atm.Density >= 0.2 && atm.Density <= 0.4, 'neblina: o horizonte some suave, mas o mapa continua visível');
 });
 
-test('projeto: só Workspace + Lighting (sem scripts, UI ou NPCs)', () => {
+test('projeto: mapa principal no Workspace, variantes no ServerStorage e um único script de sorteio', () => {
   const services = Object.keys(project.tree).filter((k) => !k.startsWith('$'));
-  assert.deepEqual(services.sort(), ['Lighting', 'Workspace']);
-  assert.equal(project.tree.Workspace['Prisão'].$path, 'build/Prisao.model.json');
+  assert.deepEqual(services.sort(), ['Lighting', 'ServerScriptService', 'ServerStorage', 'Workspace']);
+  assert.equal(project.tree.Workspace['Reino'].$path, 'build/Reino.model.json');
+  // as variantes do projeto são exatamente as de src/variants.js
+  const mapas = project.tree.ServerStorage.Mapas;
+  const names = Object.keys(mapas).filter((k) => !k.startsWith('$'));
+  assert.deepEqual(names.sort(), VARIANT_SEEDS.map(variantName).sort());
+  for (const n of names) assert.equal(mapas[n].$path, `build/Mapas/${n}.model.json`);
+  // um script só, no servidor, sem gameplay: não cria instâncias, não mexe em jogador nem em UI
+  const sss = project.tree.ServerScriptService;
+  const scripts = Object.keys(sss).filter((k) => !k.startsWith('$'));
+  assert.deepEqual(scripts, ['EscolherMapa']);
+  assert.match(sss.EscolherMapa.$path, /\.server\.luau$/);
+  const src = readFileSync(new URL(`../${sss.EscolherMapa.$path}`, import.meta.url), 'utf8');
+  for (const banned of [
+    'Instance.new',
+    'Players',
+    'RemoteEvent',
+    'RemoteFunction',
+    'Gui',
+    'Humanoid',
+    'DataStore',
+    'HttpService',
+  ]) {
+    assert.ok(!src.includes(banned), `o script de sorteio não pode usar ${banned}`);
+  }
+  assert.ok(src.includes('ServerStorage') && src.includes('Mapas'), 'o script sorteia entre os mapas do ServerStorage');
+  const raw = JSON.stringify(project.tree.Lighting) + JSON.stringify(project.tree.Workspace);
+  for (const banned of ['Gui', 'Humanoid', 'Sky"']) assert.ok(!raw.includes(banned), `projeto tem ${banned}`);
 });

@@ -5,8 +5,8 @@ import { rotationMatrix } from './builder.js';
 
 export const ENUM = Object.freeze({
   Material: { Plastic: 256, Neon: 288 },
-  PartType: { Block: 1, Cylinder: 2 },
-  SurfaceType: { Smooth: 0, Studs: 3 },
+  PartType: { Ball: 0, Block: 1, Cylinder: 2 },
+  SurfaceType: { Smooth: 0, Weld: 2, Studs: 3, Inlet: 4, Universal: 5 },
   NormalId: { Bottom: 4 },
 });
 
@@ -16,7 +16,7 @@ const SIDES = ['BottomSurface', 'FrontSurface', 'BackSurface', 'LeftSurface', 'R
 function lightJson(light) {
   if (light.type === 'Surface') {
     return {
-      name: 'Luz',
+      name: light.flicker ? 'Luz Piscando' : 'Luz',
       className: 'SurfaceLight',
       properties: {
         Face: { Enum: ENUM.NormalId.Bottom },
@@ -29,11 +29,13 @@ function lightJson(light) {
     };
   }
   return {
-    name: 'Luz',
+    name: light.flicker ? 'Luz Piscando' : 'Luz',
     className: 'PointLight',
     properties: { Brightness: light.brightness, Range: light.range, Color: c3(light.color), Shadows: true },
   };
 }
+
+const surfaceEnum = (p) => ENUM.SurfaceType[p.surface ?? 'Smooth'];
 
 export function partJson(p) {
   const m = rotationMatrix(p.rotation);
@@ -49,9 +51,11 @@ export function partJson(p) {
     Material: { Enum: ENUM.Material[p.material] },
     Shape: { Enum: ENUM.PartType[p.shape] },
     Transparency: p.transparency,
-    TopSurface: { Enum: p.studs ? ENUM.SurfaceType.Studs : ENUM.SurfaceType.Smooth },
+    TopSurface: { Enum: p.studs ? ENUM.SurfaceType.Studs : surfaceEnum(p) },
   };
-  for (const s of SIDES) properties[s] = { Enum: ENUM.SurfaceType.Smooth };
+  // estilo clássico: studs em cima e inlet embaixo; as laterais recebem o relevo (ou ficam lisas)
+  const bottom = p.studs ? ENUM.SurfaceType.Inlet : ENUM.SurfaceType.Smooth;
+  for (const s of SIDES) properties[s] = { Enum: s === 'BottomSurface' ? bottom : surfaceEnum(p) };
   if (p.className === 'SpawnLocation') {
     properties.Neutral = true;
     properties.Duration = 0;

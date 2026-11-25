@@ -4,12 +4,12 @@
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { buildPrison } from '../src/prison.js';
+import { buildMap } from '../src/map.js';
 import { buildManual, manualMarkdown } from '../src/manual.js';
 
 const out = resolve(process.argv[2] ?? 'out/previews');
 mkdirSync(out, { recursive: true });
-const manual = buildManual(buildPrison().parts);
+const manual = buildManual(buildMap().parts);
 writeFileSync(join(out, 'MANUAL.md'), manualMarkdown(manual));
 writeFileSync(
   join(out, 'manual.json'),

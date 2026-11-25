@@ -7,39 +7,32 @@ import { aabb } from './builder.js';
 const EPS = 0.01;
 const MAX_PER_STEP = 8;
 
-const FIXTURE_NAMES = new Set(['Moldura', 'Painel', 'Carcaça', 'Tubo', 'Haste']);
-const isFixture = (p) => p.material === 'Neon' || FIXTURE_NAMES.has(p.name) || p.model.startsWith('Iluminação');
-
 /** Fases na ordem real de obra. A primeira regra que casar define a fase. */
 export const PHASES = [
-  { id: 'base', title: 'Laje do térreo', match: (p) => p.name === 'Laje Térreo' },
+  { id: 'base', title: 'Mar (base de tudo)', match: (p) => p.name === 'Mar' },
+  { id: 'terreno', title: 'Terreno: terra, grama, areia, rio e lago', match: (p) => p.model === 'Terreno' },
+  { id: 'lobby', title: 'Lobby: plataforma, escadarias, estátua e mercado', match: (p) => p.model.startsWith('Lobby') },
+  { id: 'estradas', title: 'Estradas de pedra', match: (p) => p.model === 'Estradas' },
+  { id: 'pontes', title: 'Pontes de madeira', match: (p) => p.model.startsWith('Pontes') },
+  { id: 'lotes', title: 'Lotes dos castelos (30)', match: (p) => p.model.startsWith('Lotes') },
   {
-    id: 'paredes',
-    title: 'Paredes externas e parede do bloco',
-    match: (p) => (p.model === 'Envoltória' && p.name.startsWith('Parede')) || p.model === 'Estrutura/Paredes',
+    id: 'relevo',
+    title: 'Montanhas, colinas e afloramentos de rocha',
+    match: (p) => /^Relevo\/(Montanha|Colina|Afloramento)/.test(p.model),
   },
-  { id: 'colunas', title: 'Colunas', match: (p) => p.model.startsWith('Estrutura/Colunas') },
+  { id: 'trilhas', title: 'Trilhas de terra', match: (p) => p.model === 'Trilhas' },
   {
-    id: 'lajes',
-    title: 'Lajes do 2º andar, ponte e mezanino',
-    match: (p) => ['Laje', 'Laje Ponte', 'Laje Mezanino', 'Laje Ala'].includes(p.name),
+    id: 'recursos',
+    title: 'Recursos e fazendas: campos, ouro e pedra',
+    match: (p) => /^(Recursos|Fazendas)\//.test(p.model),
   },
-  { id: 'pisos', title: 'Pisos e meio-fios', match: (p) => p.model === 'Pisos' },
-  { id: 'escada', title: 'Escada', match: (p) => p.model === 'Escada' },
-  { id: 'celas', title: 'Celas', match: (p) => p.model.startsWith('Celas') && !isFixture(p) },
-  { id: 'galerias', title: 'Galerias e guarda-corpos', match: (p) => p.model.startsWith('Galerias') },
   {
-    id: 'ambientes',
-    title: 'Hall, salas, ala oeste (refeitório, almoxarifado, enfermaria) e sala de visitas',
-    match: (p) => !isFixture(p) && /^(Hall|Salas|Ala Oeste|Átrio|Sala de Visitas)/.test(p.model),
+    id: 'construcoes',
+    title: 'Vilas, torres de vigia e acampamentos',
+    match: (p) => /^(Vila|Torres de Vigia|Acampamentos)/.test(p.model),
   },
-  { id: 'acabamento', title: 'Acabamento das paredes', match: (p) => p.model.startsWith('Acabamento') },
-  {
-    id: 'teto',
-    title: 'Laje do teto e vigas',
-    match: (p) => p.model.startsWith('Estrutura/Teto') || p.name === 'Laje Teto',
-  },
-  { id: 'luz', title: 'Iluminação', match: () => true },
+  { id: 'costa', title: 'Cais e barcos', match: (p) => p.model.startsWith('Costa') },
+  { id: 'natureza', title: 'Florestas, arbustos e pedras', match: () => true },
 ];
 
 const touches = (a, b) => [0, 1, 2].every((i) => a.min[i] <= b.max[i] + EPS && b.min[i] <= a.max[i] + EPS);
@@ -75,7 +68,7 @@ export function buildManual(parts) {
     let remaining = items.filter((x) => x.phase === ph);
     if (!remaining.length) continue;
     if (!placed.length) {
-      // a primeira peça da obra é a laje
+      // a primeira peça da obra é a base (o mar)
       const first = remaining.shift();
       placed.push(first);
       order.push(first);
@@ -128,7 +121,7 @@ export function buildManual(parts) {
 /** Texto do manual (markdown) para o CI publicar. */
 export function manualMarkdown(manual) {
   const lines = [
-    '# Manual de montagem da Prisão',
+    '# Manual de montagem do Reino',
     '',
     `**${manual.parts} peças · ${manual.steps.length} etapas · ${manual.connections} pontos de conexão verificados**`,
   ];

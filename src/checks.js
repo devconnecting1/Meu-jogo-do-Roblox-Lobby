@@ -21,7 +21,7 @@ function touches(a, b, eps = EPS) {
  * "Nada flutua": todas as Parts precisam estar ligadas (por toque/encaixe) à Part raiz.
  * Retorna as Parts soltas.
  */
-export function findFloating(parts, rootName = 'Laje Térreo') {
+export function findFloating(parts, rootName = 'Mar') {
   const bx = boxes(parts);
   const order = bx.map((_, i) => i).sort((a, b) => bx[a].min[0] - bx[b].min[0]);
   const parent = bx.map((_, i) => i);
