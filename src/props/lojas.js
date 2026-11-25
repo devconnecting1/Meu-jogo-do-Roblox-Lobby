@@ -269,15 +269,20 @@ export const SHOPS = {
       for (const side of [-1, 1]) {
         const [w0, w1] = side < 0 ? [-11, -6.6] : [6.6, 11];
         const wallU = side < 0 ? -11 : 11;
-        for (const v of [-0.45, -4.45])
-          add('Divisória', [['Divisória', [w0, 0, v], [w1, 2.2, v + 0.3], C.pxWoodDark]]);
+        for (const v of [-0.45, -4.45]) add('Divisória', [['Divisória', [w0, 0, v], [w1, 2.2, v + 0.3], C.pxWoodDark]]);
         for (const v0 of [-4.15, -8.85]) {
           const [h0, h1] = side < 0 ? [wallU + 0.3, wallU + 1.7] : [wallU - 1.7, wallU - 0.3];
           const [t0, t1] = side < 0 ? [wallU + 0.2, wallU + 0.8] : [wallU - 0.8, wallU - 0.2];
           add('Feno da Baia', fardo(h0, v0 + 0.6, h1, v0 + 1.6));
           add('Cocho', [
             ['Cocho', [t0, 0, v0 + 2.1], [t1, 0.8, v0 + 3.3], C.pxWood],
-            ['Espelho do Cocho', [t0 + 0.1, 0.8, v0 + 2.2], [t1 - 0.1, 0.85, v0 + 3.2], C.pxWater, { canCollide: false }],
+            [
+              'Espelho do Cocho',
+              [t0 + 0.1, 0.8, v0 + 2.2],
+              [t1 - 0.1, 0.85, v0 + 3.2],
+              C.pxWater,
+              { canCollide: false },
+            ],
           ]);
         }
       }
@@ -286,11 +291,7 @@ export const SHOPS = {
         ['Sela', [-8.2, 1.6, 10.65], [-6.8, 2.1, 10.95], C.pxClothRed],
         ['Sela', [-6.2, 1.6, 10.65], [-4.8, 2.1, 10.95], C.pxBook],
       ]);
-      add('Feno', [
-        ...fardo(7.4, 9.6, 9.0, 10.8),
-        ...fardo(9.2, 9.6, 10.8, 10.8),
-        ...fardo(8.3, 9.6, 9.9, 10.8, 0.9),
-      ]);
+      add('Feno', [...fardo(7.4, 9.6, 9.0, 10.8), ...fardo(9.2, 9.6, 10.8, 10.8), ...fardo(8.3, 9.6, 9.9, 10.8, 0.9)]);
       add('Saco de Ração', saco(-9.8, 6.3));
       add('Saco de Ração', saco(-9.8, 7.5));
       add('Barril', barril(9.8, 6.6));
