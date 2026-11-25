@@ -162,13 +162,13 @@ export const PLANS = Object.freeze({
   estabulo: {
     name: 'Estábulo',
     group: 'loja',
-    door: [0, -4],
+    door: [0, 12],
     parts: [
-      [-12, -12, 12, -4],
-      [-12, -4, -4, 10],
-      [4, -4, 12, 10],
+      [-12, 4, 12, 12],
+      [-12, -10, -4, 4],
+      [4, -10, 12, 4],
     ],
-  }, // U em volta do picadeiro
+  }, // U: frente com a porta e alas das baias em volta do picadeiro (aberto para trás)
   banco: {
     name: 'Banco',
     group: 'loja',
