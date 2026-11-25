@@ -87,13 +87,12 @@ for (const [keys, material] of BY_COLOR) {
 }
 
 /**
- * Material de uma peça. Decisão do projeto (regra 4 do AGENTS.md): o mapa usa a textura clássica,
- * Plastic com studs em tudo, como os lugares de elite do Roblox; os materiais "realistas" (Grass,
- * Cobblestone, WoodPlanks...) foram testados na versão 20 e removidos. A tabela BY_COLOR fica
- * guardada para referência, sem uso.
+ * Material de uma peça. Estilo atual (regra 4 do AGENTS.md): blocos lisos em SmoothPlastic, sem
+ * studs, como os mapas voxel pixelados. O Reino clássico (Plastic com studs) está guardado no branch
+ * arquivo/reino-classico; as texturas "realistas" (tabela abaixo) foram rejeitadas.
  */
 export function materialFor() {
-  return 'Plastic';
+  return 'SmoothPlastic';
 }
 
 export const REALISTIC_TABLE = TABLE;

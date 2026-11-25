@@ -14,7 +14,7 @@
         "Technology": {
           "Enum": 4
         },
-        "ClockTime": 14.2,
+        "ClockTime": 15.6,
         "GeographicLatitude": 32,
         "Brightness": 3,
         "Ambient": [0.22, 0.23, 0.26],
@@ -24,7 +24,7 @@
         "ExposureCompensation": 0.1,
         "ShadowSoftness": 0.12,
         "GlobalShadows": true,
-        "ColorShift_Top": [0.1, 0.08, 0.04],
+        "ColorShift_Top": [0.14, 0.09, 0.04],
         "ColorShift_Bottom": [0, 0, 0]
       },
       "Correcao de Cor": {

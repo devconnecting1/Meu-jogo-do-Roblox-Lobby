@@ -1,6 +1,6 @@
 # Fuzz de mapas (100 mil sementes)
 
-O mapa sai de uma semente: `createWorld(semente)` gera ilha, lago, rio, lotes e estradas, e `w.buildMap()` monta as Parts. As regras do AGENTS.md precisam valer para **qualquer** semente, e não só para a padrão (`SEED`). O fuzz testa milhares de sementes no GitHub Actions para achar a que quebra uma regra antes de ela virar um mapa de servidor.
+O mapa sai de uma semente: `createWorld(semente)` gera o vale (formato, penhascos, lagoas), os lotes, as áreas de construção, as estradas e os terraços, e `w.buildMap()` monta as Parts. As regras do AGENTS.md precisam valer para **qualquer** semente, e não só para a padrão (`SEED`). O fuzz testa milhares de sementes no GitHub Actions para achar a que quebra uma regra antes de ela virar um mapa de servidor.
 
 Nada disso roda localmente. Tudo roda no GitHub Actions, como o resto do projeto.
 
@@ -12,20 +12,17 @@ As verificações ficam em `src/invariants.js` (funções puras, sem I/O). Cada 
 
 | Tipo | Regra |
 |---|---|
-| `lotes (quantidade)` | exatamente `DIM.plots` (30) lotes |
+| `lotes (quantidade)` | exatamente `DIM.plots` (30) lotes e `DIM.pads` (8) áreas de construção |
 | `lotes (nomes repetidos)` | nomes únicos |
-| `lotes (perto demais)` | dois lotes a pelo menos `DIM.minPlotSpacing` (84) studs |
-| `lotes (fora da grama)` | fundação + 2 studs de folga toda sobre grama (amostra a cada 2 studs) |
-| `lotes (perto do Lobby ou da água)` | ≥ 110 do centro do Lobby e do lago, ≥ 52 do rio |
-| `lotes (sem estrada)` | `w.plotsConnected` todo `true` (a estrada do lote chega ao Lobby) |
+| `lotes (perto demais)` | dois lotes a pelo menos `DIM.minPlotSpacing` (56) studs |
+| `lotes (piso torto ou fora do chão)` | todo o piso do lote/área é chão do vale no nível 4, com a superfície certa (amostra a cada 2 studs) |
+| `lotes (sem estrada)` | `w.plotsConnected` e `w.padsConnected` todos `true` (busca em largura até o Lobby) |
 | `lotes (quadrantes)` | lotes em pelo menos 3 dos 4 quadrantes |
-| `estradas (trecho torto ou vazio)` | cada trecho de `ROAD_LEGS` é reto (eixo X ou Z) e tem comprimento |
-| `estradas (dentro do Lobby)` | o eixo do trecho (amostra a cada 2 studs) nunca entra no quadrado do Lobby + escadarias (meia-largura `PLAZA.guard`) |
-| `estradas (fora da grama)` | o eixo só passa por grama ou rio (ponte) |
-| `estradas (atravessam lote)` | nenhum trecho passa por dentro de um lote, menos o trecho que começa ou termina dentro dele (é a estrada chegando ao centro do lote) |
-| `ilha (borda sem mar)` | as 4 bordas da grade (a cada 16 studs) são mar |
-| `Lobby (fora da grama)` | o quadrado do Lobby (meia-largura `PLAZA.reach`) é todo grama |
-| `água (lago ou rio faltando)` | existe pelo menos uma célula de lago e uma de rio |
+| `estradas (trecho torto)` | cada trecho de `ROAD_LEGS` é reto (eixo X ou Z) |
+| `estradas (fora do chão)` | o eixo só passa por chão do vale (sobre a lagoa vira passagem de pedra) |
+| `planalto (borda sem mar)` | as 4 bordas da grade (a cada 16 studs) são mar |
+| `Lobby (fora do chão)` | o círculo do Lobby (raio `PLAZA.reach`) é todo chão |
+| `relevo (penhasco ou lagoa faltando)` | existe pelo menos uma célula de penhasco e uma lagoa |
 
 ### Camada cara: `fullProblems(w, built)` (amostra, com Parts)
 
@@ -37,10 +34,8 @@ As verificações ficam em `src/invariants.js` (funções puras, sem I/O). Cada 
 | `limites` | `findOutside(parts, w.ENVELOPE)` |
 | `spawn` | exatamente um `SpawnLocation` |
 | `manual de montagem` | `buildManual(parts).problems` vazio |
-| `orçamento` | no máximo 10 000 Parts |
-| `marcos` | vilas, campos, jazidas, cais, montanhas, colinas e trilhas existem |
-
-Torres de vigia e acampamentos faltando viram **aviso** (aparecem no resumo, mas não derrubam o fuzz): num mapa apertado pode não sobrar espaço para eles.
+| `orçamento` | no máximo `DIM.maxParts` (32 000) Parts |
+| `marcos` | lotes, áreas de construção, lagoas, estradas e terraços existem |
 
 Uma exceção dentro do gerador ou das verificações vira o problema `exceção: …` da semente (com as primeiras linhas da pilha).
 

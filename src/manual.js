@@ -10,29 +10,13 @@ const MAX_PER_STEP = 8;
 /** Fases na ordem real de obra. A primeira regra que casar define a fase. */
 export const PHASES = [
   { id: 'base', title: 'Mar (base de tudo)', match: (p) => p.name === 'Mar' },
-  { id: 'terreno', title: 'Terreno: terra, grama, areia, rio e lago', match: (p) => p.model === 'Terreno' },
-  { id: 'lobby', title: 'Lobby: plataforma, escadarias, estátua e mercado', match: (p) => p.model.startsWith('Lobby') },
-  { id: 'estradas', title: 'Estradas de pedra', match: (p) => p.model === 'Estradas' },
-  { id: 'pontes', title: 'Pontes de madeira', match: (p) => p.model.startsWith('Pontes') },
+  { id: 'terreno', title: 'Chão do vale: terra, grama e terraços', match: (p) => p.model === 'Terreno' },
+  { id: 'lobby', title: 'Lobby: praça de pedra, estrado e spawn', match: (p) => p.model.startsWith('Lobby') },
+  { id: 'estradas', title: 'Estradas de terra e passagens de pedra', match: (p) => p.model === 'Estradas' },
+  { id: 'areas', title: 'Áreas de construção em volta da praça', match: (p) => p.model === 'Áreas' },
   { id: 'lotes', title: 'Lotes dos castelos (30)', match: (p) => p.model.startsWith('Lotes') },
-  {
-    id: 'relevo',
-    title: 'Montanhas, colinas e afloramentos de rocha',
-    match: (p) => /^Relevo\/(Montanha|Colina|Afloramento)/.test(p.model),
-  },
-  { id: 'trilhas', title: 'Trilhas de terra', match: (p) => p.model === 'Trilhas' },
-  {
-    id: 'recursos',
-    title: 'Recursos e fazendas: campos, ouro e pedra',
-    match: (p) => /^(Recursos|Fazendas)\//.test(p.model),
-  },
-  {
-    id: 'construcoes',
-    title: 'Vilas, torres de vigia e acampamentos',
-    match: (p) => /^(Vila|Torres de Vigia|Acampamentos)/.test(p.model),
-  },
-  { id: 'costa', title: 'Cais e barcos', match: (p) => p.model.startsWith('Costa') },
-  { id: 'natureza', title: 'Florestas, arbustos e pedras', match: () => true },
+  { id: 'penhascos', title: 'Penhascos de rocha e musgo', match: (p) => p.model === 'Penhascos' },
+  { id: 'agua', title: 'Lagoas', match: () => true },
 ];
 
 const touches = (a, b) => [0, 1, 2].every((i) => a.min[i] <= b.max[i] + EPS && b.min[i] <= a.max[i] + EPS);

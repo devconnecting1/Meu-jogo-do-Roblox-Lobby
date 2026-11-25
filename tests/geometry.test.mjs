@@ -20,7 +20,7 @@ test('sem z-fighting entre faces visíveis', () => {
   assert.equal(p.length, 0, report(p));
 });
 
-test('passagens livres de colisão (área dos castelos, estradas, pontes e spawn)', () => {
+test('áreas de construção, lotes e spawn livres de colisão', () => {
   const p = findClearanceViolations(parts, clearanceZones());
   assert.equal(p.length, 0, report(p));
 });
@@ -30,7 +30,7 @@ test('tudo dentro dos limites do mapa', () => {
   assert.equal(p.length, 0, report(p));
 });
 
-test('ilha cercada de mar: a borda da grade é mar e o terreno não passa de ±half', () => {
+test('planalto cercado de mar: a borda da grade é mar e o terreno não passa de ±half', () => {
   for (let t = -DIM.half + 1; t < DIM.half; t += DIM.cell) {
     for (const [x, z] of [
       [t, -DIM.half + 1],
@@ -41,23 +41,24 @@ test('ilha cercada de mar: a borda da grade é mar e o terreno não passa de ±h
       assert.equal(terrainAt(x, z), T.SEA, `borda (${x}, ${z}) não é mar`);
     }
   }
-  for (const p of parts.filter((x) => x.model === 'Terreno')) {
+  for (const p of parts.filter((x) => x.name !== 'Mar')) {
     for (const i of [0, 2]) {
-      assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= DIM.half, `${p.name} @ ${p.position} passa da ilha`);
+      assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= DIM.half, `${p.name} @ ${p.position} passa da grade`);
     }
   }
 });
 
-test('praia, rio e lago existem e o terreno tem as alturas certas', () => {
-  const names = new Set(parts.filter((p) => p.model === 'Terreno').map((p) => p.name));
-  for (const n of ['Terra', 'Grama', 'Barranco', 'Areia', 'Água do Rio', 'Água do Lago']) {
+test('alturas do terreno: chão no topo certo, água abaixo do chão e sem colisão', () => {
+  const top = (p) => p.position[1] + p.size[1] / 2;
+  const names = new Set(parts.map((p) => p.name));
+  for (const n of ['Chão', 'Grama', 'Grama Escura', 'Terra da Estrada', 'Pedra da Praça', 'Lote', 'Rocha', 'Musgo']) {
     assert.ok(names.has(n), `falta "${n}" no terreno`);
   }
-  const top = (p) => p.position[1] + p.size[1] / 2;
-  for (const p of parts.filter((x) => x.name === 'Grama')) assert.equal(top(p), DIM.land);
-  for (const p of parts.filter((x) => x.name === 'Areia')) assert.equal(top(p), DIM.beach);
-  for (const p of parts.filter((x) => x.model === 'Terreno' && x.name.startsWith('Água'))) {
-    assert.equal(top(p), DIM.water);
+  for (const p of parts.filter((x) => ['Terra da Estrada', 'Terra Batida', 'Lote', 'Borda do Lote'].includes(x.name))) {
+    assert.equal(top(p), DIM.land, `${p.name} @ ${p.position} fora do nível do chão`);
+  }
+  for (const p of parts.filter((x) => x.name.startsWith('Água'))) {
+    assert.ok(top(p) < DIM.land, 'água abaixo do chão');
     assert.equal(p.canCollide, false, 'água não colide (o jogador entra nela)');
   }
 });

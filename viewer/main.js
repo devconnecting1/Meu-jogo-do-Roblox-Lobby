@@ -48,8 +48,8 @@ scene.add(sun, sun.target);
 const params = new URLSearchParams(location.hash.slice(1));
 const seed = Number(params.get('seed')) || SEED;
 const world = createWorld(seed);
-const { PLOTS, LAKE } = world;
-const { parts, landmarks } = world.buildMap();
+const { PLOTS, PADS, PONDS } = world;
+const { parts } = world.buildMap();
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
 const cache = new Map();
 const lookKey = (p) => `${p.color}|${p.transparency}|${p.material}|${p.studs}|${isWet(p)}`;
@@ -101,101 +101,45 @@ orbit.maxDistance = 2200;
 orbit.maxPolarAngle = Math.PI * 0.49;
 
 const look = (x, z, dx, h, dz, ty = 4) => ({ pos: [x + dx, h, z + dz], target: [x, ty, z] });
-const OVERVIEW = { pos: [560, 540, 760], target: [-20, 0, 40] };
+const OVERVIEW = { pos: [380, 360, 500], target: [-10, 0, 20] };
 const plot = [...PLOTS].sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.z))[0];
+const pad = PADS[0];
 const VIEWS = [
-  { id: 'overview', title: 'Visão geral do reino', ...OVERVIEW },
-  { id: 'top', title: 'Mapa visto de cima (30 lotes, estradas, rio e lago)', pos: [0, 1300, 140], target: [0, 0, 0] },
+  { id: 'overview', title: 'Visão geral do Vale', ...OVERVIEW },
+  { id: 'top', title: 'Vale visto de cima (Lobby, áreas, 30 lotes, estradas e lagoas)', pos: [0, 820, 90], target: [0, 0, 0] },
+  { id: 'lobby', title: 'Lobby: praça de pedra com o estrado no meio', ...look(0, 0, 60, 52, 80, 4) },
+  { id: 'lobby-walk', title: 'Chegando na praça (altura do jogador)', pos: [0, 9, 74], target: [0, 6, 0] },
+  { id: 'pads', title: 'Áreas de construção em volta da praça', ...look(pad.x, pad.z, 40, 34, 46, 4) },
+  { id: 'plot', title: `${plot.name}: lote do castelo`, ...look(plot.x, plot.z, 40, 30, 48, 4) },
   {
-    id: 'lobby',
-    title: 'Lobby: fonte com a estátua clássica, mercado e colunas antigas',
-    ...look(0, 0, 78, 48, 96, 10),
-  },
-  { id: 'market', title: 'Lojas do Lobby (altura do jogador)', pos: [2, 16, 6], target: [30, 14, 30] },
-  { id: 'lobby-stairs', title: 'Escadaria de madeira do Lobby', pos: [74, 17, 26], target: [44, 8, 0] },
-  {
-    id: 'fountain',
-    title: 'Fonte do Lobby: estátua do boneco clássico com o logo',
-    pos: [22, 20, 30],
-    target: [0, 22, 0],
-  },
-  { id: 'plot', title: `${plot.name}: fundação do castelo`, ...look(plot.x, plot.z, 52, 34, 62, 5) },
-  {
-    id: 'plots',
-    title: 'Lotes espalhados pelo mapa',
-    pos: [plot.x * 0.3 + 220, 260, plot.z * 0.3 + 260],
-    target: [plot.x, 0, plot.z],
+    id: 'road',
+    title: 'Estrada de terra (altura do jogador)',
+    pos: [plot.x * 0.55, 10, plot.z * 0.55 + 6],
+    target: [plot.x, 5, plot.z],
   },
 ];
 const add = (v) => v && VIEWS.push(v);
-if (landmarks.bridges.length) {
-  const [x, z, axis] = landmarks.bridges[0];
+// penhasco mais alto: câmera dentro do vale olhando para a parede de rocha
+{
+  let best = null;
+  for (let k = 0; k < 72; k++) {
+    const a = (k / 72) * Math.PI * 2;
+    const r = world.valleyR(Math.cos(a) * 200, Math.sin(a) * 200);
+    const h = world.heightAt(Math.cos(a) * (r + 30), Math.sin(a) * (r + 30));
+    if (!best || h > best.h) best = { a, r, h };
+  }
+  const [cx, cz] = [Math.cos(best.a), Math.sin(best.a)];
   add({
-    id: 'bridge',
-    title: 'Ponte de madeira sobre o rio',
-    ...(axis === 'x' ? look(x, z, 18, 24, 46) : look(x, z, 46, 24, 18)),
-  });
-  add({
-    id: 'bridge-walk',
-    title: 'Atravessando a ponte (altura do jogador)',
-    pos: axis === 'x' ? [x - 26, 12, z] : [x, 12, z - 26],
-    target: axis === 'x' ? [x + 20, 7, z] : [x, 7, z + 20],
-  });
-}
-add({ id: 'lake', title: 'Lago e rio', ...look(LAKE.x, LAKE.z, 120, 80, -100, 0) });
-if (landmarks.groves.green) {
-  const [x, z] = landmarks.groves.green;
-  add({ id: 'forest', title: 'Floresta', ...look(x, z, 62, 40, 62, 8) });
-}
-if (landmarks.groves.autumn) {
-  const [x, z] = landmarks.groves.autumn;
-  add({ id: 'autumn', title: 'Bosque de outono', ...look(x, z, 62, 40, 62, 8) });
-}
-const tallest = [...landmarks.mountains].sort((p, q) => q[2] - p[2])[0];
-if (tallest) {
-  const [x, z, peak, R] = tallest;
-  add({
-    id: 'mountain',
-    title: 'Montanha com neve e pinheiros',
-    ...look(x, z, R * 2.2, peak * 0.9, R * 2.2, peak * 0.4),
+    id: 'cliffs',
+    title: 'Penhascos de rocha em blocos cercando o vale',
+    pos: [cx * (best.r - 90), 22, cz * (best.r - 90)],
+    target: [cx * (best.r + 20), best.h * 0.6, cz * (best.r + 20)],
   });
 }
-if (landmarks.hills.length) {
-  const [x, z, peak, R] = landmarks.hills[0];
-  add({ id: 'hill', title: 'Colina em terraços', ...look(x, z, R * 2.2, peak + 18, R * 2, 8) });
+if (PONDS.length) {
+  const [p] = PONDS;
+  add({ id: 'pond', title: 'Lagoa com passagem de pedra', ...look(p.x, p.z, p.r * 1.6, 34, p.r * 1.8, 2) });
 }
-if (landmarks.villages.length) {
-  const [x, z] = landmarks.villages[0];
-  add({ id: 'village', title: 'Vila: casas, poço, celeiro e moinho', ...look(x, z, 60, 42, 70, 6) });
-  add({ id: 'village-walk', title: 'Rua da vila (altura do jogador)', pos: [x + 34, 11, z + 6], target: [x, 8, z] });
-}
-if (landmarks.farmDistricts?.length) {
-  const [x, z] = landmarks.farmDistricts[0];
-  add({ id: 'farmland', title: 'Região de fazenda: campos, espantalho e sede', ...look(x, z + 10, 70, 55, 90, 4) });
-}
-if (landmarks.towers.length) {
-  const [x, z] = landmarks.towers[0];
-  add({ id: 'tower', title: 'Torre de vigia na beira da estrada', ...look(x, z, 30, 22, 34, 10) });
-}
-if (landmarks.camps.length) {
-  const [x, z] = landmarks.camps[0];
-  add({ id: 'camp', title: 'Acampamento na floresta', ...look(x, z, 26, 18, 30, 4) });
-}
-if (landmarks.farms.length) {
-  const [x, z] = landmarks.farms[0];
-  add({ id: 'farm', title: 'Campo de trigo', ...look(x, z, 34, 22, 38, 3) });
-}
-const mine = landmarks.mines.find((m) => m[2] === 'ouro') ?? landmarks.mines[0];
-if (mine) add({ id: 'mine', title: 'Jazida de ouro', ...look(mine[0], mine[1], 24, 18, 28, 4) });
-if (landmarks.docks.length) {
-  const [x, z, axis, dir] = landmarks.docks[0];
-  const out = (t) => (axis === 'x' ? [x + dir * t, z] : [x, z + dir * t]);
-  const [tx, tz] = out(20);
-  add({ id: 'dock', title: 'Cais e barco na praia', ...look(tx, tz, 34, 20, 34, 2) });
-}
-const palm = parts.find((p) => p.model === 'Vegetação/Coqueiros' && p.name === 'Tronco');
-if (palm)
-  add({ id: 'beach', title: 'Praia com coqueiros', ...look(palm.position[0], palm.position[2], 36, 18, 36, 6) });
 VIEWS.push(
   { id: 'build-25', title: 'Montagem — 25% das etapas', ...OVERVIEW, step: 0.25 },
   { id: 'build-50', title: 'Montagem — 50% das etapas', ...OVERVIEW, step: 0.5 },

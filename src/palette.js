@@ -84,6 +84,22 @@ export const C = Object.freeze({
   awningBlue: [96, 120, 150],
   awningOlive: [150, 146, 96],
   cloth: [226, 222, 210],
+
+  // Terreno do Vale (estilo voxel pixelado, blocos lisos): tons quentes e foscos
+  pxGrass: [108, 156, 72],
+  pxGrassDark: [88, 132, 60],
+  pxDirt: [120, 84, 56], // estradas de terra
+  pxDirtDark: [96, 66, 46],
+  pxSoil: [92, 64, 44], // lateral do chão (terra por baixo da grama)
+  pxStone: [204, 184, 148], // pedra clara da praça
+  pxStoneDark: [150, 128, 98],
+  pxPad: [150, 112, 78], // piso das áreas de construção e dos lotes
+  pxPadEdge: [118, 108, 94], // borda de pedra das áreas e lotes
+  pxCliff: [146, 98, 66], // penhascos de rocha
+  pxCliffDark: [112, 74, 52],
+  pxCliffLight: [168, 118, 82],
+  pxMoss: [92, 128, 62],
+  pxWater: [86, 150, 170],
 });
 
 /** Saturação HSV (0..1) de uma cor [r,g,b]. */
