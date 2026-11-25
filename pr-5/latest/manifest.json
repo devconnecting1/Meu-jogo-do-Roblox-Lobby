@@ -18,7 +18,7 @@
     },
     {
       "id": "estatua",
-      "title": "Estátua de Luvitlua no estrado"
+      "title": "Estátua de Luvitlua (boneco R6) no estrado"
     },
     {
       "id": "estatua-placa",
@@ -178,8 +178,8 @@
     }
   ],
   "stats": {
-    "total": 9432,
-    "lights": 1,
+    "total": 9416,
+    "lights": 0,
     "groups": {
       "Mar": 1,
       "Penhascos": 4476,
@@ -187,13 +187,13 @@
       "Lotes": 820,
       "Estradas": 950,
       "Áreas": 151,
-      "Lobby": 279,
+      "Lobby": 263,
       "Água": 22
     }
   },
   "manual": {
-    "parts": 9432,
-    "steps": 1184,
-    "connections": 58082
+    "parts": 9416,
+    "steps": 1181,
+    "connections": 58057
   }
 }

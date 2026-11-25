@@ -1,6 +1,6 @@
 # Manual de montagem do Reino
 
-**9432 peças · 1184 etapas · 58082 pontos de conexão verificados**
+**9416 peças · 1181 etapas · 58057 pontos de conexão verificados**
 
 ## Mar (base de tudo)
 
@@ -386,263 +386,263 @@
 374. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — 2× Letra L, 2× Letra U, 2× Letra V, Letra I, Letra T
 375. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — 4× Letra U, 2× Letra A, Letra L, Letra V
 376. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — Letra V, Letra I, Letra T, Letra L, 2× Letra U, Letra A
-377. **Lobby/Estátua de Luvitlua/Avatar** — 2× Bota, 2× Perna, Saia da Armadura, Capa, Manopla, Cinto
-378. **Lobby/Estátua de Luvitlua/Avatar** — Tronco, Braço Esquerdo, Peitoral, Braço Direito, 2× Ombreira, Elmo, Emblema
-379. **Lobby/Estátua de Luvitlua/Avatar** — Viseira, Penacho, Manopla
-380. **Lobby/Estátua de Luvitlua/Espada de Gelo** — Cabo, Guarda, Lâmina, Ponta
+377. **Lobby/Estátua de Luvitlua/Boneco R6** — Perna Esquerda, Perna Direita, Tronco, Braço Esquerdo, Braço Direito, 2× Cabeça
 
 ## Estradas de terra e passagens de pedra
 
-381. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-382. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+378. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+379. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+380. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+381. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+382. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
 383. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-384. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+384. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
 385. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-386. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-387. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-388. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+386. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+387. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+388. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
 389. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
 390. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-391. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-392. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+391. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+392. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 393. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 394. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-395. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+395. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
 396. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-397. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+397. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
 398. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-399. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-400. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-401. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+399. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+400. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+401. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
 402. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-403. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-404. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-405. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-406. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-407. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-408. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-409. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+403. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+404. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+405. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+406. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+407. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+408. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+409. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 410. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-411. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-412. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+411. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+412. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
 413. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-414. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-415. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+414. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+415. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 416. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-417. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-418. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-419. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-420. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-421. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-422. **Estradas** — 7× Terra da Estrada, Terra Batida
-423. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-424. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-425. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-426. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-427. **Estradas** — 7× Terra da Estrada, Terra Batida
-428. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-429. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-430. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+417. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+418. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+419. **Estradas** — 7× Terra da Estrada, Terra Batida
+420. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+421. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+422. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+423. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+424. **Estradas** — 7× Terra da Estrada, Terra Batida
+425. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+426. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+427. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+428. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+429. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+430. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
 431. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-432. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-433. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-434. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-435. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-436. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-437. **Estradas** — 7× Terra da Estrada, Terra Batida
-438. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-439. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-440. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-441. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-442. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-443. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-444. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-445. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-446. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-447. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-448. **Estradas** — 7× Terra da Estrada, Terra Batida
-449. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-450. **Estradas** — 7× Terra da Estrada, Terra Batida
+432. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+433. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+434. **Estradas** — 7× Terra da Estrada, Terra Batida
+435. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+436. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+437. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+438. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+439. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+440. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+441. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+442. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+443. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+444. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+445. **Estradas** — 7× Terra da Estrada, Terra Batida
+446. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+447. **Estradas** — 7× Terra da Estrada, Terra Batida
+448. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+449. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+450. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
 451. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 452. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 453. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-454. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-455. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-456. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-457. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-458. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+454. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+455. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+456. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+457. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+458. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
 459. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-460. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+460. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 461. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-462. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-463. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+462. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+463. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
 464. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-465. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-466. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-467. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-468. **Estradas** — 8× Terra da Estrada
-469. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+465. **Estradas** — 8× Terra da Estrada
+466. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+467. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+468. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+469. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 470. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-471. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-472. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-473. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-474. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-475. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-476. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-477. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-478. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-479. **Estradas** — 7× Terra da Estrada, Terra Batida
+471. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+472. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+473. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+474. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+475. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+476. **Estradas** — 7× Terra da Estrada, Terra Batida
+477. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+478. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+479. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 480. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-481. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-482. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-483. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+481. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+482. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+483. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
 484. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-485. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-486. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-487. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-488. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-489. **Estradas** — 4× Terra da Estrada, 2× Terra Batida, 2× Passagem de Pedra
-490. **Estradas** — 4× Terra da Estrada, 3× Terra Batida, Passagem de Pedra
-491. **Estradas** — 4× Terra da Estrada, 3× Passagem de Pedra, Terra Batida
-492. **Estradas** — Passagem de Pedra, 5× Terra da Estrada, 2× Terra Batida
-493. **Estradas** — 8× Terra da Estrada
-494. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-495. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-496. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-497. **Estradas** — 7× Terra da Estrada, Terra Batida
-498. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-499. **Estradas** — 5× Terra da Estrada, Terra Batida
+485. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+486. **Estradas** — 4× Terra da Estrada, 2× Terra Batida, 2× Passagem de Pedra
+487. **Estradas** — 4× Terra da Estrada, 3× Terra Batida, Passagem de Pedra
+488. **Estradas** — 4× Terra da Estrada, 3× Passagem de Pedra, Terra Batida
+489. **Estradas** — Passagem de Pedra, 5× Terra da Estrada, 2× Terra Batida
+490. **Estradas** — 8× Terra da Estrada
+491. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+492. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+493. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+494. **Estradas** — 7× Terra da Estrada, Terra Batida
+495. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+496. **Estradas** — 5× Terra da Estrada, Terra Batida
 
 ## Áreas de construção em volta da praça
 
-500. **Áreas** — 6× Borda da Área, 2× Área de Construção
-501. **Áreas** — 5× Borda da Área, 3× Área de Construção
+497. **Áreas** — 6× Borda da Área, 2× Área de Construção
+498. **Áreas** — 5× Borda da Área, 3× Área de Construção
+499. **Áreas** — 6× Borda da Área, 2× Área de Construção
+500. **Áreas** — 3× Área de Construção, 5× Borda da Área
+501. **Áreas** — 6× Borda da Área, 2× Área de Construção
 502. **Áreas** — 6× Borda da Área, 2× Área de Construção
-503. **Áreas** — 3× Área de Construção, 5× Borda da Área
+503. **Áreas** — 5× Borda da Área, 3× Área de Construção
 504. **Áreas** — 6× Borda da Área, 2× Área de Construção
-505. **Áreas** — 6× Borda da Área, 2× Área de Construção
-506. **Áreas** — 5× Borda da Área, 3× Área de Construção
+505. **Áreas** — 3× Área de Construção, 5× Borda da Área
+506. **Áreas** — 6× Borda da Área, 2× Área de Construção
 507. **Áreas** — 6× Borda da Área, 2× Área de Construção
-508. **Áreas** — 3× Área de Construção, 5× Borda da Área
+508. **Áreas** — 5× Borda da Área, 3× Área de Construção
 509. **Áreas** — 6× Borda da Área, 2× Área de Construção
-510. **Áreas** — 6× Borda da Área, 2× Área de Construção
-511. **Áreas** — 5× Borda da Área, 3× Área de Construção
+510. **Áreas** — 3× Área de Construção, 5× Borda da Área
+511. **Áreas** — 6× Borda da Área, 2× Área de Construção
 512. **Áreas** — 6× Borda da Área, 2× Área de Construção
-513. **Áreas** — 3× Área de Construção, 5× Borda da Área
+513. **Áreas** — 5× Borda da Área, 3× Área de Construção
 514. **Áreas** — 6× Borda da Área, 2× Área de Construção
-515. **Áreas** — 6× Borda da Área, 2× Área de Construção
-516. **Áreas** — 5× Borda da Área, 3× Área de Construção
-517. **Áreas** — 6× Borda da Área, 2× Área de Construção
-518. **Áreas** — 2× Área de Construção, 5× Borda da Área
+515. **Áreas** — 2× Área de Construção, 5× Borda da Área
 
 ## Lotes dos castelos (30)
 
-519. **Lotes** — 6× Borda do Lote, 2× Lote
-520. **Lotes** — 3× Lote, 5× Borda do Lote
-521. **Lotes** — 4× Lote, 4× Borda do Lote
-522. **Lotes** — 5× Borda do Lote, 3× Lote
-523. **Lotes** — 6× Borda do Lote, 2× Lote
-524. **Lotes** — 2× Lote, 6× Borda do Lote
+516. **Lotes** — 6× Borda do Lote, 2× Lote
+517. **Lotes** — 3× Lote, 5× Borda do Lote
+518. **Lotes** — 4× Lote, 4× Borda do Lote
+519. **Lotes** — 5× Borda do Lote, 3× Lote
+520. **Lotes** — 6× Borda do Lote, 2× Lote
+521. **Lotes** — 2× Lote, 6× Borda do Lote
+522. **Lotes** — 3× Lote, 5× Borda do Lote
+523. **Lotes** — 5× Borda do Lote, 3× Lote
+524. **Lotes** — 6× Borda do Lote, 2× Lote
 525. **Lotes** — 3× Lote, 5× Borda do Lote
-526. **Lotes** — 5× Borda do Lote, 3× Lote
+526. **Lotes** — 3× Lote, 5× Borda do Lote
 527. **Lotes** — 6× Borda do Lote, 2× Lote
 528. **Lotes** — 3× Lote, 5× Borda do Lote
 529. **Lotes** — 3× Lote, 5× Borda do Lote
-530. **Lotes** — 6× Borda do Lote, 2× Lote
-531. **Lotes** — 3× Lote, 5× Borda do Lote
-532. **Lotes** — 3× Lote, 5× Borda do Lote
+530. **Lotes** — 3× Lote, 5× Borda do Lote
+531. **Lotes** — 5× Borda do Lote, 3× Lote
+532. **Lotes** — 6× Borda do Lote, 2× Lote
 533. **Lotes** — 3× Lote, 5× Borda do Lote
-534. **Lotes** — 5× Borda do Lote, 3× Lote
+534. **Lotes** — 3× Lote, 5× Borda do Lote
 535. **Lotes** — 6× Borda do Lote, 2× Lote
-536. **Lotes** — 3× Lote, 5× Borda do Lote
-537. **Lotes** — 3× Lote, 5× Borda do Lote
+536. **Lotes** — 5× Borda do Lote, 3× Lote
+537. **Lotes** — 6× Borda do Lote, 2× Lote
 538. **Lotes** — 6× Borda do Lote, 2× Lote
-539. **Lotes** — 5× Borda do Lote, 3× Lote
-540. **Lotes** — 6× Borda do Lote, 2× Lote
+539. **Lotes** — 6× Borda do Lote, 2× Lote
+540. **Lotes** — 3× Lote, 5× Borda do Lote
 541. **Lotes** — 6× Borda do Lote, 2× Lote
-542. **Lotes** — 6× Borda do Lote, 2× Lote
-543. **Lotes** — 3× Lote, 5× Borda do Lote
-544. **Lotes** — 6× Borda do Lote, 2× Lote
-545. **Lotes** — 3× Lote, 5× Borda do Lote
-546. **Lotes** — 6× Borda do Lote, 2× Lote
-547. **Lotes** — 5× Borda do Lote, 3× Lote
+542. **Lotes** — 3× Lote, 5× Borda do Lote
+543. **Lotes** — 6× Borda do Lote, 2× Lote
+544. **Lotes** — 5× Borda do Lote, 3× Lote
+545. **Lotes** — 5× Borda do Lote, 3× Lote
+546. **Lotes** — 5× Borda do Lote, 3× Lote
+547. **Lotes** — 6× Borda do Lote, 2× Lote
 548. **Lotes** — 5× Borda do Lote, 3× Lote
-549. **Lotes** — 5× Borda do Lote, 3× Lote
-550. **Lotes** — 6× Borda do Lote, 2× Lote
-551. **Lotes** — 5× Borda do Lote, 3× Lote
-552. **Lotes** — 6× Borda do Lote, 2× Lote
-553. **Lotes** — 3× Lote, 5× Borda do Lote
-554. **Lotes** — 6× Borda do Lote, 2× Lote
-555. **Lotes** — 3× Lote, 5× Borda do Lote
-556. **Lotes** — 6× Borda do Lote, 2× Lote
-557. **Lotes** — 3× Lote, 5× Borda do Lote
-558. **Lotes** — 2× Lote, 6× Borda do Lote
-559. **Lotes** — 3× Lote, 5× Borda do Lote
+549. **Lotes** — 6× Borda do Lote, 2× Lote
+550. **Lotes** — 3× Lote, 5× Borda do Lote
+551. **Lotes** — 6× Borda do Lote, 2× Lote
+552. **Lotes** — 3× Lote, 5× Borda do Lote
+553. **Lotes** — 6× Borda do Lote, 2× Lote
+554. **Lotes** — 3× Lote, 5× Borda do Lote
+555. **Lotes** — 2× Lote, 6× Borda do Lote
+556. **Lotes** — 3× Lote, 5× Borda do Lote
+557. **Lotes** — 6× Borda do Lote, 2× Lote
+558. **Lotes** — 3× Lote, 5× Borda do Lote
+559. **Lotes** — 5× Borda do Lote, 3× Lote
 560. **Lotes** — 6× Borda do Lote, 2× Lote
-561. **Lotes** — 3× Lote, 5× Borda do Lote
-562. **Lotes** — 5× Borda do Lote, 3× Lote
-563. **Lotes** — 6× Borda do Lote, 2× Lote
+561. **Lotes** — 6× Borda do Lote, 2× Lote
+562. **Lotes** — 6× Borda do Lote, 2× Lote
+563. **Lotes** — 5× Borda do Lote, 3× Lote
 564. **Lotes** — 6× Borda do Lote, 2× Lote
-565. **Lotes** — 6× Borda do Lote, 2× Lote
+565. **Lotes** — 3× Lote, 5× Borda do Lote
 566. **Lotes** — 5× Borda do Lote, 3× Lote
 567. **Lotes** — 6× Borda do Lote, 2× Lote
 568. **Lotes** — 3× Lote, 5× Borda do Lote
 569. **Lotes** — 5× Borda do Lote, 3× Lote
 570. **Lotes** — 6× Borda do Lote, 2× Lote
-571. **Lotes** — 3× Lote, 5× Borda do Lote
-572. **Lotes** — 5× Borda do Lote, 3× Lote
-573. **Lotes** — 6× Borda do Lote, 2× Lote
+571. **Lotes** — 6× Borda do Lote, 2× Lote
+572. **Lotes** — 6× Borda do Lote, 2× Lote
+573. **Lotes** — 3× Lote, 5× Borda do Lote
 574. **Lotes** — 6× Borda do Lote, 2× Lote
 575. **Lotes** — 6× Borda do Lote, 2× Lote
 576. **Lotes** — 3× Lote, 5× Borda do Lote
-577. **Lotes** — 6× Borda do Lote, 2× Lote
+577. **Lotes** — 5× Borda do Lote, 3× Lote
 578. **Lotes** — 6× Borda do Lote, 2× Lote
 579. **Lotes** — 3× Lote, 5× Borda do Lote
 580. **Lotes** — 5× Borda do Lote, 3× Lote
 581. **Lotes** — 6× Borda do Lote, 2× Lote
-582. **Lotes** — 3× Lote, 5× Borda do Lote
-583. **Lotes** — 5× Borda do Lote, 3× Lote
+582. **Lotes** — 6× Borda do Lote, 2× Lote
+583. **Lotes** — 3× Lote, 5× Borda do Lote
 584. **Lotes** — 6× Borda do Lote, 2× Lote
-585. **Lotes** — 6× Borda do Lote, 2× Lote
-586. **Lotes** — 3× Lote, 5× Borda do Lote
-587. **Lotes** — 6× Borda do Lote, 2× Lote
-588. **Lotes** — 5× Borda do Lote, 3× Lote
-589. **Lotes** — 6× Borda do Lote, 2× Lote
+585. **Lotes** — 5× Borda do Lote, 3× Lote
+586. **Lotes** — 6× Borda do Lote, 2× Lote
+587. **Lotes** — 5× Borda do Lote, 3× Lote
+588. **Lotes** — 6× Borda do Lote, 2× Lote
+589. **Lotes** — 3× Lote, 5× Borda do Lote
 590. **Lotes** — 5× Borda do Lote, 3× Lote
 591. **Lotes** — 6× Borda do Lote, 2× Lote
 592. **Lotes** — 3× Lote, 5× Borda do Lote
-593. **Lotes** — 5× Borda do Lote, 3× Lote
+593. **Lotes** — 6× Borda do Lote, 2× Lote
 594. **Lotes** — 6× Borda do Lote, 2× Lote
-595. **Lotes** — 3× Lote, 5× Borda do Lote
-596. **Lotes** — 6× Borda do Lote, 2× Lote
-597. **Lotes** — 6× Borda do Lote, 2× Lote
+595. **Lotes** — 5× Borda do Lote, 3× Lote
+596. **Lotes** — 5× Borda do Lote, 3× Lote
+597. **Lotes** — 5× Borda do Lote, 3× Lote
 598. **Lotes** — 5× Borda do Lote, 3× Lote
 599. **Lotes** — 5× Borda do Lote, 3× Lote
-600. **Lotes** — 5× Borda do Lote, 3× Lote
-601. **Lotes** — 5× Borda do Lote, 3× Lote
-602. **Lotes** — 5× Borda do Lote, 3× Lote
-603. **Lotes** — 6× Borda do Lote, 2× Lote
+600. **Lotes** — 6× Borda do Lote, 2× Lote
+601. **Lotes** — 6× Borda do Lote, 2× Lote
+602. **Lotes** — 3× Lote, 5× Borda do Lote
+603. **Lotes** — 5× Borda do Lote, 3× Lote
 604. **Lotes** — 6× Borda do Lote, 2× Lote
-605. **Lotes** — 3× Lote, 5× Borda do Lote
-606. **Lotes** — 5× Borda do Lote, 3× Lote
-607. **Lotes** — 6× Borda do Lote, 2× Lote
+605. **Lotes** — 6× Borda do Lote, 2× Lote
+606. **Lotes** — 3× Lote, 5× Borda do Lote
+607. **Lotes** — 5× Borda do Lote, 3× Lote
 608. **Lotes** — 6× Borda do Lote, 2× Lote
-609. **Lotes** — 3× Lote, 5× Borda do Lote
-610. **Lotes** — 5× Borda do Lote, 3× Lote
-611. **Lotes** — 6× Borda do Lote, 2× Lote
-612. **Lotes** — 6× Borda do Lote, 2× Lote
+609. **Lotes** — 6× Borda do Lote, 2× Lote
+610. **Lotes** — 6× Borda do Lote, 2× Lote
+611. **Lotes** — 3× Lote, 5× Borda do Lote
+612. **Lotes** — 5× Borda do Lote, 3× Lote
 613. **Lotes** — 6× Borda do Lote, 2× Lote
-614. **Lotes** — 3× Lote, 5× Borda do Lote
-615. **Lotes** — 5× Borda do Lote, 3× Lote
+614. **Lotes** — 5× Borda do Lote, 3× Lote
+615. **Lotes** — 6× Borda do Lote, 2× Lote
 616. **Lotes** — 6× Borda do Lote, 2× Lote
-617. **Lotes** — 5× Borda do Lote, 3× Lote
-618. **Lotes** — 6× Borda do Lote, 2× Lote
-619. **Lotes** — 6× Borda do Lote, 2× Lote
-620. **Lotes** — 3× Lote, 5× Borda do Lote
-621. **Lotes** — 3× Borda do Lote, Lote
+617. **Lotes** — 3× Lote, 5× Borda do Lote
+618. **Lotes** — 3× Borda do Lote, Lote
 
 ## Penhascos de rocha e musgo
 
+619. **Penhascos** — 8× Rocha
+620. **Penhascos** — 8× Rocha
+621. **Penhascos** — 8× Rocha
 622. **Penhascos** — 8× Rocha
 623. **Penhascos** — 8× Rocha
 624. **Penhascos** — 8× Rocha
@@ -1007,10 +1007,10 @@
 983. **Penhascos** — 8× Rocha
 984. **Penhascos** — 8× Rocha
 985. **Penhascos** — 8× Rocha
-986. **Penhascos** — 8× Rocha
-987. **Penhascos** — 8× Rocha
-988. **Penhascos** — 8× Rocha
-989. **Penhascos** — 6× Rocha, 2× Musgo
+986. **Penhascos** — 6× Rocha, 2× Musgo
+987. **Penhascos** — 8× Musgo
+988. **Penhascos** — 8× Musgo
+989. **Penhascos** — 8× Musgo
 990. **Penhascos** — 8× Musgo
 991. **Penhascos** — 8× Musgo
 992. **Penhascos** — 8× Musgo
@@ -1199,13 +1199,10 @@
 1175. **Penhascos** — 8× Musgo
 1176. **Penhascos** — 8× Musgo
 1177. **Penhascos** — 8× Musgo
-1178. **Penhascos** — 8× Musgo
-1179. **Penhascos** — 8× Musgo
-1180. **Penhascos** — 8× Musgo
-1181. **Penhascos** — 4× Musgo
+1178. **Penhascos** — 4× Musgo
 
 ## Lagoas
 
-1182. **Água** — 8× Leito
-1183. **Água** — 3× Leito, 5× Água da Lagoa
-1184. **Água** — 6× Água da Lagoa
+1179. **Água** — 8× Leito
+1180. **Água** — 3× Leito, 5× Água da Lagoa
+1181. **Água** — 6× Água da Lagoa
