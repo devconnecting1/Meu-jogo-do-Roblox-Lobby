@@ -125,37 +125,125 @@ const KEEP_SURF = new Set(['pedra', 'pedraEscura', 'lote', 'loteBorda', 'area', 
  */
 export const PLANS = Object.freeze({
   // prédios do Lobby (lojas e serviços); bordas em múltiplos de 4 para cobrir células inteiras
-  taverna: { name: 'Taverna', group: 'loja', parts: [[-12, -12, 12, 0], [-12, 0, 0, 12]] }, // salão + ala em L
-  ferraria: { name: 'Ferraria', group: 'loja', parts: [[-12, -8, 4, 8], [4, -4, 12, 4]] }, // oficina + forja
-  mercado: { name: 'Mercado Coberto', group: 'loja', parts: [[-12, -8, 12, 4], [-4, 4, 4, 12]] }, // salão + alpendre
-  capela: { name: 'Capela', group: 'loja', parts: [[-4, -12, 4, 12], [-12, -8, 12, 0]] }, // nave + transepto
+  taverna: {
+    name: 'Taverna',
+    group: 'loja',
+    parts: [
+      [-12, -12, 12, 0],
+      [-12, 0, 0, 12],
+    ],
+  }, // salão + ala em L
+  ferraria: {
+    name: 'Ferraria',
+    group: 'loja',
+    parts: [
+      [-12, -8, 4, 8],
+      [4, -4, 12, 4],
+    ],
+  }, // oficina + forja
+  mercado: {
+    name: 'Mercado Coberto',
+    group: 'loja',
+    parts: [
+      [-12, -8, 12, 4],
+      [-4, 4, 4, 12],
+    ],
+  }, // salão + alpendre
+  capela: {
+    name: 'Capela',
+    group: 'loja',
+    parts: [
+      [-4, -12, 4, 12],
+      [-12, -8, 12, 0],
+    ],
+  }, // nave + transepto
   torreMago: { name: 'Torre do Mago', group: 'loja', parts: [{ c: [0, 0], r: 11 }] }, // torre redonda
-  estabulo: { name: 'Estábulo', group: 'loja', parts: [[-12, -12, 12, -4], [-12, -4, -4, 12], [4, -4, 12, 12]] }, // U
-  banco: { name: 'Banco', group: 'loja', parts: [[-8, -12, 8, 4], [-4, 4, 4, 12]] }, // cofre + escadaria
-  guilda: { name: 'Salão da Guilda', group: 'loja', parts: [[-12, -4, 12, 4], [-8, -8, 8, 8], [-4, -12, 4, 12]] },
+  estabulo: {
+    name: 'Estábulo',
+    group: 'loja',
+    parts: [
+      [-12, -12, 12, -4],
+      [-12, -4, -4, 12],
+      [4, -4, 12, 12],
+    ],
+  }, // U
+  banco: {
+    name: 'Banco',
+    group: 'loja',
+    parts: [
+      [-8, -12, 8, 4],
+      [-4, 4, 4, 12],
+    ],
+  }, // cofre + escadaria
+  guilda: {
+    name: 'Salão da Guilda',
+    group: 'loja',
+    parts: [
+      [-12, -4, 12, 4],
+      [-8, -8, 8, 8],
+      [-4, -12, 4, 12],
+    ],
+  },
   // castelos dos jogadores e dos bots
   fortaleza: {
     name: 'Fortaleza com Torres',
     group: 'castelo',
     parts: [[-8, -8, 8, 8], { c: [-8, -8], r: 8 }, { c: [8, -8], r: 8 }, { c: [-8, 8], r: 8 }, { c: [8, 8], r: 8 }],
   },
-  casteloL: { name: 'Castelo em L', group: 'castelo', parts: [[-16, -16, 16, 0], [-16, 0, 0, 16]] },
+  casteloL: {
+    name: 'Castelo em L',
+    group: 'castelo',
+    parts: [
+      [-16, -16, 16, 0],
+      [-16, 0, 0, 16],
+    ],
+  },
   casteloRedondo: { name: 'Castelo Redondo', group: 'castelo', parts: [{ c: [0, 0], r: 16 }] },
-  castelaoPatio: { name: 'Castelo com Pátio', group: 'castelo', parts: [[-16, -12, 16, 8], [-4, 8, 4, 16]] },
-  cidadela: { name: 'Cidadela em Cruz', group: 'castelo', parts: [[-16, -8, 16, 8], [-8, -16, 8, 16]] },
-  casteloU: { name: 'Castelo em U', group: 'castelo', parts: [[-16, -16, 16, -4], [-16, -4, -4, 16], [4, -4, 16, 16]] },
-  forteT: { name: 'Forte em T', group: 'castelo', parts: [[-16, -16, 16, -4], [-8, -4, 8, 16]] },
+  castelaoPatio: {
+    name: 'Castelo com Pátio',
+    group: 'castelo',
+    parts: [
+      [-16, -12, 16, 8],
+      [-4, 8, 4, 16],
+    ],
+  },
+  cidadela: {
+    name: 'Cidadela em Cruz',
+    group: 'castelo',
+    parts: [
+      [-16, -8, 16, 8],
+      [-8, -16, 8, 16],
+    ],
+  },
+  casteloU: {
+    name: 'Castelo em U',
+    group: 'castelo',
+    parts: [
+      [-16, -16, 16, -4],
+      [-16, -4, -4, 16],
+      [4, -4, 16, 16],
+    ],
+  },
+  forteT: {
+    name: 'Forte em T',
+    group: 'castelo',
+    parts: [
+      [-16, -16, 16, -4],
+      [-8, -4, 8, 16],
+    ],
+  },
 });
 const SHOP_PLANS = Object.keys(PLANS).filter((k) => PLANS[k].group === 'loja');
 const CASTLE_PLANS = Object.keys(PLANS).filter((k) => PLANS[k].group === 'castelo');
 
 /** Gira (x, z) em passos de 90° (k = 0..3): a frente +z vai para +z, −x, −z e +x. */
-const rot90 = (x, z, k) => [
-  [x, z],
-  [-z, x],
-  [-x, -z],
-  [z, -x],
-][k & 3];
+const rot90 = (x, z, k) =>
+  [
+    [x, z],
+    [-z, x],
+    [-x, -z],
+    [z, -x],
+  ][k & 3];
 
 /** O ponto (x, z) do mundo está na planta da construção p (com folga `m` em volta)? */
 export function inPlan(p, x, z, m = 0) {
