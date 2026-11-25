@@ -411,8 +411,57 @@ export function createWorld(seed = SEED) {
         if (tryPath(zx, own) || tryPath(zz, own)) return true;
       }
     }
-    return false;
+    return gridRoute(x, z, own);
   };
+  /**
+   * Último recurso: busca em largura na grade (células de chão ou lagoa, fora da folga dos outros
+   * lotes e áreas) até a estrada mais perto; o caminho vira trechos retos nas curvas.
+   */
+  function gridRoute(x, z, own) {
+    const start = [cellOf(x), cellOf(z)];
+    const prev = new Int32Array(N * N).fill(-1);
+    const idx = (i, j) => j * N + i;
+    prev[idx(...start)] = idx(...start);
+    const queue = [start];
+    let goal = null;
+    for (let q = 0; q < queue.length && !goal; q++) {
+      const [i, j] = queue[q];
+      for (const [di, dj] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const ii = i + di;
+        const jj = j + dj;
+        if (!inGrid(ii, jj) || prev[idx(ii, jj)] >= 0) continue;
+        if (type[jj][ii] !== T.GROUND && type[jj][ii] !== T.WATER) continue;
+        if (blockedBy(cellCenter(ii), cellCenter(jj), own)) continue;
+        prev[idx(ii, jj)] = idx(i, j);
+        const s = surf[jj][ii];
+        if (s === 'terra' || s === 'terraEscura' || s === 'ponte') {
+          goal = [ii, jj];
+          break;
+        }
+        queue.push([ii, jj]);
+      }
+    }
+    if (!goal) return false;
+    const cells = [goal];
+    while (idx(...cells[0]) !== idx(...start)) {
+      const p = prev[idx(...cells[0])];
+      cells.unshift([p % N, Math.floor(p / N)]);
+    }
+    const pts = cells.map(([i, j]) => [cellCenter(i), cellCenter(j)]);
+    const turns = [pts[0]];
+    for (let k = 1; k + 1 < pts.length; k++) {
+      const [a, b, c] = [pts[k - 1], pts[k], pts[k + 1]];
+      if ((b[0] - a[0]) * (c[1] - b[1]) !== (b[1] - a[1]) * (c[0] - b[0])) turns.push(b);
+    }
+    turns.push(pts.at(-1));
+    for (let k = 0; k + 1 < turns.length; k++) drawLeg(turns[k], turns[k + 1]);
+    return true;
+  }
   const padsLinked = PADS.map((p) => connect(p.x, p.z, p));
   const plotsLinked = PLOTS.map((p) => connect(p.x, p.z, p));
 

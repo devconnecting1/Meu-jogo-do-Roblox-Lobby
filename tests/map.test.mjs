@@ -48,7 +48,7 @@ test('30 lotes (20 jogadores + 10 bots) com nomes únicos, planos, espaçados e 
       assert.ok(d >= DIM.minPlotSpacing, `${PLOTS[a].name} e ${PLOTS[b].name} a ${d.toFixed(1)} studs`);
     }
   }
-  const quad = new Set(PLOTS.map((p) => `${Math.sign(p.x)}${Math.sign(p.z)}`));
+  const quad = new Set(PLOTS.map((p) => `${p.x >= 0 ? 'L' : 'O'}${p.z >= 0 ? 'S' : 'N'}`)); // x = 0 conta no leste
   assert.equal(quad.size, 4, `lotes só em ${quad.size} quadrantes`);
 });
 

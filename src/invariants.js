@@ -122,7 +122,8 @@ function plotChecks(w, out) {
   });
   collect(out, 'lotes (sem estrada)', lost);
 
-  const quads = new Set(PLOTS.map((p) => `${Math.sign(p.x - PLAZA.x)},${Math.sign(p.z - PLAZA.z)}`));
+  const side = (v) => (v >= 0 ? 1 : -1); // um lote exatamente no eixo conta no lado positivo
+  const quads = new Set(PLOTS.map((p) => `${side(p.x - PLAZA.x)},${side(p.z - PLAZA.z)}`));
   const filled = ['1,1', '1,-1', '-1,1', '-1,-1'].filter((q) => quads.has(q));
   const spread = [];
   if (filled.length < 3) spread.push(`lotes em só ${filled.length} quadrante(s): ${filled.join(' ') || 'nenhum'}`);
