@@ -31,7 +31,7 @@ export const DIM = Object.freeze({
   cap: 0.6, // espessura da camada de grama/areia
   bottom: -5, // fundo dos blocos de terra (dentro do mar)
   seaBottom: -6,
-  islandRadius: 570,
+  islandRadius: 600, // raio de referência da silhueta (cada semente deforma: elipse, lóbulos, baías)
   plots: 30, // lotes de castelo
   players: 20, // lotes de jogadores reais
   bots: 10, // lotes de bots
@@ -116,11 +116,45 @@ export function createWorld(seed = SEED) {
     return d;
   }
 
+  // --- Silhueta da ilha, sorteada por semente: elipse girada (mais redonda ou mais comprida),
+  // lóbulos (harmônicos), 1 a 3 baías fundas, 0 a 2 penínsulas e costa recortada por ruído
+  // deformado. Cada servidor tem uma ilha com outro formato; o raio fica entre ISLAND_MIN
+  // (sempre sobra espaço para o Lobby, o lago e os 30 lotes) e a borda da grade.
+  const shapeRand = mulberry32(seed ^ 0x15a7);
+  const ISLAND_MIN = 380;
+  const ISLAND_MAX = DIM.half - 24;
+  const shapeTilt = shapeRand() * Math.PI;
+  const shapeAspect = 0.8 + shapeRand() * 0.2; // eixo menor / eixo maior
+  const lobes = [2, 3, 4, 5].map((k) => [k, shapeRand() * (k === 2 ? 0.07 : 0.045), shapeRand() * Math.PI * 2]);
+  const notches = [];
+  const nBays = 1 + Math.floor(shapeRand() * 3);
+  for (let k = 0; k < nBays; k++) {
+    notches.push([shapeRand() * Math.PI * 2, -(0.1 + shapeRand() * 0.1), 0.16 + shapeRand() * 0.2]);
+  }
+  const nCapes = Math.floor(shapeRand() * 3);
+  for (let k = 0; k < nCapes; k++) {
+    notches.push([shapeRand() * Math.PI * 2, 0.08 + shapeRand() * 0.08, 0.12 + shapeRand() * 0.12]);
+  }
+  function coastRadius(x, z) {
+    const phi = Math.atan2(z, x);
+    const c = Math.cos(phi - shapeTilt);
+    const s = Math.sin(phi - shapeTilt) / shapeAspect;
+    let f = 1 / Math.sqrt(c * c + s * s); // elipse
+    for (const [k, amp, ph] of lobes) f += amp * Math.cos(k * phi + ph);
+    for (const [a, depth, width] of notches) {
+      const d = Math.atan2(Math.sin(phi - a), Math.cos(phi - a)) / width;
+      f += depth * Math.exp(-d * d);
+    }
+    // ruído com o domínio deformado: a costa ganha enseadas e pontas irregulares
+    const wx = x + (nz(x, z, 230, 7) - 0.5) * 140;
+    const wz = z + (nz(x, z, 230, 8) - 0.5) * 140;
+    const n = 0.6 * nz(wx, wz, 170, 1) + 0.4 * nz(wx, wz, 60, 2);
+    return Math.max(ISLAND_MIN, Math.min(ISLAND_MAX, DIM.islandRadius * f * (0.8 + 0.3 * n)));
+  }
+
   function rawType(x, z) {
     const r = Math.hypot(x, z);
-    const n = 0.6 * nz(x, z, 170, 1) + 0.4 * nz(x, z, 60, 2);
-    const edge = Math.min(DIM.half - 24, DIM.islandRadius * (0.74 + 0.34 * n));
-    if (r >= edge) return T.SEA;
+    if (r >= coastRadius(x, z)) return T.SEA;
     const lakeEdge = LAKE.r * (0.85 + 0.3 * nz(x, z, 40, 3));
     if (Math.hypot(x - LAKE.x, z - LAKE.z) < lakeEdge) return T.LAKE;
     if (distToRiver(x, z) < RIVER_HALF) return T.RIVER;
@@ -1232,10 +1266,13 @@ export function createWorld(seed = SEED) {
       { list: landmarks.outcrops, want: 14, R: [8, 13], H: [5, 9], name: 'Afloramento' },
     ];
     for (const kind of relief) {
-      for (let attempt = 0; attempt < 6000 && kind.list.length < kind.want; attempt++) {
+      for (let attempt = 0; attempt < 9000 && kind.list.length < kind.want; attempt++) {
         const x = Math.round((rand() * 2 - 1) * 500);
         const z = Math.round((rand() * 2 - 1) * 500);
-        const R = Math.round(kind.R[0] + rand() * (kind.R[1] - kind.R[0]));
+        // mapa apertado (ilha comprida, baías fundas): depois de muitas tentativas o relevo
+        // aceita ser um pouco menor, em vez de faltar montanha
+        const shrink = attempt < 4000 ? 1 : attempt < 6500 ? 0.85 : 0.72;
+        const R = Math.round((kind.R[0] + rand() * (kind.R[1] - kind.R[0])) * shrink);
         const H = Math.round(kind.H[0] + rand() * (kind.H[1] - kind.H[0]));
         const r = { x0: x - R, x1: x + R, z0: z - R, z1: z + R };
         const ok =

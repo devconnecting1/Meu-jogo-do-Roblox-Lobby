@@ -18,6 +18,25 @@ test('as variantes são diferentes do mapa principal e entre si', () => {
   assert.equal(new Set(sigs).size, sigs.length, 'duas sementes geraram os mesmos lotes');
 });
 
+test('cada semente tem uma ilha com outro formato (silhueta procedural, não o mesmo círculo)', () => {
+  const step = 16;
+  const mask = (w) => {
+    const cells = [];
+    for (let x = -592; x <= 592; x += step) {
+      for (let z = -592; z <= 592; z += step) cells.push(w.terrainAt(x, z) === 0 ? 0 : 1);
+    }
+    return cells;
+  };
+  const masks = [SEED, ...VARIANT_SEEDS].map((s) => mask(createWorld(s)));
+  for (let a = 0; a < masks.length; a++) {
+    for (let b = a + 1; b < masks.length; b++) {
+      const diff = masks[a].reduce((n, v, k) => n + (v !== masks[b][k] ? 1 : 0), 0);
+      const land = Math.max(...[masks[a], masks[b]].map((m) => m.reduce((n, v) => n + v, 0)));
+      assert.ok(diff / land >= 0.08, `ilhas parecidas demais (${((100 * diff) / land).toFixed(1)}% de diferença)`);
+    }
+  }
+});
+
 for (const seed of VARIANT_SEEDS) {
   test(`variante ${seed}: 30 lotes ligados, nada flutua, sem z-fighting, passagens livres e montagem possível`, () => {
     const w = createWorld(seed);
