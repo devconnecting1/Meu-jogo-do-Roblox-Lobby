@@ -1,6 +1,6 @@
 # Manual de montagem do Reino
 
-**9219 peças · 1156 etapas · 57146 pontos de conexão verificados**
+**9432 peças · 1184 etapas · 58082 pontos de conexão verificados**
 
 ## Mar (base de tudo)
 
@@ -32,26 +32,26 @@
 23. **Terreno** — 8× Chão
 24. **Terreno** — 8× Chão
 25. **Terreno** — 8× Chão
-26. **Terreno** — 8× Chão
-27. **Terreno** — 8× Chão
-28. **Terreno** — 8× Chão
-29. **Terreno** — 7× Chão, Base da Praça
+26. **Terreno** — 2× Base da Praça, 6× Chão
+27. **Terreno** — 6× Chão, 2× Base da Praça
+28. **Terreno** — 7× Chão, Base da Praça
+29. **Terreno** — 5× Chão, 3× Base da Praça
 30. **Terreno** — 7× Chão, Base da Praça
-31. **Terreno** — 2× Base da Praça, 6× Chão
-32. **Terreno** — 6× Chão, 2× Base da Praça
-33. **Terreno** — 6× Chão, 2× Base da Praça
-34. **Terreno** — 4× Base da Praça, 4× Chão
-35. **Terreno** — 4× Base da Praça, 4× Chão
-36. **Terreno** — 4× Base da Praça, 4× Chão
-37. **Terreno** — 3× Base da Praça, 5× Chão
+31. **Terreno** — 4× Chão, 4× Base da Praça
+32. **Terreno** — 3× Chão, 5× Base da Praça
+33. **Terreno** — 4× Base da Praça, 4× Chão
+34. **Terreno** — 6× Chão, 2× Base da Praça
+35. **Terreno** — 7× Chão, Base da Praça
+36. **Terreno** — 7× Chão, Base da Praça
+37. **Terreno** — 7× Chão, Base da Praça
 38. **Terreno** — 7× Chão, Base da Praça
 39. **Terreno** — 7× Chão, Base da Praça
 40. **Terreno** — 7× Chão, Base da Praça
-41. **Terreno** — 7× Chão, Base da Praça
+41. **Terreno** — 2× Base da Praça, 6× Chão
 42. **Terreno** — 7× Chão, Base da Praça
-43. **Terreno** — 7× Chão, Base da Praça
-44. **Terreno** — 7× Chão, Base da Praça
-45. **Terreno** — 5× Chão, 3× Base da Praça
+43. **Terreno** — 8× Chão
+44. **Terreno** — 8× Chão
+45. **Terreno** — 8× Chão
 46. **Terreno** — 8× Chão
 47. **Terreno** — 8× Chão
 48. **Terreno** — 8× Chão
@@ -84,565 +84,565 @@
 75. **Terreno** — 8× Chão
 76. **Terreno** — 8× Chão
 77. **Terreno** — 8× Chão
-78. **Terreno** — 6× Chão, Grama, Grama Escura
-79. **Terreno** — 5× Grama, 3× Grama Escura
-80. **Terreno** — 5× Grama, 3× Grama Escura
-81. **Terreno** — 6× Grama, 2× Grama Escura
-82. **Terreno** — 8× Grama
-83. **Terreno** — 5× Grama, 3× Grama Escura
-84. **Terreno** — 5× Grama, 3× Grama Escura
+78. **Terreno** — 8× Chão
+79. **Terreno** — 8× Chão
+80. **Terreno** — 6× Chão, Grama, Grama Escura
+81. **Terreno** — 5× Grama, 3× Grama Escura
+82. **Terreno** — 5× Grama, 3× Grama Escura
+83. **Terreno** — 6× Grama, 2× Grama Escura
+84. **Terreno** — 8× Grama
 85. **Terreno** — 5× Grama, 3× Grama Escura
 86. **Terreno** — 5× Grama, 3× Grama Escura
-87. **Terreno** — 3× Grama Escura, 5× Grama
-88. **Terreno** — 3× Grama Escura, 5× Grama
+87. **Terreno** — 5× Grama, 3× Grama Escura
+88. **Terreno** — 5× Grama, 3× Grama Escura
 89. **Terreno** — 3× Grama Escura, 5× Grama
 90. **Terreno** — 3× Grama Escura, 5× Grama
 91. **Terreno** — 3× Grama Escura, 5× Grama
-92. **Terreno** — 4× Grama Escura, 4× Grama
-93. **Terreno** — 5× Grama, 3× Grama Escura
+92. **Terreno** — 3× Grama Escura, 5× Grama
+93. **Terreno** — 3× Grama Escura, 5× Grama
 94. **Terreno** — 4× Grama Escura, 4× Grama
 95. **Terreno** — 5× Grama, 3× Grama Escura
-96. **Terreno** — 3× Grama Escura, 5× Grama
-97. **Terreno** — 4× Grama, 4× Grama Escura
-98. **Terreno** — 7× Grama, Grama Escura
-99. **Terreno** — 7× Grama, Grama Escura
-100. **Terreno** — 7× Grama, Grama Escura
-101. **Terreno** — 7× Grama, Grama Escura
-102. **Terreno** — 5× Grama, 3× Grama Escura
-103. **Terreno** — 6× Grama, 2× Grama Escura
-104. **Terreno** — 5× Grama, 3× Grama Escura
-105. **Terreno** — 2× Grama Escura, 6× Grama
-106. **Terreno** — 6× Grama, 2× Grama Escura
+96. **Terreno** — 4× Grama Escura, 4× Grama
+97. **Terreno** — 6× Grama, 2× Grama Escura
+98. **Terreno** — 4× Grama Escura, 4× Grama
+99. **Terreno** — 5× Grama, 3× Grama Escura
+100. **Terreno** — 2× Grama Escura, 6× Grama
+101. **Terreno** — 6× Grama, 2× Grama Escura
+102. **Terreno** — 7× Grama, Grama Escura
+103. **Terreno** — 7× Grama, Grama Escura
+104. **Terreno** — 7× Grama, Grama Escura
+105. **Terreno** — 5× Grama, 3× Grama Escura
+106. **Terreno** — Grama Escura, 7× Grama
 107. **Terreno** — 3× Grama Escura, 5× Grama
-108. **Terreno** — 5× Grama, 3× Grama Escura
-109. **Terreno** — 7× Grama, Grama Escura
-110. **Terreno** — 3× Grama Escura, 5× Grama
+108. **Terreno** — 7× Grama, Grama Escura
+109. **Terreno** — 3× Grama Escura, 5× Grama
+110. **Terreno** — 6× Grama, 2× Grama Escura
 111. **Terreno** — 6× Grama, 2× Grama Escura
-112. **Terreno** — 5× Grama, 3× Grama Escura
-113. **Terreno** — 3× Grama Escura, 5× Grama
-114. **Terreno** — 6× Grama, 2× Grama Escura
-115. **Terreno** — 2× Grama Escura, 6× Grama
-116. **Terreno** — 7× Grama, Grama Escura
-117. **Terreno** — 2× Grama Escura, 6× Grama
-118. **Terreno** — 6× Grama, 2× Grama Escura
+112. **Terreno** — 2× Grama Escura, 6× Grama
+113. **Terreno** — 5× Grama, 3× Grama Escura
+114. **Terreno** — 7× Grama, Grama Escura
+115. **Terreno** — 3× Grama Escura, 5× Grama
+116. **Terreno** — 2× Grama Escura, 6× Grama
+117. **Terreno** — 6× Grama, 2× Grama Escura
+118. **Terreno** — 7× Grama, Grama Escura
 119. **Terreno** — 6× Grama, 2× Grama Escura
-120. **Terreno** — 5× Grama, 3× Grama Escura
+120. **Terreno** — 4× Grama, 4× Grama Escura
 121. **Terreno** — 6× Grama, 2× Grama Escura
-122. **Terreno** — 6× Grama, 2× Grama Escura
-123. **Terreno** — 6× Grama, 2× Grama Escura
+122. **Terreno** — 3× Grama Escura, 5× Grama
+123. **Terreno** — 5× Grama, 3× Grama Escura
 124. **Terreno** — 6× Grama, 2× Grama Escura
 125. **Terreno** — 6× Grama, 2× Grama Escura
-126. **Terreno** — 6× Grama, 2× Grama Escura
-127. **Terreno** — 7× Grama, Grama Escura
-128. **Terreno** — 3× Grama Escura, 5× Grama
-129. **Terreno** — 6× Grama, 2× Grama Escura
-130. **Terreno** — 8× Grama
+126. **Terreno** — 3× Grama Escura, 5× Grama
+127. **Terreno** — 6× Grama, 2× Grama Escura
+128. **Terreno** — 7× Grama, Grama Escura
+129. **Terreno** — 2× Grama Escura, 6× Grama
+130. **Terreno** — 6× Grama, 2× Grama Escura
 131. **Terreno** — 7× Grama, Grama Escura
-132. **Terreno** — 7× Grama, Grama Escura
-133. **Terreno** — 3× Grama Escura, 5× Grama
-134. **Terreno** — 7× Grama, Grama Escura
+132. **Terreno** — 2× Grama Escura, 6× Grama
+133. **Terreno** — 2× Grama Escura, 6× Grama
+134. **Terreno** — 6× Grama, 2× Grama Escura
 135. **Terreno** — 6× Grama, 2× Grama Escura
-136. **Terreno** — 6× Grama, 2× Grama Escura
-137. **Terreno** — 5× Grama, 3× Grama Escura
-138. **Terreno** — 6× Grama, 2× Grama Escura
-139. **Terreno** — 5× Grama, 3× Grama Escura
-140. **Terreno** — 4× Grama, 4× Grama Escura
+136. **Terreno** — 5× Grama, 3× Grama Escura
+137. **Terreno** — 6× Grama, 2× Grama Escura
+138. **Terreno** — 4× Grama, 4× Grama Escura
+139. **Terreno** — 6× Grama, 2× Grama Escura
+140. **Terreno** — 5× Grama, 3× Grama Escura
 141. **Terreno** — 6× Grama, 2× Grama Escura
 142. **Terreno** — 5× Grama, 3× Grama Escura
-143. **Terreno** — 6× Grama, 2× Grama Escura
-144. **Terreno** — 3× Grama Escura, 5× Grama
-145. **Terreno** — 7× Grama, Grama Escura
-146. **Terreno** — 7× Grama, Grama Escura
-147. **Terreno** — 2× Grama Escura, 6× Grama
-148. **Terreno** — 5× Grama, 3× Grama Escura
-149. **Terreno** — 6× Grama, 2× Grama Escura
-150. **Terreno** — 4× Grama Escura, 4× Grama
-151. **Terreno** — 6× Grama, 2× Grama Escura
+143. **Terreno** — 7× Grama, Grama Escura
+144. **Terreno** — 6× Grama, 2× Grama Escura
+145. **Terreno** — 6× Grama, 2× Grama Escura
+146. **Terreno** — 5× Grama, 3× Grama Escura
+147. **Terreno** — 6× Grama, 2× Grama Escura
+148. **Terreno** — 6× Grama, 2× Grama Escura
+149. **Terreno** — 4× Grama Escura, 4× Grama
+150. **Terreno** — 6× Grama, 2× Grama Escura
+151. **Terreno** — 5× Grama, 3× Grama Escura
 152. **Terreno** — 3× Grama Escura, 5× Grama
-153. **Terreno** — 3× Grama Escura, 5× Grama
-154. **Terreno** — 3× Grama Escura, 5× Grama
-155. **Terreno** — 3× Grama Escura, 5× Grama
-156. **Terreno** — 4× Grama Escura, 4× Grama
-157. **Terreno** — 5× Grama, 3× Grama Escura
-158. **Terreno** — 6× Grama, 2× Grama Escura
-159. **Terreno** — 4× Grama Escura, 4× Grama
-160. **Terreno** — 5× Grama, 3× Grama Escura
-161. **Terreno** — 6× Grama, 2× Grama Escura
+153. **Terreno** — 5× Grama, 3× Grama Escura
+154. **Terreno** — 6× Grama, 2× Grama Escura
+155. **Terreno** — 6× Grama, 2× Grama Escura
+156. **Terreno** — 3× Grama Escura, 5× Grama
+157. **Terreno** — 6× Grama, 2× Grama Escura
+158. **Terreno** — 5× Grama, 3× Grama Escura
+159. **Terreno** — 6× Grama, 2× Grama Escura
+160. **Terreno** — 6× Grama, 2× Grama Escura
+161. **Terreno** — 7× Grama, Grama Escura
 162. **Terreno** — 3× Grama Escura, 5× Grama
-163. **Terreno** — 6× Grama, 2× Grama Escura
-164. **Terreno** — 6× Grama, 2× Grama Escura
-165. **Terreno** — 5× Grama, 3× Grama Escura
-166. **Terreno** — 6× Grama, 2× Grama Escura
+163. **Terreno** — 7× Grama, Grama Escura
+164. **Terreno** — 3× Grama Escura, 5× Grama
+165. **Terreno** — 4× Grama, 4× Grama Escura
+166. **Terreno** — 5× Grama, 3× Grama Escura
 167. **Terreno** — 4× Grama Escura, 4× Grama
-168. **Terreno** — 4× Grama Escura, 4× Grama
-169. **Terreno** — 5× Grama, 3× Grama Escura
-170. **Terreno** — 4× Grama, 4× Grama Escura
-171. **Terreno** — 4× Grama, 4× Grama Escura
+168. **Terreno** — 5× Grama, 3× Grama Escura
+169. **Terreno** — 4× Grama Escura, 4× Grama
+170. **Terreno** — 5× Grama, 3× Grama Escura
+171. **Terreno** — 3× Grama Escura, 5× Grama
 172. **Terreno** — 7× Grama, Grama Escura
-173. **Terreno** — 3× Grama Escura, 5× Grama
+173. **Terreno** — 6× Grama, 2× Grama Escura
 174. **Terreno** — 6× Grama, 2× Grama Escura
-175. **Terreno** — 7× Grama, Grama Escura
-176. **Terreno** — 2× Grama Escura, 6× Grama
-177. **Terreno** — 3× Grama Escura, 5× Grama
-178. **Terreno** — 6× Grama, 2× Grama Escura
-179. **Terreno** — 2× Grama Escura, 6× Grama
-180. **Terreno** — 7× Grama, Grama Escura
-181. **Terreno** — 7× Grama, Grama Escura
+175. **Terreno** — 6× Grama, 2× Grama Escura
+176. **Terreno** — 7× Grama, Grama Escura
+177. **Terreno** — 6× Grama, 2× Grama Escura
+178. **Terreno** — 7× Grama, Grama Escura
+179. **Terreno** — Grama Escura, 7× Grama
+180. **Terreno** — 4× Grama, 4× Grama Escura
+181. **Terreno** — 8× Grama
 182. **Terreno** — 3× Grama Escura, 5× Grama
 183. **Terreno** — 2× Grama Escura, 6× Grama
-184. **Terreno** — 8× Grama
-185. **Terreno** — 3× Grama Escura, 5× Grama
-186. **Terreno** — 7× Grama, Grama Escura
-187. **Terreno** — 2× Grama Escura, 6× Grama
+184. **Terreno** — 7× Grama, Grama Escura
+185. **Terreno** — 2× Grama Escura, 6× Grama
+186. **Terreno** — 6× Grama, 2× Grama Escura
+187. **Terreno** — 6× Grama, 2× Grama Escura
 188. **Terreno** — 7× Grama, Grama Escura
-189. **Terreno** — 7× Grama, Grama Escura
+189. **Terreno** — 5× Grama, 3× Grama Escura
 190. **Terreno** — 4× Grama, 4× Grama Escura
-191. **Terreno** — 5× Grama, 3× Grama Escura
-192. **Terreno** — 7× Grama, Grama Escura
-193. **Terreno** — 5× Grama, 3× Grama Escura
-194. **Terreno** — 5× Grama, 3× Grama Escura
-195. **Terreno** — 4× Grama Escura, 4× Grama
-196. **Terreno** — 5× Grama, 3× Grama Escura
-197. **Terreno** — 3× Grama Escura, 5× Grama
-198. **Terreno** — 6× Grama, 2× Grama Escura
-199. **Terreno** — 6× Grama, 2× Grama Escura
+191. **Terreno** — 6× Grama, 2× Grama Escura
+192. **Terreno** — 6× Grama, 2× Grama Escura
+193. **Terreno** — 3× Grama Escura, 5× Grama
+194. **Terreno** — 4× Grama Escura, 4× Grama
+195. **Terreno** — 3× Grama Escura, 5× Grama
+196. **Terreno** — 4× Grama Escura, 4× Grama
+197. **Terreno** — 8× Grama
+198. **Terreno** — 3× Grama Escura, 5× Grama
+199. **Terreno** — 7× Grama, Grama Escura
 200. **Terreno** — 6× Grama, 2× Grama Escura
-201. **Terreno** — 6× Grama, 2× Grama Escura
-202. **Terreno** — 2× Grama Escura, 6× Grama
-203. **Terreno** — 3× Grama Escura, 5× Grama
-204. **Terreno** — 2× Grama Escura, 6× Grama
+201. **Terreno** — 5× Grama, 3× Grama Escura
+202. **Terreno** — 3× Grama Escura, 5× Grama
+203. **Terreno** — 5× Grama, 3× Grama Escura
+204. **Terreno** — 6× Grama, 2× Grama Escura
 205. **Terreno** — 6× Grama, 2× Grama Escura
-206. **Terreno** — 6× Grama, 2× Grama Escura
-207. **Terreno** — 2× Grama Escura, 6× Grama
-208. **Terreno** — 5× Grama, 3× Grama Escura
+206. **Terreno** — 7× Grama, Grama Escura
+207. **Terreno** — 6× Grama, 2× Grama Escura
+208. **Terreno** — 6× Grama, 2× Grama Escura
 209. **Terreno** — 6× Grama, 2× Grama Escura
-210. **Terreno** — 6× Grama, 2× Grama Escura
-211. **Terreno** — 4× Grama Escura, 4× Grama
-212. **Terreno** — 6× Grama, 2× Grama Escura
-213. **Terreno** — 3× Grama Escura, 5× Grama
-214. **Terreno** — 6× Grama, 2× Grama Escura
-215. **Terreno** — 5× Grama, 3× Grama Escura
-216. **Terreno** — 6× Grama, 2× Grama Escura
-217. **Terreno** — 3× Grama Escura, 5× Grama
+210. **Terreno** — 5× Grama, 3× Grama Escura
+211. **Terreno** — 2× Grama Escura, 6× Grama
+212. **Terreno** — 4× Grama Escura, 4× Grama
+213. **Terreno** — 6× Grama, 2× Grama Escura
+214. **Terreno** — 7× Grama, Grama Escura
+215. **Terreno** — 2× Grama Escura, 6× Grama
+216. **Terreno** — 3× Grama Escura, 5× Grama
+217. **Terreno** — 7× Grama, Grama Escura
 218. **Terreno** — 6× Grama, 2× Grama Escura
-219. **Terreno** — Grama Escura, 7× Grama
+219. **Terreno** — 8× Grama
 220. **Terreno** — 7× Grama, Grama Escura
-221. **Terreno** — 5× Grama, 3× Grama Escura
+221. **Terreno** — 6× Grama, 2× Grama Escura
 222. **Terreno** — 7× Grama, Grama Escura
 223. **Terreno** — 5× Grama, 3× Grama Escura
-224. **Terreno** — 3× Grama Escura, 5× Grama
+224. **Terreno** — 6× Grama, 2× Grama Escura
 225. **Terreno** — 2× Grama Escura, 6× Grama
-226. **Terreno** — 3× Grama Escura, 5× Grama
+226. **Terreno** — 2× Grama Escura, 6× Grama
 227. **Terreno** — 3× Grama Escura, 5× Grama
 228. **Terreno** — 7× Grama, Grama Escura
-229. **Terreno** — 6× Grama, 2× Grama Escura
+229. **Terreno** — 7× Grama, Grama Escura
 230. **Terreno** — 7× Grama, Grama Escura
-231. **Terreno** — 2× Grama Escura, 6× Grama
-232. **Terreno** — 2× Grama Escura, 6× Grama
+231. **Terreno** — 6× Grama, 2× Grama Escura
+232. **Terreno** — 6× Grama, 2× Grama Escura
 233. **Terreno** — 6× Grama, 2× Grama Escura
-234. **Terreno** — 3× Grama Escura, 5× Grama
+234. **Terreno** — 6× Grama, 2× Grama Escura
 235. **Terreno** — 6× Grama, 2× Grama Escura
-236. **Terreno** — 4× Grama Escura, 4× Grama
-237. **Terreno** — 6× Grama, 2× Grama Escura
-238. **Terreno** — 5× Grama, 3× Grama Escura
-239. **Terreno** — 6× Grama, 2× Grama Escura
-240. **Terreno** — 5× Grama, 3× Grama Escura
-241. **Terreno** — 4× Grama Escura, 4× Grama
-242. **Terreno** — 6× Grama, 2× Grama Escura
-243. **Terreno** — 2× Grama Escura, 6× Grama
-244. **Terreno** — 5× Grama, 3× Grama Escura
-245. **Terreno** — Grama Escura, 7× Grama
-246. **Terreno** — 3× Grama Escura, 5× Grama
+236. **Terreno** — 5× Grama, 3× Grama Escura
+237. **Terreno** — 4× Grama Escura, 4× Grama
+238. **Terreno** — 6× Grama, 2× Grama Escura
+239. **Terreno** — 4× Grama Escura, 4× Grama
+240. **Terreno** — 6× Grama, 2× Grama Escura
+241. **Terreno** — 6× Grama, 2× Grama Escura
+242. **Terreno** — 5× Grama Escura, 3× Grama
+243. **Terreno** — 6× Grama, 2× Grama Escura
+244. **Terreno** — 6× Grama, 2× Grama Escura
+245. **Terreno** — 5× Grama, 3× Grama Escura
+246. **Terreno** — 7× Grama, Grama Escura
 247. **Terreno** — 5× Grama, 3× Grama Escura
-248. **Terreno** — 6× Grama, 2× Grama Escura
-249. **Terreno** — 3× Grama Escura, 5× Grama
-250. **Terreno** — 5× Grama, 3× Grama Escura
-251. **Terreno** — 6× Grama, 2× Grama Escura
+248. **Terreno** — 5× Grama, 3× Grama Escura
+249. **Terreno** — 6× Grama, 2× Grama Escura
+250. **Terreno** — 6× Grama, 2× Grama Escura
+251. **Terreno** — 3× Grama Escura, 5× Grama
 252. **Terreno** — 3× Grama Escura, 5× Grama
 253. **Terreno** — 6× Grama, 2× Grama Escura
-254. **Terreno** — 6× Grama, 2× Grama Escura
-255. **Terreno** — 3× Grama Escura, 5× Grama
+254. **Terreno** — 3× Grama Escura, 5× Grama
+255. **Terreno** — 6× Grama, 2× Grama Escura
 256. **Terreno** — 6× Grama, 2× Grama Escura
-257. **Terreno** — 5× Grama, 3× Grama Escura
+257. **Terreno** — 3× Grama Escura, 5× Grama
 258. **Terreno** — 6× Grama, 2× Grama Escura
-259. **Terreno** — 5× Grama, 3× Grama Escura
+259. **Terreno** — 3× Grama Escura, 5× Grama
 260. **Terreno** — 6× Grama, 2× Grama Escura
-261. **Terreno** — 6× Grama, 2× Grama Escura
+261. **Terreno** — 3× Grama Escura, 5× Grama
 262. **Terreno** — 7× Grama, Grama Escura
-263. **Terreno** — 3× Grama Escura, 5× Grama
-264. **Terreno** — 7× Grama, Grama Escura
+263. **Terreno** — 6× Grama, 2× Grama Escura
+264. **Terreno** — 6× Grama, 2× Grama Escura
 265. **Terreno** — 2× Grama Escura, 6× Grama
 266. **Terreno** — 6× Grama, 2× Grama Escura
-267. **Terreno** — Grama Escura, 7× Grama
+267. **Terreno** — 6× Grama, 2× Grama Escura
 268. **Terreno** — 7× Grama, Grama Escura
-269. **Terreno** — 7× Grama, Grama Escura
-270. **Terreno** — 6× Grama, 2× Grama Escura
-271. **Terreno** — 4× Grama Escura, 4× Grama
-272. **Terreno** — 6× Grama, 2× Grama Escura
-273. **Terreno** — 3× Grama Escura, 5× Grama
+269. **Terreno** — 8× Grama
+270. **Terreno** — 7× Grama, Grama Escura
+271. **Terreno** — 6× Grama, 2× Grama Escura
+272. **Terreno** — 4× Grama Escura, 4× Grama
+273. **Terreno** — 5× Grama, 3× Grama Escura
 274. **Terreno** — 6× Grama, 2× Grama Escura
 275. **Terreno** — 3× Grama Escura, 5× Grama
-276. **Terreno** — 6× Grama, 2× Grama Escura
+276. **Terreno** — 5× Grama, 3× Grama Escura
 277. **Terreno** — 6× Grama, 2× Grama Escura
 278. **Terreno** — 6× Grama, 2× Grama Escura
-279. **Terreno** — 5× Grama, 3× Grama Escura
-280. **Terreno** — 7× Grama, Grama Escura
-281. **Terreno** — 3× Grama Escura, 5× Grama
-282. **Terreno** — 5× Grama, 3× Grama Escura
+279. **Terreno** — 3× Grama Escura, 5× Grama
+280. **Terreno** — 6× Grama, 2× Grama Escura
+281. **Terreno** — 2× Grama Escura, 6× Grama
+282. **Terreno** — 6× Grama, 2× Grama Escura
 283. **Terreno** — 5× Grama, 3× Grama Escura
-284. **Terreno** — 6× Grama, 2× Grama Escura
-285. **Terreno** — 6× Grama, 2× Grama Escura
-286. **Terreno** — 7× Grama, Grama Escura
+284. **Terreno** — 5× Grama, 3× Grama Escura
+285. **Terreno** — 7× Grama, Grama Escura
+286. **Terreno** — 2× Grama Escura, 6× Grama
 287. **Terreno** — 5× Grama, 3× Grama Escura
 288. **Terreno** — 6× Grama, 2× Grama Escura
 289. **Terreno** — 4× Grama Escura, 4× Grama
 290. **Terreno** — 6× Grama, 2× Grama Escura
-291. **Terreno** — 2× Grama Escura, 6× Grama
-292. **Terreno** — 3× Grama Escura, 5× Grama
-293. **Terreno** — 4× Grama Escura, 4× Grama
-294. **Terreno** — 3× Grama Escura, 5× Grama
-295. **Terreno** — 3× Grama Escura, 5× Grama
-296. **Terreno** — 3× Grama Escura, 5× Grama
-297. **Terreno** — 6× Grama, 2× Grama Escura
-298. **Terreno** — 7× Grama, Grama Escura
+291. **Terreno** — 3× Grama Escura, 5× Grama
+292. **Terreno** — 4× Grama Escura, 4× Grama
+293. **Terreno** — 5× Grama, 3× Grama Escura
+294. **Terreno** — 5× Grama, 3× Grama Escura
+295. **Terreno** — 5× Grama, 3× Grama Escura
+296. **Terreno** — 5× Grama, 3× Grama Escura
+297. **Terreno** — 8× Grama
+298. **Terreno** — 5× Grama, 3× Grama Escura
 299. **Terreno** — 5× Grama, 3× Grama Escura
-300. **Terreno** — 3× Grama Escura, 5× Grama
-301. **Terreno** — 4× Grama Escura, 4× Grama
+300. **Terreno** — 5× Grama, 3× Grama Escura
+301. **Terreno** — 5× Grama, 3× Grama Escura
 302. **Terreno** — 6× Grama, 2× Grama Escura
-303. **Terreno** — 5× Grama, 3× Grama Escura
-304. **Terreno** — 6× Grama, 2× Grama Escura
-305. **Terreno** — 7× Grama, Grama Escura
-306. **Terreno** — 8× Grama
+303. **Terreno** — 3× Grama Escura, 5× Grama
+304. **Terreno** — 7× Grama, Grama Escura
+305. **Terreno** — 6× Grama, 2× Grama Escura
+306. **Terreno** — Grama Escura, 7× Grama
 307. **Terreno** — 8× Grama
 308. **Terreno** — 8× Grama
 309. **Terreno** — 8× Grama
-310. **Terreno** — 6× Grama, 2× Grama Escura
-311. **Terreno** — 8× Grama
+310. **Terreno** — 3× Grama Escura, 5× Grama
+311. **Terreno** — 2× Grama Escura, 6× Grama
 312. **Terreno** — 8× Grama
-313. **Terreno** — 8× Grama
-314. **Terreno** — 6× Grama, 2× Grama Escura
-315. **Terreno** — 7× Grama, Grama Escura
+313. **Terreno** — 2× Grama Escura, 6× Grama
+314. **Terreno** — 5× Grama, 3× Grama Escura
+315. **Terreno** — 3× Grama, 5× Grama Escura
 316. **Terreno** — 5× Grama, 3× Grama Escura
-317. **Terreno** — 5× Grama, 3× Grama Escura
-318. **Terreno** — 2× Grama Escura, 6× Grama
+317. **Terreno** — 3× Grama Escura, 5× Grama
+318. **Terreno** — 6× Grama, 2× Grama Escura
 319. **Terreno** — 6× Grama, 2× Grama Escura
-320. **Terreno** — 7× Grama, Grama Escura
+320. **Terreno** — 8× Grama
 321. **Terreno** — 7× Grama, Grama Escura
-322. **Terreno** — 6× Grama, 2× Grama Escura
-323. **Terreno** — 5× Grama, 3× Grama Escura
-324. **Terreno** — 5× Grama, 3× Grama Escura
-325. **Terreno** — 6× Grama, 2× Grama Escura
-326. **Terreno** — 6× Grama, 2× Grama Escura
-327. **Terreno** — 7× Grama, Grama Escura
-328. **Terreno** — 3× Grama Escura, 5× Grama
-329. **Terreno** — 3× Grama Escura, 5× Grama
-330. **Terreno** — 6× Grama, 2× Grama Escura
-331. **Terreno** — 6× Grama, 2× Grama Escura
-332. **Terreno** — 5× Grama, 3× Grama Escura
+322. **Terreno** — 8× Grama
+323. **Terreno** — 6× Grama, 2× Grama Escura
+324. **Terreno** — 7× Grama, Grama Escura
+325. **Terreno** — 3× Grama Escura, 5× Grama
+326. **Terreno** — 4× Grama Escura, 4× Grama
+327. **Terreno** — 6× Grama, 2× Grama Escura
+328. **Terreno** — 7× Grama, Grama Escura
+329. **Terreno** — Grama Escura, 7× Grama
+330. **Terreno** — 3× Grama Escura, 5× Grama
+331. **Terreno** — 3× Grama Escura, 5× Grama
+332. **Terreno** — 6× Grama, 2× Grama Escura
 333. **Terreno** — 6× Grama, 2× Grama Escura
-334. **Terreno** — 6× Grama, 2× Grama Escura
-335. **Terreno** — 7× Grama, Grama Escura
-336. **Terreno** — 2× Grama Escura, 6× Grama
+334. **Terreno** — 5× Grama, 3× Grama Escura
+335. **Terreno** — 6× Grama, 2× Grama Escura
+336. **Terreno** — 6× Grama, 2× Grama Escura
 337. **Terreno** — 7× Grama, Grama Escura
-338. **Terreno** — 8× Grama
-339. **Terreno** — Grama, Grama Escura
+338. **Terreno** — 2× Grama Escura, 6× Grama
+339. **Terreno** — 4× Grama, 4× Grama Escura
+340. **Terreno** — 6× Grama, 2× Grama Escura
+341. **Terreno** — 8× Grama
+342. **Terreno** — 8× Grama
+343. **Terreno** — 4× Grama, Grama Escura
 
 ## Lobby: praça de pedra, estrado e spawn
 
-340. **Lobby** — 6× Pedra da Praça, 2× Faixa da Praça
-341. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
-342. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
-343. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
-344. **Lobby** — 4× Pedra da Praça, 4× Faixa da Praça
-345. **Lobby** — 4× Pedra da Praça, 4× Faixa da Praça
+344. **Lobby** — 6× Pedra da Praça, 2× Faixa da Praça
+345. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
 346. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
-347. **Lobby** — 3× Faixa da Praça, 5× Pedra da Praça
-348. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
-349. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
-350. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
-351. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
-352. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
-353. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
-354. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
-355. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
-356. **Lobby** — 4× Pedra da Praça, 4× Faixa da Praça
-357. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
-358. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
-359. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
-360. **Lobby** — 7× Pedra da Praça, Faixa da Praça
-361. **Lobby** — 2× Pedra da Praça, SpawnLocation
+347. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
+348. **Lobby** — 4× Pedra da Praça, 4× Faixa da Praça
+349. **Lobby** — 4× Pedra da Praça, 4× Faixa da Praça
+350. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
+351. **Lobby** — 3× Faixa da Praça, 5× Pedra da Praça
+352. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
+353. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
+354. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
+355. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
+356. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
+357. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
+358. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
+359. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
+360. **Lobby** — 4× Pedra da Praça, 4× Faixa da Praça
+361. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
+362. **Lobby** — 4× Faixa da Praça, 4× Pedra da Praça
+363. **Lobby** — 5× Pedra da Praça, 3× Faixa da Praça
+364. **Lobby** — 7× Pedra da Praça, Faixa da Praça
+365. **Lobby** — 2× Pedra da Praça, SpawnLocation
+366. **Lobby/Estátua de Luvitlua/Pedestal** — 2× Degrau, Corpo do Pedestal, Placa, Faixa Dourada, Tampo
+367. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — 2× Letra L, 2× Letra U, Letra V, Letra I, Letra T, Letra A
+368. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — Letra A, Letra L, 2× Letra U, 2× Letra V, Letra I, Letra T
+369. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — 2× Letra L, 4× Letra U, 2× Letra A
+370. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — 2× Letra V, Letra I, Letra T, Letra L, 2× Letra U, Letra A
+371. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — Letra A, Letra L, 2× Letra U, 2× Letra V, Letra I, Letra T
+372. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — 2× Letra L, 4× Letra U, Letra A, Letra V
+373. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — Letra V, Letra I, Letra T, Letra L, 2× Letra U, 2× Letra A
+374. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — 2× Letra L, 2× Letra U, 2× Letra V, Letra I, Letra T
+375. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — 4× Letra U, 2× Letra A, Letra L, Letra V
+376. **Lobby/Estátua de Luvitlua/Pedestal/Nome** — Letra V, Letra I, Letra T, Letra L, 2× Letra U, Letra A
+377. **Lobby/Estátua de Luvitlua/Avatar** — 2× Bota, 2× Perna, Saia da Armadura, Capa, Manopla, Cinto
+378. **Lobby/Estátua de Luvitlua/Avatar** — Tronco, Braço Esquerdo, Peitoral, Braço Direito, 2× Ombreira, Elmo, Emblema
+379. **Lobby/Estátua de Luvitlua/Avatar** — Viseira, Penacho, Manopla
+380. **Lobby/Estátua de Luvitlua/Espada de Gelo** — Cabo, Guarda, Lâmina, Ponta
 
 ## Estradas de terra e passagens de pedra
 
-362. **Estradas** — 7× Terra da Estrada, Terra Batida
-363. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-364. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-365. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-366. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-367. **Estradas** — 7× Terra da Estrada, Terra Batida
-368. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-369. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-370. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-371. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-372. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-373. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-374. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-375. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-376. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-377. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-378. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-379. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-380. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-381. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-382. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-383. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-384. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-385. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-386. **Estradas** — 7× Terra da Estrada, Terra Batida
+381. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+382. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+383. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+384. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+385. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+386. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
 387. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-388. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-389. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+388. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+389. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
 390. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-391. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-392. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-393. **Estradas** — 7× Terra da Estrada, Terra Batida
-394. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-395. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-396. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-397. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-398. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-399. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-400. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-401. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+391. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+392. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+393. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+394. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+395. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+396. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+397. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+398. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+399. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+400. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+401. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
 402. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-403. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-404. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-405. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-406. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+403. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+404. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+405. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+406. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
 407. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-408. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-409. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-410. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+408. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+409. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+410. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
 411. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-412. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-413. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-414. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-415. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-416. **Estradas** — 8× Terra da Estrada
-417. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-418. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-419. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-420. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-421. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-422. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-423. **Estradas** — 7× Terra da Estrada, Terra Batida
-424. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+412. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+413. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+414. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+415. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+416. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+417. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+418. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+419. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+420. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+421. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+422. **Estradas** — 7× Terra da Estrada, Terra Batida
+423. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+424. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
 425. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-426. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-427. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+426. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+427. **Estradas** — 7× Terra da Estrada, Terra Batida
 428. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-429. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-430. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+429. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+430. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
 431. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-432. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-433. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-434. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-435. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-436. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-437. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-438. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-439. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-440. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-441. **Estradas** — 7× Terra da Estrada, Terra Batida
-442. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-443. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+432. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+433. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+434. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+435. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+436. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+437. **Estradas** — 7× Terra da Estrada, Terra Batida
+438. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+439. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+440. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+441. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+442. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+443. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
 444. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-445. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-446. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+445. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+446. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 447. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-448. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-449. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-450. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+448. **Estradas** — 7× Terra da Estrada, Terra Batida
+449. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+450. **Estradas** — 7× Terra da Estrada, Terra Batida
 451. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-452. **Estradas** — 7× Terra da Estrada, Terra Batida
-453. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-454. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+452. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+453. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+454. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 455. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
 456. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-457. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
-458. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
-459. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-460. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
-461. **Estradas** — 3× Terra Batida, 3× Terra da Estrada, 2× Passagem de Pedra
-462. **Estradas** — 4× Terra da Estrada, 3× Terra Batida, Passagem de Pedra
-463. **Estradas** — 4× Terra da Estrada, 3× Passagem de Pedra, Terra Batida
-464. **Estradas** — Passagem de Pedra, 6× Terra da Estrada, Terra Batida
-465. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-466. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+457. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+458. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+459. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+460. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+461. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+462. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+463. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+464. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+465. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+466. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
 467. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
-468. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
-469. **Estradas** — 7× Terra da Estrada, Terra Batida
-470. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
-471. **Estradas** — 7× Terra da Estrada, Terra Batida
+468. **Estradas** — 8× Terra da Estrada
+469. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+470. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+471. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+472. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+473. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+474. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+475. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+476. **Estradas** — 4× Terra da Estrada, 4× Terra Batida
+477. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+478. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+479. **Estradas** — 7× Terra da Estrada, Terra Batida
+480. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+481. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+482. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+483. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+484. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+485. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+486. **Estradas** — 2× Terra Batida, 6× Terra da Estrada
+487. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+488. **Estradas** — 6× Terra da Estrada, 2× Terra Batida
+489. **Estradas** — 4× Terra da Estrada, 2× Terra Batida, 2× Passagem de Pedra
+490. **Estradas** — 4× Terra da Estrada, 3× Terra Batida, Passagem de Pedra
+491. **Estradas** — 4× Terra da Estrada, 3× Passagem de Pedra, Terra Batida
+492. **Estradas** — Passagem de Pedra, 5× Terra da Estrada, 2× Terra Batida
+493. **Estradas** — 8× Terra da Estrada
+494. **Estradas** — 5× Terra da Estrada, 3× Terra Batida
+495. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+496. **Estradas** — 4× Terra Batida, 4× Terra da Estrada
+497. **Estradas** — 7× Terra da Estrada, Terra Batida
+498. **Estradas** — 3× Terra Batida, 5× Terra da Estrada
+499. **Estradas** — 5× Terra da Estrada, Terra Batida
 
 ## Áreas de construção em volta da praça
 
-472. **Áreas** — 6× Borda da Área, 2× Área de Construção
-473. **Áreas** — 5× Borda da Área, 3× Área de Construção
-474. **Áreas** — 6× Borda da Área, 2× Área de Construção
-475. **Áreas** — 3× Área de Construção, 5× Borda da Área
-476. **Áreas** — 6× Borda da Área, 2× Área de Construção
-477. **Áreas** — 6× Borda da Área, 2× Área de Construção
-478. **Áreas** — 5× Borda da Área, 3× Área de Construção
-479. **Áreas** — 6× Borda da Área, 2× Área de Construção
-480. **Áreas** — 3× Área de Construção, 5× Borda da Área
-481. **Áreas** — 6× Borda da Área, 2× Área de Construção
-482. **Áreas** — 6× Borda da Área, 2× Área de Construção
-483. **Áreas** — 5× Borda da Área, 3× Área de Construção
-484. **Áreas** — 6× Borda da Área, 2× Área de Construção
-485. **Áreas** — 3× Área de Construção, 5× Borda da Área
-486. **Áreas** — 6× Borda da Área, 2× Área de Construção
-487. **Áreas** — 6× Borda da Área, 2× Área de Construção
-488. **Áreas** — 5× Borda da Área, 3× Área de Construção
-489. **Áreas** — 6× Borda da Área, 2× Área de Construção
-490. **Áreas** — 2× Área de Construção, 5× Borda da Área
+500. **Áreas** — 6× Borda da Área, 2× Área de Construção
+501. **Áreas** — 5× Borda da Área, 3× Área de Construção
+502. **Áreas** — 6× Borda da Área, 2× Área de Construção
+503. **Áreas** — 3× Área de Construção, 5× Borda da Área
+504. **Áreas** — 6× Borda da Área, 2× Área de Construção
+505. **Áreas** — 6× Borda da Área, 2× Área de Construção
+506. **Áreas** — 5× Borda da Área, 3× Área de Construção
+507. **Áreas** — 6× Borda da Área, 2× Área de Construção
+508. **Áreas** — 3× Área de Construção, 5× Borda da Área
+509. **Áreas** — 6× Borda da Área, 2× Área de Construção
+510. **Áreas** — 6× Borda da Área, 2× Área de Construção
+511. **Áreas** — 5× Borda da Área, 3× Área de Construção
+512. **Áreas** — 6× Borda da Área, 2× Área de Construção
+513. **Áreas** — 3× Área de Construção, 5× Borda da Área
+514. **Áreas** — 6× Borda da Área, 2× Área de Construção
+515. **Áreas** — 6× Borda da Área, 2× Área de Construção
+516. **Áreas** — 5× Borda da Área, 3× Área de Construção
+517. **Áreas** — 6× Borda da Área, 2× Área de Construção
+518. **Áreas** — 2× Área de Construção, 5× Borda da Área
 
 ## Lotes dos castelos (30)
 
-491. **Lotes** — 6× Borda do Lote, 2× Lote
-492. **Lotes** — 3× Lote, 5× Borda do Lote
-493. **Lotes** — 4× Lote, 4× Borda do Lote
-494. **Lotes** — 5× Borda do Lote, 3× Lote
-495. **Lotes** — 6× Borda do Lote, 2× Lote
-496. **Lotes** — 2× Lote, 6× Borda do Lote
-497. **Lotes** — 3× Lote, 5× Borda do Lote
-498. **Lotes** — 5× Borda do Lote, 3× Lote
-499. **Lotes** — 6× Borda do Lote, 2× Lote
-500. **Lotes** — 3× Lote, 5× Borda do Lote
-501. **Lotes** — 3× Lote, 5× Borda do Lote
-502. **Lotes** — 6× Borda do Lote, 2× Lote
-503. **Lotes** — 3× Lote, 5× Borda do Lote
-504. **Lotes** — 3× Lote, 5× Borda do Lote
-505. **Lotes** — 3× Lote, 5× Borda do Lote
-506. **Lotes** — 5× Borda do Lote, 3× Lote
-507. **Lotes** — 6× Borda do Lote, 2× Lote
-508. **Lotes** — 3× Lote, 5× Borda do Lote
-509. **Lotes** — 3× Lote, 5× Borda do Lote
-510. **Lotes** — 6× Borda do Lote, 2× Lote
-511. **Lotes** — 5× Borda do Lote, 3× Lote
-512. **Lotes** — 6× Borda do Lote, 2× Lote
-513. **Lotes** — 6× Borda do Lote, 2× Lote
-514. **Lotes** — 6× Borda do Lote, 2× Lote
-515. **Lotes** — 3× Lote, 5× Borda do Lote
-516. **Lotes** — 6× Borda do Lote, 2× Lote
-517. **Lotes** — 3× Lote, 5× Borda do Lote
-518. **Lotes** — 6× Borda do Lote, 2× Lote
-519. **Lotes** — 5× Borda do Lote, 3× Lote
-520. **Lotes** — 5× Borda do Lote, 3× Lote
-521. **Lotes** — 5× Borda do Lote, 3× Lote
-522. **Lotes** — 6× Borda do Lote, 2× Lote
-523. **Lotes** — 5× Borda do Lote, 3× Lote
-524. **Lotes** — 6× Borda do Lote, 2× Lote
+519. **Lotes** — 6× Borda do Lote, 2× Lote
+520. **Lotes** — 3× Lote, 5× Borda do Lote
+521. **Lotes** — 4× Lote, 4× Borda do Lote
+522. **Lotes** — 5× Borda do Lote, 3× Lote
+523. **Lotes** — 6× Borda do Lote, 2× Lote
+524. **Lotes** — 2× Lote, 6× Borda do Lote
 525. **Lotes** — 3× Lote, 5× Borda do Lote
-526. **Lotes** — 6× Borda do Lote, 2× Lote
-527. **Lotes** — 3× Lote, 5× Borda do Lote
-528. **Lotes** — 6× Borda do Lote, 2× Lote
+526. **Lotes** — 5× Borda do Lote, 3× Lote
+527. **Lotes** — 6× Borda do Lote, 2× Lote
+528. **Lotes** — 3× Lote, 5× Borda do Lote
 529. **Lotes** — 3× Lote, 5× Borda do Lote
-530. **Lotes** — 2× Lote, 6× Borda do Lote
+530. **Lotes** — 6× Borda do Lote, 2× Lote
 531. **Lotes** — 3× Lote, 5× Borda do Lote
-532. **Lotes** — 6× Borda do Lote, 2× Lote
+532. **Lotes** — 3× Lote, 5× Borda do Lote
 533. **Lotes** — 3× Lote, 5× Borda do Lote
 534. **Lotes** — 5× Borda do Lote, 3× Lote
 535. **Lotes** — 6× Borda do Lote, 2× Lote
-536. **Lotes** — 6× Borda do Lote, 2× Lote
-537. **Lotes** — 6× Borda do Lote, 2× Lote
-538. **Lotes** — 5× Borda do Lote, 3× Lote
-539. **Lotes** — 6× Borda do Lote, 2× Lote
-540. **Lotes** — 3× Lote, 5× Borda do Lote
-541. **Lotes** — 5× Borda do Lote, 3× Lote
+536. **Lotes** — 3× Lote, 5× Borda do Lote
+537. **Lotes** — 3× Lote, 5× Borda do Lote
+538. **Lotes** — 6× Borda do Lote, 2× Lote
+539. **Lotes** — 5× Borda do Lote, 3× Lote
+540. **Lotes** — 6× Borda do Lote, 2× Lote
+541. **Lotes** — 6× Borda do Lote, 2× Lote
 542. **Lotes** — 6× Borda do Lote, 2× Lote
 543. **Lotes** — 3× Lote, 5× Borda do Lote
-544. **Lotes** — 5× Borda do Lote, 3× Lote
-545. **Lotes** — 6× Borda do Lote, 2× Lote
+544. **Lotes** — 6× Borda do Lote, 2× Lote
+545. **Lotes** — 3× Lote, 5× Borda do Lote
 546. **Lotes** — 6× Borda do Lote, 2× Lote
-547. **Lotes** — 6× Borda do Lote, 2× Lote
-548. **Lotes** — 3× Lote, 5× Borda do Lote
-549. **Lotes** — 6× Borda do Lote, 2× Lote
+547. **Lotes** — 5× Borda do Lote, 3× Lote
+548. **Lotes** — 5× Borda do Lote, 3× Lote
+549. **Lotes** — 5× Borda do Lote, 3× Lote
 550. **Lotes** — 6× Borda do Lote, 2× Lote
-551. **Lotes** — 3× Lote, 5× Borda do Lote
-552. **Lotes** — 5× Borda do Lote, 3× Lote
-553. **Lotes** — 6× Borda do Lote, 2× Lote
-554. **Lotes** — 3× Lote, 5× Borda do Lote
-555. **Lotes** — 5× Borda do Lote, 3× Lote
+551. **Lotes** — 5× Borda do Lote, 3× Lote
+552. **Lotes** — 6× Borda do Lote, 2× Lote
+553. **Lotes** — 3× Lote, 5× Borda do Lote
+554. **Lotes** — 6× Borda do Lote, 2× Lote
+555. **Lotes** — 3× Lote, 5× Borda do Lote
 556. **Lotes** — 6× Borda do Lote, 2× Lote
-557. **Lotes** — 6× Borda do Lote, 2× Lote
-558. **Lotes** — 3× Lote, 5× Borda do Lote
-559. **Lotes** — 6× Borda do Lote, 2× Lote
-560. **Lotes** — 5× Borda do Lote, 3× Lote
-561. **Lotes** — 6× Borda do Lote, 2× Lote
+557. **Lotes** — 3× Lote, 5× Borda do Lote
+558. **Lotes** — 2× Lote, 6× Borda do Lote
+559. **Lotes** — 3× Lote, 5× Borda do Lote
+560. **Lotes** — 6× Borda do Lote, 2× Lote
+561. **Lotes** — 3× Lote, 5× Borda do Lote
 562. **Lotes** — 5× Borda do Lote, 3× Lote
 563. **Lotes** — 6× Borda do Lote, 2× Lote
-564. **Lotes** — 3× Lote, 5× Borda do Lote
-565. **Lotes** — 5× Borda do Lote, 3× Lote
-566. **Lotes** — 6× Borda do Lote, 2× Lote
-567. **Lotes** — 3× Lote, 5× Borda do Lote
-568. **Lotes** — 6× Borda do Lote, 2× Lote
-569. **Lotes** — 6× Borda do Lote, 2× Lote
-570. **Lotes** — 5× Borda do Lote, 3× Lote
-571. **Lotes** — 5× Borda do Lote, 3× Lote
+564. **Lotes** — 6× Borda do Lote, 2× Lote
+565. **Lotes** — 6× Borda do Lote, 2× Lote
+566. **Lotes** — 5× Borda do Lote, 3× Lote
+567. **Lotes** — 6× Borda do Lote, 2× Lote
+568. **Lotes** — 3× Lote, 5× Borda do Lote
+569. **Lotes** — 5× Borda do Lote, 3× Lote
+570. **Lotes** — 6× Borda do Lote, 2× Lote
+571. **Lotes** — 3× Lote, 5× Borda do Lote
 572. **Lotes** — 5× Borda do Lote, 3× Lote
-573. **Lotes** — 5× Borda do Lote, 3× Lote
-574. **Lotes** — 5× Borda do Lote, 3× Lote
+573. **Lotes** — 6× Borda do Lote, 2× Lote
+574. **Lotes** — 6× Borda do Lote, 2× Lote
 575. **Lotes** — 6× Borda do Lote, 2× Lote
-576. **Lotes** — 6× Borda do Lote, 2× Lote
-577. **Lotes** — 3× Lote, 5× Borda do Lote
-578. **Lotes** — 5× Borda do Lote, 3× Lote
-579. **Lotes** — 6× Borda do Lote, 2× Lote
-580. **Lotes** — 6× Borda do Lote, 2× Lote
-581. **Lotes** — 3× Lote, 5× Borda do Lote
-582. **Lotes** — 5× Borda do Lote, 3× Lote
-583. **Lotes** — 6× Borda do Lote, 2× Lote
+576. **Lotes** — 3× Lote, 5× Borda do Lote
+577. **Lotes** — 6× Borda do Lote, 2× Lote
+578. **Lotes** — 6× Borda do Lote, 2× Lote
+579. **Lotes** — 3× Lote, 5× Borda do Lote
+580. **Lotes** — 5× Borda do Lote, 3× Lote
+581. **Lotes** — 6× Borda do Lote, 2× Lote
+582. **Lotes** — 3× Lote, 5× Borda do Lote
+583. **Lotes** — 5× Borda do Lote, 3× Lote
 584. **Lotes** — 6× Borda do Lote, 2× Lote
 585. **Lotes** — 6× Borda do Lote, 2× Lote
 586. **Lotes** — 3× Lote, 5× Borda do Lote
-587. **Lotes** — 5× Borda do Lote, 3× Lote
-588. **Lotes** — 6× Borda do Lote, 2× Lote
-589. **Lotes** — 5× Borda do Lote, 3× Lote
-590. **Lotes** — 6× Borda do Lote, 2× Lote
+587. **Lotes** — 6× Borda do Lote, 2× Lote
+588. **Lotes** — 5× Borda do Lote, 3× Lote
+589. **Lotes** — 6× Borda do Lote, 2× Lote
+590. **Lotes** — 5× Borda do Lote, 3× Lote
 591. **Lotes** — 6× Borda do Lote, 2× Lote
 592. **Lotes** — 3× Lote, 5× Borda do Lote
-593. **Lotes** — 3× Borda do Lote, Lote
+593. **Lotes** — 5× Borda do Lote, 3× Lote
+594. **Lotes** — 6× Borda do Lote, 2× Lote
+595. **Lotes** — 3× Lote, 5× Borda do Lote
+596. **Lotes** — 6× Borda do Lote, 2× Lote
+597. **Lotes** — 6× Borda do Lote, 2× Lote
+598. **Lotes** — 5× Borda do Lote, 3× Lote
+599. **Lotes** — 5× Borda do Lote, 3× Lote
+600. **Lotes** — 5× Borda do Lote, 3× Lote
+601. **Lotes** — 5× Borda do Lote, 3× Lote
+602. **Lotes** — 5× Borda do Lote, 3× Lote
+603. **Lotes** — 6× Borda do Lote, 2× Lote
+604. **Lotes** — 6× Borda do Lote, 2× Lote
+605. **Lotes** — 3× Lote, 5× Borda do Lote
+606. **Lotes** — 5× Borda do Lote, 3× Lote
+607. **Lotes** — 6× Borda do Lote, 2× Lote
+608. **Lotes** — 6× Borda do Lote, 2× Lote
+609. **Lotes** — 3× Lote, 5× Borda do Lote
+610. **Lotes** — 5× Borda do Lote, 3× Lote
+611. **Lotes** — 6× Borda do Lote, 2× Lote
+612. **Lotes** — 6× Borda do Lote, 2× Lote
+613. **Lotes** — 6× Borda do Lote, 2× Lote
+614. **Lotes** — 3× Lote, 5× Borda do Lote
+615. **Lotes** — 5× Borda do Lote, 3× Lote
+616. **Lotes** — 6× Borda do Lote, 2× Lote
+617. **Lotes** — 5× Borda do Lote, 3× Lote
+618. **Lotes** — 6× Borda do Lote, 2× Lote
+619. **Lotes** — 6× Borda do Lote, 2× Lote
+620. **Lotes** — 3× Lote, 5× Borda do Lote
+621. **Lotes** — 3× Borda do Lote, Lote
 
 ## Penhascos de rocha e musgo
 
-594. **Penhascos** — 8× Rocha
-595. **Penhascos** — 8× Rocha
-596. **Penhascos** — 8× Rocha
-597. **Penhascos** — 8× Rocha
-598. **Penhascos** — 8× Rocha
-599. **Penhascos** — 8× Rocha
-600. **Penhascos** — 8× Rocha
-601. **Penhascos** — 8× Rocha
-602. **Penhascos** — 8× Rocha
-603. **Penhascos** — 8× Rocha
-604. **Penhascos** — 8× Rocha
-605. **Penhascos** — 8× Rocha
-606. **Penhascos** — 8× Rocha
-607. **Penhascos** — 8× Rocha
-608. **Penhascos** — 8× Rocha
-609. **Penhascos** — 8× Rocha
-610. **Penhascos** — 8× Rocha
-611. **Penhascos** — 8× Rocha
-612. **Penhascos** — 8× Rocha
-613. **Penhascos** — 8× Rocha
-614. **Penhascos** — 8× Rocha
-615. **Penhascos** — 8× Rocha
-616. **Penhascos** — 8× Rocha
-617. **Penhascos** — 8× Rocha
-618. **Penhascos** — 8× Rocha
-619. **Penhascos** — 8× Rocha
-620. **Penhascos** — 8× Rocha
-621. **Penhascos** — 8× Rocha
 622. **Penhascos** — 8× Rocha
 623. **Penhascos** — 8× Rocha
 624. **Penhascos** — 8× Rocha
@@ -982,35 +982,35 @@
 958. **Penhascos** — 8× Rocha
 959. **Penhascos** — 8× Rocha
 960. **Penhascos** — 8× Rocha
-961. **Penhascos** — 6× Rocha, 2× Musgo
-962. **Penhascos** — 8× Musgo
-963. **Penhascos** — 8× Musgo
-964. **Penhascos** — 8× Musgo
-965. **Penhascos** — 8× Musgo
-966. **Penhascos** — 8× Musgo
-967. **Penhascos** — 8× Musgo
-968. **Penhascos** — 8× Musgo
-969. **Penhascos** — 8× Musgo
-970. **Penhascos** — 8× Musgo
-971. **Penhascos** — 8× Musgo
-972. **Penhascos** — 8× Musgo
-973. **Penhascos** — 8× Musgo
-974. **Penhascos** — 8× Musgo
-975. **Penhascos** — 8× Musgo
-976. **Penhascos** — 8× Musgo
-977. **Penhascos** — 8× Musgo
-978. **Penhascos** — 8× Musgo
-979. **Penhascos** — 8× Musgo
-980. **Penhascos** — 8× Musgo
-981. **Penhascos** — 8× Musgo
-982. **Penhascos** — 8× Musgo
-983. **Penhascos** — 8× Musgo
-984. **Penhascos** — 8× Musgo
-985. **Penhascos** — 8× Musgo
-986. **Penhascos** — 8× Musgo
-987. **Penhascos** — 8× Musgo
-988. **Penhascos** — 8× Musgo
-989. **Penhascos** — 8× Musgo
+961. **Penhascos** — 8× Rocha
+962. **Penhascos** — 8× Rocha
+963. **Penhascos** — 8× Rocha
+964. **Penhascos** — 8× Rocha
+965. **Penhascos** — 8× Rocha
+966. **Penhascos** — 8× Rocha
+967. **Penhascos** — 8× Rocha
+968. **Penhascos** — 8× Rocha
+969. **Penhascos** — 8× Rocha
+970. **Penhascos** — 8× Rocha
+971. **Penhascos** — 8× Rocha
+972. **Penhascos** — 8× Rocha
+973. **Penhascos** — 8× Rocha
+974. **Penhascos** — 8× Rocha
+975. **Penhascos** — 8× Rocha
+976. **Penhascos** — 8× Rocha
+977. **Penhascos** — 8× Rocha
+978. **Penhascos** — 8× Rocha
+979. **Penhascos** — 8× Rocha
+980. **Penhascos** — 8× Rocha
+981. **Penhascos** — 8× Rocha
+982. **Penhascos** — 8× Rocha
+983. **Penhascos** — 8× Rocha
+984. **Penhascos** — 8× Rocha
+985. **Penhascos** — 8× Rocha
+986. **Penhascos** — 8× Rocha
+987. **Penhascos** — 8× Rocha
+988. **Penhascos** — 8× Rocha
+989. **Penhascos** — 6× Rocha, 2× Musgo
 990. **Penhascos** — 8× Musgo
 991. **Penhascos** — 8× Musgo
 992. **Penhascos** — 8× Musgo
@@ -1174,10 +1174,38 @@
 1150. **Penhascos** — 8× Musgo
 1151. **Penhascos** — 8× Musgo
 1152. **Penhascos** — 8× Musgo
-1153. **Penhascos** — 4× Musgo
+1153. **Penhascos** — 8× Musgo
+1154. **Penhascos** — 8× Musgo
+1155. **Penhascos** — 8× Musgo
+1156. **Penhascos** — 8× Musgo
+1157. **Penhascos** — 8× Musgo
+1158. **Penhascos** — 8× Musgo
+1159. **Penhascos** — 8× Musgo
+1160. **Penhascos** — 8× Musgo
+1161. **Penhascos** — 8× Musgo
+1162. **Penhascos** — 8× Musgo
+1163. **Penhascos** — 8× Musgo
+1164. **Penhascos** — 8× Musgo
+1165. **Penhascos** — 8× Musgo
+1166. **Penhascos** — 8× Musgo
+1167. **Penhascos** — 8× Musgo
+1168. **Penhascos** — 8× Musgo
+1169. **Penhascos** — 8× Musgo
+1170. **Penhascos** — 8× Musgo
+1171. **Penhascos** — 8× Musgo
+1172. **Penhascos** — 8× Musgo
+1173. **Penhascos** — 8× Musgo
+1174. **Penhascos** — 8× Musgo
+1175. **Penhascos** — 8× Musgo
+1176. **Penhascos** — 8× Musgo
+1177. **Penhascos** — 8× Musgo
+1178. **Penhascos** — 8× Musgo
+1179. **Penhascos** — 8× Musgo
+1180. **Penhascos** — 8× Musgo
+1181. **Penhascos** — 4× Musgo
 
 ## Lagoas
 
-1154. **Água** — 8× Leito
-1155. **Água** — 3× Leito, 5× Água da Lagoa
-1156. **Água** — 6× Água da Lagoa
+1182. **Água** — 8× Leito
+1183. **Água** — 3× Leito, 5× Água da Lagoa
+1184. **Água** — 6× Água da Lagoa
