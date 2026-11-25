@@ -95,7 +95,8 @@ function plotChecks(w, out) {
     for (let j = i + 1; j < PLOTS.length; j++) {
       const [a, b] = [PLOTS[i], PLOTS[j]];
       const d = Math.hypot(a.x - b.x, a.z - b.z);
-      if (d < DIM.minPlotSpacing) close.push(`${a.name} e ${b.name} a ${d.toFixed(1)} studs (mín. ${DIM.minPlotSpacing})`);
+      if (d < DIM.minPlotSpacing)
+        close.push(`${a.name} e ${b.name} a ${d.toFixed(1)} studs (mín. ${DIM.minPlotSpacing})`);
     }
   }
   collect(out, 'lotes (perto demais)', close);
