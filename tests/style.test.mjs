@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import { buildMap, DIM } from '../src/map.js';
 import { C, saturation } from '../src/palette.js';
 import { stats } from '../src/builder.js';
-import { MATERIALS, materialFor } from '../src/materials.js';
 
 const { parts } = buildMap();
 const ALLOWED_KEYS = [
@@ -33,34 +32,15 @@ test('somente Part clássico (Block, Cylinder ou Ball) e SpawnLocation', () => {
   }
 });
 
-test('materiais: textura nativa do Roblox pela cor (materialFor); Neon só em lâmpada sem colisão e com luz', () => {
+test('materiais: Plastic em tudo; Neon só em lâmpada sem colisão e com luz', () => {
   for (const p of parts) {
-    assert.ok(MATERIALS.includes(p.material), `${p.name}: material ${p.material}`);
+    assert.ok(['Plastic', 'Neon'].includes(p.material), `${p.name}: material ${p.material}`);
     if (p.material === 'Neon') {
       assert.equal(p.canCollide, false, `${p.name}: Neon não deve colidir`);
       assert.ok(p.light, `${p.model}/${p.name}: Neon sem luz é lâmpada falsa`);
-    } else {
-      assert.equal(p.material, materialFor(p.color), `${p.model}/${p.name}: material fora da tabela de cores`);
     }
     if (p.light) assert.equal(p.material, 'Neon', `${p.name}: luz precisa estar numa peça Neon`);
   }
-});
-
-test('mapa texturizado: grama, areia, pedra, estrada, madeira e telhados com material próprio', () => {
-  const has = (name, material) => parts.some((p) => p.name === name && p.material === material);
-  assert.ok(has('Grama', 'Grass'), 'grama sem textura de grama');
-  assert.ok(has('Areia', 'Sand'), 'praia sem textura de areia');
-  assert.ok(has('Estrada', 'Cobblestone') || parts.some((p) => p.material === 'Cobblestone'), 'estrada sem pedra');
-  assert.ok(
-    parts.some((p) => p.material === 'WoodPlanks'),
-    'sem tábuas de madeira',
-  );
-  assert.ok(
-    parts.some((p) => p.material === 'Rock'),
-    'montanhas sem rocha',
-  );
-  const plastic = parts.filter((p) => p.material === 'Plastic').length;
-  assert.ok(plastic / parts.length < 0.25, `${plastic} peças ainda lisas (Plastic)`);
 });
 
 test('sem textura, decal, UI, NPC ou script: só os campos conhecidos de Part', () => {
@@ -84,8 +64,11 @@ test('relevo clássico (Inlet/Weld/Universal) só em peças opacas de Plastic', 
   }
 });
 
-test('studs clássicos só nas peças de Plastic (flores, emblemas); texturas não levam studs', () => {
-  for (const p of parts) assert.equal(p.studs, p.material === 'Plastic', `${p.model}/${p.name}: studs = ${p.studs}`);
+test('estilo clássico: studs no topo de tudo, menos no mar e na água', () => {
+  for (const p of parts) {
+    const wet = p.name === 'Mar' || p.name.startsWith('Água');
+    assert.equal(p.studs, !wet, `${p.model}/${p.name}: studs = ${p.studs}`);
+  }
 });
 
 test('valores numéricos válidos e transparência controlada', () => {

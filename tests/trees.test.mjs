@@ -5,7 +5,6 @@ import assert from 'node:assert/strict';
 import { makeBuilder, aabb } from '../src/builder.js';
 import { findFloating, findZFighting } from '../src/checks.js';
 import { C } from '../src/palette.js';
-import { materialFor } from '../src/materials.js';
 import { TREE_KINDS, TREE_RADIUS, plantTree, bush, flowerPatch } from '../src/props/trees.js';
 
 function mulberry32(seed) {
@@ -91,7 +90,7 @@ test('cores da paleta, medidas >= 0,04 e nomes permitidos', () => {
         for (const v of [...p.position, ...p.size]) assert.ok(Number.isFinite(v), `${label(p)}: número inválido`);
         for (const v of p.size) assert.ok(v >= 0.04, `${label(p)}: tamanho ${v}`);
         assert.ok(!FORBIDDEN.test(`${p.model}/${p.name}`), `${label(p)}: nome proibido`);
-        assert.equal(p.material, materialFor(p.color), `${label(p)}: material ${p.material}`);
+        assert.equal(p.material, 'Plastic', `${label(p)}: material ${p.material}`);
         assert.equal(p.transparency, 0, `${label(p)}: transparente`);
         if (p.rotation) assert.equal(p.rotation[0], 0, `${label(p)}: giro em X (use Y e Z)`);
       }

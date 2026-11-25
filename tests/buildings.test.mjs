@@ -5,7 +5,6 @@ import assert from 'node:assert/strict';
 import { makeBuilder, aabb } from '../src/builder.js';
 import { findFloating, findZFighting } from '../src/checks.js';
 import { C } from '../src/palette.js';
-import { materialFor } from '../src/materials.js';
 import { BUILDINGS, FACES, building, footprint } from '../src/props/buildings.js';
 
 /** Sorteio determinístico (mesmo algoritmo do mapa), só para os testes. */
@@ -53,7 +52,7 @@ function problemas(kind, face, seed, origin = [0, 0, 0]) {
     const { min, max } = aabb(p);
     if (!PALETTE.has(p.color.join(','))) out.push(`${tag} cor fora da paleta: ${label(p)}`);
     if (BANNED.test(`${p.model}/${p.name}`)) out.push(`${tag} nome proibido: ${label(p)}`);
-    if (p.material !== materialFor(p.color)) out.push(`${tag} material ${p.material} fora da tabela: ${label(p)}`);
+    if (p.material !== 'Plastic') out.push(`${tag} material ${p.material}: ${label(p)}`);
     if (p.light) out.push(`${tag} luz numa construção: ${label(p)}`);
     if (!(p.transparency >= 0 && p.transparency <= 0.8)) out.push(`${tag} transparência: ${label(p)}`);
     if (p.size.some((s) => !(s >= 0.04))) out.push(`${tag} tamanho ${p.size}: ${label(p)}`);

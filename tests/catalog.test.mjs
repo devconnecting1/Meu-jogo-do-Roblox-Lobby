@@ -117,7 +117,7 @@ test('só cores da paleta, medidas >= 0,04, nomes permitidos e studs fora da ág
     if (!PALETTE.has(p.color.join(','))) out.push(`cor fora da paleta ${p.color}: ${label(p)}`);
     if (p.size.some((s) => !(s >= 0.04))) out.push(`tamanho ${p.size}: ${label(p)}`);
     if (BANNED.test(`${p.model}/${p.name}`)) out.push(`nome proibido: ${label(p)}`);
-    if (p.studs !== (p.material === 'Plastic')) out.push(`studs = ${p.studs} em ${p.material}: ${label(p)}`);
+    if (p.studs !== !p.name.startsWith('Água')) out.push(`studs = ${p.studs}: ${label(p)}`);
   }
   assert.equal(out.length, 0, report(out));
 });

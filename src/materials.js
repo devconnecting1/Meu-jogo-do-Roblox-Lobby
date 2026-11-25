@@ -86,7 +86,14 @@ for (const [keys, material] of BY_COLOR) {
   for (const k of keys) if (C[k]) TABLE.set(C[k].join(','), material);
 }
 
-/** Material de uma peça pela cor (cores sem entrada, como flores, ficam em Plastic). */
-export function materialFor(color) {
-  return TABLE.get(color.join(',')) ?? 'Plastic';
+/**
+ * Material de uma peça. Decisão do projeto (regra 4 do AGENTS.md): o mapa usa a textura clássica,
+ * Plastic com studs em tudo, como os lugares de elite do Roblox; os materiais "realistas" (Grass,
+ * Cobblestone, WoodPlanks...) foram testados na versão 20 e removidos. A tabela BY_COLOR fica
+ * guardada para referência, sem uso.
+ */
+export function materialFor() {
+  return 'Plastic';
 }
+
+export const REALISTIC_TABLE = TABLE;
