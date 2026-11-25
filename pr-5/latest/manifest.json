@@ -6,7 +6,7 @@
     },
     {
       "id": "top",
-      "title": "Vale visto de cima (Lobby, áreas, 30 lotes, estradas e lagoas)"
+      "title": "Vale visto de cima (Lobby, 8 lojas, estradas e lagoas)"
     },
     {
       "id": "lobby",
@@ -26,27 +26,23 @@
     },
     {
       "id": "pads",
-      "title": "Áreas de construção em volta da praça"
-    },
-    {
-      "id": "plot",
-      "title": "Lote 01: lote do castelo"
+      "title": "Lojas em volta da praça à noite"
     },
     {
       "id": "road",
-      "title": "Estrada de terra (altura do jogador)"
+      "title": "Saída da praça à noite (altura do jogador)"
     },
     {
       "id": "cliffs",
       "title": "Penhascos de rocha em blocos cercando o vale"
     },
     {
-      "id": "predio-capela",
-      "title": "Capela (fachada)"
+      "id": "predio-padaria",
+      "title": "Padaria (fachada)"
     },
     {
-      "id": "predio-capela-dentro",
-      "title": "Capela (interior, da porta)"
+      "id": "predio-padaria-dentro",
+      "title": "Padaria (interior)"
     },
     {
       "id": "predio-banco",
@@ -54,7 +50,7 @@
     },
     {
       "id": "predio-banco-dentro",
-      "title": "Banco (interior, da porta)"
+      "title": "Banco (interior)"
     },
     {
       "id": "predio-ferraria",
@@ -62,7 +58,7 @@
     },
     {
       "id": "predio-ferraria-dentro",
-      "title": "Ferraria (interior, da porta)"
+      "title": "Ferraria (interior)"
     },
     {
       "id": "predio-estabulo",
@@ -70,7 +66,7 @@
     },
     {
       "id": "predio-estabulo-dentro",
-      "title": "Estábulo (interior, da porta)"
+      "title": "Estábulo (interior)"
     },
     {
       "id": "predio-mercado",
@@ -78,7 +74,7 @@
     },
     {
       "id": "predio-mercado-dentro",
-      "title": "Mercado Coberto (interior, da porta)"
+      "title": "Mercado Coberto (interior)"
     },
     {
       "id": "predio-guilda",
@@ -86,7 +82,7 @@
     },
     {
       "id": "predio-guilda-dentro",
-      "title": "Salão da Guilda (interior, da porta)"
+      "title": "Salão da Guilda (interior)"
     },
     {
       "id": "predio-taverna",
@@ -94,7 +90,7 @@
     },
     {
       "id": "predio-taverna-dentro",
-      "title": "Taverna (interior, da porta)"
+      "title": "Taverna (interior)"
     },
     {
       "id": "predio-torreMago",
@@ -102,63 +98,7 @@
     },
     {
       "id": "predio-torreMago-dentro",
-      "title": "Torre do Mago (interior, da porta)"
-    },
-    {
-      "id": "castelo-castelaoPatio",
-      "title": "Lote 01: Castelo com Pátio (fachada)"
-    },
-    {
-      "id": "castelo-castelaoPatio-dentro",
-      "title": "Lote 01: Castelo com Pátio (interior, do portão)"
-    },
-    {
-      "id": "castelo-cidadela",
-      "title": "Lote 02: Cidadela em Cruz (fachada)"
-    },
-    {
-      "id": "castelo-cidadela-dentro",
-      "title": "Lote 02: Cidadela em Cruz (interior, do portão)"
-    },
-    {
-      "id": "castelo-forteT",
-      "title": "Lote 03: Forte em T (fachada)"
-    },
-    {
-      "id": "castelo-forteT-dentro",
-      "title": "Lote 03: Forte em T (interior, do portão)"
-    },
-    {
-      "id": "castelo-casteloRedondo",
-      "title": "Lote 06: Castelo Redondo (fachada)"
-    },
-    {
-      "id": "castelo-casteloRedondo-dentro",
-      "title": "Lote 06: Castelo Redondo (interior, do portão)"
-    },
-    {
-      "id": "castelo-fortaleza",
-      "title": "Lote 07: Fortaleza com Torres (fachada)"
-    },
-    {
-      "id": "castelo-fortaleza-dentro",
-      "title": "Lote 07: Fortaleza com Torres (interior, do portão)"
-    },
-    {
-      "id": "castelo-casteloU",
-      "title": "Lote 08: Castelo em U (fachada)"
-    },
-    {
-      "id": "castelo-casteloU-dentro",
-      "title": "Lote 08: Castelo em U (interior, do portão)"
-    },
-    {
-      "id": "castelo-casteloL",
-      "title": "Lote 13: Castelo em L (fachada)"
-    },
-    {
-      "id": "castelo-casteloL-dentro",
-      "title": "Lote 13: Castelo em L (interior, do portão)"
+      "title": "Torre do Mago (interior)"
     },
     {
       "id": "pond",
@@ -178,22 +118,22 @@
     }
   ],
   "stats": {
-    "total": 9416,
-    "lights": 0,
+    "total": 10103,
+    "lights": 32,
     "groups": {
       "Mar": 1,
       "Penhascos": 4476,
-      "Terreno": 2733,
-      "Lotes": 820,
-      "Estradas": 950,
-      "Áreas": 151,
-      "Lobby": 263,
-      "Água": 22
+      "Terreno": 3211,
+      "Estradas": 507,
+      "Áreas": 280,
+      "Lobby": 295,
+      "Água": 20,
+      "Construções": 1313
     }
   },
   "manual": {
-    "parts": 9416,
-    "steps": 1181,
-    "connections": 58057
+    "parts": 10103,
+    "steps": 1392,
+    "connections": 57209
   }
 }
