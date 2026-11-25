@@ -6,7 +6,6 @@ import { readdirSync } from 'node:fs';
 import { aabb } from '../src/builder.js';
 import { findFloating, findZFighting, intersects } from '../src/checks.js';
 import { C } from '../src/palette.js';
-import { materialFor } from '../src/materials.js';
 import { CATALOG, GROUPS, buildCatalog } from '../src/catalog.js';
 import { TREE_KINDS } from '../src/props/trees.js';
 import { BUILDINGS } from '../src/props/buildings.js';
