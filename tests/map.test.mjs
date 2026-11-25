@@ -71,7 +71,8 @@ test('estátua de Luvitlua no estrado: boneco R6 oficial, pedestal e nome em let
   const topY = Math.max(...st.map((p) => p.position[1] + p.size[1] / 2));
   assert.ok(topY >= DIM.land + 25, `estátua baixa (${topY})`);
   for (const p of st) {
-    for (const i of [0, 2]) assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= 7.5 + 1e-6, `${p.name} fora do estrado`);
+    for (const i of [0, 2])
+      assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= 7.5 + 1e-6, `${p.name} fora do estrado`);
   }
   // proporções do R6 oficial: tronco 2×2×1, braços e pernas 1×2×1 (vinco de 0,02), mesma altura
   const r6 = st.filter((p) => p.model.endsWith('/Boneco R6'));
@@ -88,14 +89,20 @@ test('estátua de Luvitlua no estrado: boneco R6 oficial, pedestal e nome em let
     assert.ok(Math.abs(w - tw / 2) <= tw * 0.02 && Math.abs(d - td) <= td * 0.05, `${n} fora do 1×2×1`);
   }
   assert.ok(r6.filter((p) => p.name === 'Cabeça').length >= 1, 'boneco sem cabeça');
-  assert.ok(r6.every((p) => p.color.join() === r6[0].color.join()), 'estátua em mais de uma cor');
+  assert.ok(
+    r6.every((p) => p.color.join() === r6[0].color.join()),
+    'estátua em mais de uma cor',
+  );
   // só o corpo do R6: nada de armadura, roupa, arma ou item (pedido do dono do jogo)
   const body = new Set(['Cabeça', 'Tronco', 'Braço Esquerdo', 'Braço Direito', 'Perna Esquerda', 'Perna Direita']);
   const extra = r6.filter((p) => !body.has(p.name)).map((p) => p.name);
   assert.deepEqual(extra, [], `boneco com peças além do corpo R6: ${extra.join(', ')}`);
   const sub = new Set(st.map((p) => p.model.split('/').slice(2).join('/')));
   for (const m of sub) assert.ok(['Pedestal', 'Pedestal/Nome', 'Boneco R6'].includes(m), `estátua com ${m}`);
-  assert.ok(st.every((p) => !p.light && p.material !== 'Neon'), 'estátua com brilho ou luz');
+  assert.ok(
+    st.every((p) => !p.light && p.material !== 'Neon'),
+    'estátua com brilho ou luz',
+  );
 });
 
 test('8 áreas de construção em volta da praça, planas e ligadas ao Lobby', () => {
