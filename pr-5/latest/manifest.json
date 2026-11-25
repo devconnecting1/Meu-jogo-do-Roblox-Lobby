@@ -82,22 +82,22 @@
     }
   ],
   "stats": {
-    "total": 9141,
+    "total": 9219,
     "lights": 0,
     "groups": {
       "Mar": 1,
       "Penhascos": 4476,
-      "Terreno": 2606,
-      "Estradas": 925,
-      "Lotes": 780,
-      "Áreas": 160,
+      "Terreno": 2698,
+      "Lotes": 820,
+      "Estradas": 880,
+      "Áreas": 151,
       "Lobby": 171,
       "Água": 22
     }
   },
   "manual": {
-    "parts": 9141,
-    "steps": 1146,
-    "connections": 56938
+    "parts": 9219,
+    "steps": 1156,
+    "connections": 57146
   }
 }
