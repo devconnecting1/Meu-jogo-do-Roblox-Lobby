@@ -405,13 +405,14 @@ export const SHOP_DOORS = Object.fromEntries(
   Object.entries(SHOPS).map(([k, s]) => [k, { door: s.door, floorTop: s.floorTop ?? 0.4, model: s.model }]),
 );
 
-const SCALE = { s: DIM.buildScale, y: DIM.buildScaleY };
 const LIGHT_LANTERN = { type: 'Point', range: 22, brightness: 1.4, color: [255, 206, 140] };
 
 /** Monta a loja da área `pad` (chão do vale em `floorY`). Devolve as zonas de passagem (mundo). */
 export function buildShop(b, pad, floorY) {
   const s = SHOPS[pad.plan];
-  const f = makeFrame(b, `Construções/${s.model}`, pad, floorY, [], SCALE);
+  // escala lida aqui (não no topo do módulo): src/map.js importa este arquivo antes de criar DIM
+  const scale = { s: DIM.buildScale, y: DIM.buildScaleY };
+  const f = makeFrame(b, `Construções/${s.model}`, pad, floorY, [], scale);
   const occ = planMask(s.parts ?? PLANS[pad.plan].parts, pad.size / 2 / DIM.buildScale);
   const floorTop = s.floorTop ?? 0.4;
   const shell = buildShell(f, occ, {

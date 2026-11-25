@@ -133,6 +133,7 @@ Cada item já derrubou o CI uma vez (na prisão ou no Reino clássico; as regras
 | Construções: "Fortaleza sem Ameia" | toda a muralha da Fortaleza é torre e as ameias de torre tinham outro nome | ameia de torre também se chama "Ameia" |
 | Construções: "Neon não deve colidir" (Bola de Cristal) | peça Neon com luz, mas com colisão | toda luz Neon (lampião, brasa, cristal) com `canCollide: false` |
 | (decisão) castelos, lotes e igreja removidos; lojas grandes, neutras e iluminadas; mapa só de noite | o dono pediu "apenas lojas", tamanho real e noite | plantas em escala de desenho × `DIM.buildScale`; nada de castelo/igreja (testado); Lighting de noite (testado) |
+| todos os testes: "Cannot access 'DIM' before initialization" | `lojas.js` lia `DIM` no topo do módulo, mas `src/map.js` importa `lojas.js` antes de criar `DIM` (import circular) | nos módulos de `src/props/`, use `DIM`/`PLANS` só dentro das funções, nunca no topo do arquivo |
 | capturas: "page.screenshot: Timeout 30000ms" (Salão da Guilda) | o SwiftShader do CI demorou mais de 30 s para desenhar uma vista com muitas peças | `page.screenshot` com 150 s de limite; no visualizador, só 8 luzes pontuais fixas que vão para as luzes mais perto de cada vista (o shader não recompila) |
 | captura com a vista anterior | o SwiftShader demora a desenhar muitas malhas | tudo instanciado no visualizador; o CI espera 2 quadros antes de capturar |
 
