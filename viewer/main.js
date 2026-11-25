@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createWorld, SEED, DIM } from '../src/map.js';
 import { stats as countStats } from '../src/builder.js';
 import { buildManual } from '../src/manual.js';
+import { isWet, surfaceMaterial } from './surfaces.js';
 
 // ---------------------------------------------------------------------------
 // Cena: dia claro, sol com sombra e neblina leve (como o Lighting do Roblox)
@@ -38,72 +39,11 @@ sun.shadow.bias = -0.0006;
 sun.shadow.normalBias = 0.6;
 scene.add(sun, sun.target);
 
-// Studs clássicos no topo das peças: textura de 1 stud aplicada em coordenadas de mundo
-// (assim tudo continua instanciado e o CI renderiza rápido).
-function studTexture() {
-  const n = 64;
-  const c = document.createElement('canvas');
-  c.width = c.height = n;
-  const g = c.getContext('2d');
-  g.fillStyle = '#f2f2f2';
-  g.fillRect(0, 0, n, n);
-  g.strokeStyle = '#d6d6d6';
-  g.lineWidth = 2;
-  g.strokeRect(1, 1, n - 2, n - 2);
-  const cx = n / 2;
-  const r = n * 0.28;
-  const disc = (dx, dy, color, rr = r) => {
-    g.fillStyle = color;
-    g.beginPath();
-    g.arc(cx + dx, cx + dy, rr, 0, Math.PI * 2);
-    g.fill();
-  };
-  disc(3, 3, '#a9a9a9');
-  disc(-2, -2, '#ffffff');
-  disc(0, 0, '#e4e4e4', r * 0.9);
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
-  return t;
-}
-const STUD_TEX = studTexture();
-
-function addStuds(m) {
-  m.onBeforeCompile = (sh) => {
-    sh.uniforms.studMap = { value: STUD_TEX };
-    sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vStudUv;\nvarying float vStudTop;')
-      .replace(
-        '#include <begin_vertex>',
-        [
-          '#include <begin_vertex>',
-          'vec4 studWorld = vec4(transformed, 1.0);',
-          '#ifdef USE_INSTANCING',
-          '  studWorld = instanceMatrix * studWorld;',
-          '#endif',
-          'studWorld = modelMatrix * studWorld;',
-          'vStudUv = studWorld.xz;',
-          'vStudTop = normal.y;',
-        ].join('\n'),
-      );
-    sh.fragmentShader = sh.fragmentShader
-      .replace(
-        '#include <common>',
-        '#include <common>\nuniform sampler2D studMap;\nvarying vec2 vStudUv;\nvarying float vStudTop;',
-      )
-      .replace(
-        '#include <map_fragment>',
-        '#include <map_fragment>\nif (vStudTop > 0.5) diffuseColor.rgb *= texture2D(studMap, vStudUv).rgb;',
-      );
-  };
-  m.customProgramCacheKey = () => 'studs';
-  return m;
-}
-
 // ---------------------------------------------------------------------------
-// Parts -> malhas instanciadas (uma por grupo + cor + aparência)
+// Parts -> malhas instanciadas (uma por grupo + cor + material + aparência)
 // ---------------------------------------------------------------------------
+// Aparência (viewer/surfaces.js): material do Roblox desenhado por shader em coordenadas da peça
+// (Grass, Cobblestone, WoodPlanks, Brick...) e studs no topo das peças Plastic; tudo instanciado.
 // #seed=123 mostra outra variante do mapa (cada servidor do jogo usa uma semente)
 const params = new URLSearchParams(location.hash.slice(1));
 const seed = Number(params.get('seed')) || SEED;
@@ -111,24 +51,13 @@ const world = createWorld(seed);
 const { PLOTS, LAKE } = world;
 const { parts, landmarks } = world.buildMap();
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
-const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
 const cache = new Map();
+const lookKey = (p) => `${p.color}|${p.transparency}|${p.material}|${p.studs}|${isWet(p)}`;
 
 function material(p) {
-  const k = `${p.color}|${p.transparency}|${p.material}|${p.studs}|${p.name === 'Mar'}`;
-  if (cache.has(k)) return cache.get(k);
-  const wet = p.name === 'Mar' || p.name.startsWith('Água');
-  const m = new THREE.MeshStandardMaterial({
-    color: srgb(p.color),
-    roughness: wet ? 0.3 : 0.82,
-    metalness: wet ? 0.05 : 0,
-    transparent: p.transparency > 0,
-    opacity: 1 - p.transparency,
-    depthWrite: p.transparency === 0,
-  });
-  if (p.studs) addStuds(m);
-  cache.set(k, m);
-  return m;
+  const k = lookKey(p);
+  if (!cache.has(k)) cache.set(k, surfaceMaterial(p));
+  return cache.get(k);
 }
 
 const manual = buildManual(parts);
@@ -137,7 +66,7 @@ for (const st of manual.steps) for (const i of st.parts) stepOf[i] = st.n;
 
 const buckets = new Map();
 parts.forEach((p, i) => {
-  const k = `${p.group}|${p.color}|${p.transparency}|${p.material}|${p.studs}`;
+  const k = `${p.group}|${lookKey(p)}`;
   if (!buckets.has(k)) buckets.set(k, []);
   buckets.get(k).push({ p, i });
 });

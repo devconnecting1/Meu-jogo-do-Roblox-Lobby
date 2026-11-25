@@ -59,7 +59,7 @@ A prisão antiga (projeto anterior) está guardada no branch `arquivo/prisao`. E
 | `tools/screenshots.mjs` | Renderiza as vistas do visualizador (Playwright), inclusive os estágios da montagem |
 | `tools/manual.mjs` | Gera `MANUAL.md` e `manual.json` (publicados no branch `ci-previews`) |
 | `tools/ci/*` | Verificação do lugar, branch `ci-previews` e comentários no PR |
-| `viewer/main.js`, `index.html` | Visualizador Three.js (tudo instanciado; studs por shader em coordenadas de mundo) |
+| `viewer/main.js`, `index.html` | Visualizador Three.js (tudo instanciado; studs por shader em coordenadas de mundo; texturas procedurais dos materiais do Roblox por shader, sem imagens, em `viewer/surfaces.js`) |
 | `src/props/lobby.js` | Peças do Lobby: lojas (`shop`, `SHOPS`, `shopFootprint`), `bench`, `planter`, `archGate`, `lampPost` |
 | `src/catalog.js` | Catálogo de peças (`CATALOG`, `buildCatalog`): cada peça de `src/props/` sozinha no seu chão de studs |
 | `viewer/catalog.html`, `viewer/catalog.js` | Visualizador do catálogo (lista de peças, botão "Colisão", `window.__catalogo`) |

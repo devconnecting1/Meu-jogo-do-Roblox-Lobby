@@ -7,6 +7,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildCatalog, GROUPS } from '../src/catalog.js';
 import { aabb, stats as countStats } from '../src/builder.js';
 import { C } from '../src/palette.js';
+import { addStuds, isWet, surfaceMaterial } from './surfaces.js';
 
 // ---------------------------------------------------------------------------
 // Cena: dia claro, sol com sombra e neblina leve (como o Lighting do Roblox)
@@ -53,91 +54,19 @@ sun.shadow.bias = -0.0005;
 sun.shadow.normalBias = 0.3;
 scene.add(sun, sun.target);
 
-// Studs clássicos no topo das peças: textura de 1 stud aplicada em coordenadas de mundo
-// (mesma técnica do viewer/main.js; tudo continua instanciado).
-function studTexture() {
-  const n = 64;
-  const c = document.createElement('canvas');
-  c.width = c.height = n;
-  const g = c.getContext('2d');
-  g.fillStyle = '#f2f2f2';
-  g.fillRect(0, 0, n, n);
-  g.strokeStyle = '#d6d6d6';
-  g.lineWidth = 2;
-  g.strokeRect(1, 1, n - 2, n - 2);
-  const cx = n / 2;
-  const r = n * 0.28;
-  const disc = (dx, dy, color, rr = r) => {
-    g.fillStyle = color;
-    g.beginPath();
-    g.arc(cx + dx, cx + dy, rr, 0, Math.PI * 2);
-    g.fill();
-  };
-  disc(3, 3, '#a9a9a9');
-  disc(-2, -2, '#ffffff');
-  disc(0, 0, '#e4e4e4', r * 0.9);
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
-  return t;
-}
-const STUD_TEX = studTexture();
-
-function addStuds(m) {
-  m.onBeforeCompile = (sh) => {
-    sh.uniforms.studMap = { value: STUD_TEX };
-    sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vStudUv;\nvarying float vStudTop;')
-      .replace(
-        '#include <begin_vertex>',
-        [
-          '#include <begin_vertex>',
-          'vec4 studWorld = vec4(transformed, 1.0);',
-          '#ifdef USE_INSTANCING',
-          '  studWorld = instanceMatrix * studWorld;',
-          '#endif',
-          'studWorld = modelMatrix * studWorld;',
-          'vStudUv = studWorld.xz;',
-          'vStudTop = normal.y;',
-        ].join('\n'),
-      );
-    sh.fragmentShader = sh.fragmentShader
-      .replace(
-        '#include <common>',
-        '#include <common>\nuniform sampler2D studMap;\nvarying vec2 vStudUv;\nvarying float vStudTop;',
-      )
-      .replace(
-        '#include <map_fragment>',
-        '#include <map_fragment>\nif (vStudTop > 0.5) diffuseColor.rgb *= texture2D(studMap, vStudUv).rgb;',
-      );
-  };
-  m.customProgramCacheKey = () => 'studs';
-  return m;
-}
-
 // ---------------------------------------------------------------------------
-// Parts -> malhas instanciadas (uma por cor + aparência + colisão)
+// Parts -> malhas instanciadas (uma por cor + material + aparência + colisão)
 // ---------------------------------------------------------------------------
+// Aparência igual à do viewer/main.js (viewer/surfaces.js): texturas procedurais dos materiais do
+// Roblox e studs no topo das peças Plastic, tudo instanciado.
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
-const srgb = ([r, g, b]) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
 const cache = new Map();
+const lookKey = (p) => `${p.color}|${p.transparency}|${p.material}|${p.studs}|${isWet(p)}`;
 
 function material(p) {
-  const k = `${p.color}|${p.transparency}|${p.material}|${p.studs}`;
-  if (cache.has(k)) return cache.get(k);
-  const wet = p.name.startsWith('Água');
-  const m = new THREE.MeshStandardMaterial({
-    color: srgb(p.color),
-    roughness: wet ? 0.3 : 0.82,
-    metalness: wet ? 0.05 : 0,
-    transparent: p.transparency > 0,
-    opacity: 1 - p.transparency,
-    depthWrite: p.transparency === 0,
-  });
-  if (p.studs) addStuds(m);
-  cache.set(k, m);
-  return m;
+  const k = lookKey(p);
+  if (!cache.has(k)) cache.set(k, surfaceMaterial(p));
+  return cache.get(k);
 }
 
 // modo "Colisão": o que colide fica vermelho e opaco; o resto vira um vulto translúcido
@@ -154,7 +83,7 @@ const pads = new Set(entries.map((e) => e.pad));
 const buckets = new Map();
 parts.forEach((p, i) => {
   const pad = pads.has(i);
-  const k = `${p.color}|${p.transparency}|${p.material}|${p.studs}|${p.canCollide}|${pad}`;
+  const k = `${lookKey(p)}|${p.canCollide}|${pad}`;
   if (!buckets.has(k)) buckets.set(k, { pad, list: [] });
   buckets.get(k).list.push(p);
 });
@@ -184,7 +113,7 @@ for (const { pad, list } of buckets.values()) {
 // gramado em volta dos chãos (só no visualizador; não é Part)
 const lawn = new THREE.Mesh(
   new THREE.PlaneGeometry(ext.x + cell * 4, ext.z + cell * 4),
-  new THREE.MeshStandardMaterial({ color: srgb(C.grass), roughness: 0.95 }),
+  surfaceMaterial({ name: 'Gramado', color: C.grass, material: 'Grass', transparency: 0, studs: false }),
 );
 lawn.rotation.x = -Math.PI / 2;
 lawn.position.set(mid.x, -1, mid.z);
