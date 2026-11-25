@@ -15,7 +15,11 @@ export const PHASES = [
   { id: 'estradas', title: 'Estradas de terra e passagens de pedra', match: (p) => p.model === 'Estradas' },
   { id: 'areas', title: 'Áreas de construção em volta da praça', match: (p) => p.model === 'Áreas' },
   { id: 'lotes', title: 'Lotes dos castelos (30)', match: (p) => p.model.startsWith('Lotes') },
-  { id: 'construcoes', title: 'Construções: prédios do Lobby e castelos', match: (p) => p.model.startsWith('Construções') },
+  {
+    id: 'construcoes',
+    title: 'Construções: prédios do Lobby e castelos',
+    match: (p) => p.model.startsWith('Construções'),
+  },
   { id: 'penhascos', title: 'Penhascos de rocha e musgo', match: (p) => p.model === 'Penhascos' },
   { id: 'agua', title: 'Lagoas', match: () => true },
 ];

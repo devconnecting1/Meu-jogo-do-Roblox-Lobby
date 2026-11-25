@@ -131,7 +131,8 @@ export const PLANS = Object.freeze({
   // prédios do Lobby (lojas e serviços); bordas em múltiplos de 4 para cobrir células inteiras
   taverna: {
     name: 'Taverna',
-    group: 'loja', door: [6, 0],
+    group: 'loja',
+    door: [6, 0],
     parts: [
       [-12, -12, 12, 0],
       [-12, 0, 0, 12],
@@ -139,7 +140,8 @@ export const PLANS = Object.freeze({
   }, // salão + ala em L
   ferraria: {
     name: 'Ferraria',
-    group: 'loja', door: [-4, 8],
+    group: 'loja',
+    door: [-4, 8],
     parts: [
       [-12, -8, 4, 8],
       [4, -4, 12, 4],
@@ -147,7 +149,8 @@ export const PLANS = Object.freeze({
   }, // oficina + forja
   mercado: {
     name: 'Mercado Coberto',
-    group: 'loja', door: [0, 12],
+    group: 'loja',
+    door: [0, 12],
     parts: [
       [-12, -8, 12, 4],
       [-4, 4, 4, 12],
@@ -155,7 +158,8 @@ export const PLANS = Object.freeze({
   }, // salão + alpendre
   capela: {
     name: 'Capela',
-    group: 'loja', door: [0, 12],
+    group: 'loja',
+    door: [0, 12],
     parts: [
       [-4, -12, 4, 12],
       [-12, -8, 12, -4],
@@ -164,7 +168,8 @@ export const PLANS = Object.freeze({
   torreMago: { name: 'Torre do Mago', group: 'loja', door: [0, 12], parts: [{ c: [0, 0], r: 12 }] }, // torre redonda
   estabulo: {
     name: 'Estábulo',
-    group: 'loja', door: [0, -4],
+    group: 'loja',
+    door: [0, -4],
     parts: [
       [-12, -12, 12, -4],
       [-12, -4, -4, 12],
@@ -173,7 +178,8 @@ export const PLANS = Object.freeze({
   }, // U
   banco: {
     name: 'Banco',
-    group: 'loja', door: [0, 8],
+    group: 'loja',
+    door: [0, 8],
     parts: [
       [-8, -12, 8, 4],
       [-4, 4, 4, 8],
@@ -181,7 +187,8 @@ export const PLANS = Object.freeze({
   }, // cofre + escadaria
   guilda: {
     name: 'Salão da Guilda',
-    group: 'loja', door: [0, 12],
+    group: 'loja',
+    door: [0, 12],
     parts: [
       [-12, -4, 12, 4],
       [-8, -8, 8, 8],
@@ -191,12 +198,14 @@ export const PLANS = Object.freeze({
   // castelos dos jogadores e dos bots
   fortaleza: {
     name: 'Fortaleza com Torres',
-    group: 'castelo', door: [0, 12],
+    group: 'castelo',
+    door: [0, 12],
     parts: [[-8, -8, 8, 8], { c: [-8, -8], r: 8 }, { c: [8, -8], r: 8 }, { c: [-8, 8], r: 8 }, { c: [8, 8], r: 8 }],
   },
   casteloL: {
     name: 'Castelo em L',
-    group: 'castelo', door: [8, 0],
+    group: 'castelo',
+    door: [8, 0],
     parts: [
       [-16, -16, 16, 0],
       [-16, 0, 0, 16],
@@ -205,7 +214,8 @@ export const PLANS = Object.freeze({
   casteloRedondo: { name: 'Castelo Redondo', group: 'castelo', door: [0, 16], parts: [{ c: [0, 0], r: 16 }] },
   castelaoPatio: {
     name: 'Castelo com Pátio',
-    group: 'castelo', door: [0, 16],
+    group: 'castelo',
+    door: [0, 16],
     parts: [
       [-16, -12, 16, 8],
       [-4, 8, 4, 16],
@@ -213,7 +223,8 @@ export const PLANS = Object.freeze({
   },
   cidadela: {
     name: 'Cidadela em Cruz',
-    group: 'castelo', door: [0, 16],
+    group: 'castelo',
+    door: [0, 16],
     parts: [
       [-16, -8, 16, 8],
       [-4, -16, 4, 16],
@@ -221,7 +232,8 @@ export const PLANS = Object.freeze({
   },
   casteloU: {
     name: 'Castelo em U',
-    group: 'castelo', door: [0, -4],
+    group: 'castelo',
+    door: [0, -4],
     parts: [
       [-16, -16, 16, -4],
       [-16, -4, -4, 16],
@@ -230,7 +242,8 @@ export const PLANS = Object.freeze({
   },
   forteT: {
     name: 'Forte em T',
-    group: 'castelo', door: [0, 16],
+    group: 'castelo',
+    door: [0, 16],
     parts: [
       [-16, -16, 16, -4],
       [-4, -4, 4, 16],

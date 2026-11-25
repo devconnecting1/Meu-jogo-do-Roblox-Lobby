@@ -73,7 +73,8 @@ test('estátua de Luvitlua no estrado: pedestal, nome em letras de pixel e espad
   const blade = st.find((p) => p.name === 'Lâmina');
   assert.ok(blade && blade.material === 'Neon' && blade.light, 'lâmina de gelo sem brilho');
   for (const p of st) {
-    for (const i of [0, 2]) assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= 7.5 + 1e-6, `${p.name} fora do estrado`);
+    for (const i of [0, 2])
+      assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= 7.5 + 1e-6, `${p.name} fora do estrado`);
   }
 });
 
