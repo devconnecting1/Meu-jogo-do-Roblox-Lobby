@@ -51,8 +51,14 @@ test('mapa texturizado: grama, areia, pedra, estrada, madeira e telhados com mat
   assert.ok(has('Grama', 'Grass'), 'grama sem textura de grama');
   assert.ok(has('Areia', 'Sand'), 'praia sem textura de areia');
   assert.ok(has('Estrada', 'Cobblestone') || parts.some((p) => p.material === 'Cobblestone'), 'estrada sem pedra');
-  assert.ok(parts.some((p) => p.material === 'WoodPlanks'), 'sem tábuas de madeira');
-  assert.ok(parts.some((p) => p.material === 'Rock'), 'montanhas sem rocha');
+  assert.ok(
+    parts.some((p) => p.material === 'WoodPlanks'),
+    'sem tábuas de madeira',
+  );
+  assert.ok(
+    parts.some((p) => p.material === 'Rock'),
+    'montanhas sem rocha',
+  );
   const plastic = parts.filter((p) => p.material === 'Plastic').length;
   assert.ok(plastic / parts.length < 0.25, `${plastic} peças ainda lisas (Plastic)`);
 });
