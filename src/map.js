@@ -103,7 +103,17 @@ const SURF = Object.freeze({
 });
 
 /** Superfícies por onde o caminho liga o Lobby às áreas e aos lotes. */
-const PATH_SURF = new Set(['terra', 'terraEscura', 'pedra', 'pedraEscura', 'ponte', 'lote', 'loteBorda', 'area', 'areaBorda']);
+const PATH_SURF = new Set([
+  'terra',
+  'terraEscura',
+  'pedra',
+  'pedraEscura',
+  'ponte',
+  'lote',
+  'loteBorda',
+  'area',
+  'areaBorda',
+]);
 /** Superfícies que as estradas nunca repintam. */
 const KEEP_SURF = new Set(['pedra', 'pedraEscura', 'lote', 'loteBorda', 'area', 'areaBorda']);
 
@@ -576,7 +586,8 @@ export function createWorld(seed = SEED) {
     b.box('Lobby', 'SpawnLocation', [sx, sy + 0.5, sz], [8, 1, 8], C.pxStoneDark, { className: 'SpawnLocation' });
 
     let terraces = 0;
-    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) if (type[j][i] === T.GROUND && top[j][i] > land + 1) terraces++;
+    for (let j = 0; j < N; j++)
+      for (let i = 0; i < N; i++) if (type[j][i] === T.GROUND && top[j][i] > land + 1) terraces++;
     const landmarks = {
       plots: PLOTS.length,
       pads: PADS.length,
