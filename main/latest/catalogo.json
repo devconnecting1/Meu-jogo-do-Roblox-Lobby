@@ -1,0 +1,886 @@
+{
+  "views": [
+    {
+      "id": "todos",
+      "title": "Todas as peças do catálogo"
+    },
+    {
+      "id": "fonte",
+      "title": "Fonte com a estátua clássica"
+    },
+    {
+      "id": "arvore-carvalho",
+      "title": "Carvalho"
+    },
+    {
+      "id": "arvore-pinheiro",
+      "title": "Pinheiro"
+    },
+    {
+      "id": "arvore-betula",
+      "title": "Bétula"
+    },
+    {
+      "id": "arvore-cerejeira",
+      "title": "Cerejeira"
+    },
+    {
+      "id": "arvore-redonda",
+      "title": "Árvore redonda"
+    },
+    {
+      "id": "arvore-seca",
+      "title": "Árvore seca"
+    },
+    {
+      "id": "arvore-coqueiro",
+      "title": "Coqueiro"
+    },
+    {
+      "id": "arvore-outono",
+      "title": "Árvore de outono"
+    },
+    {
+      "id": "arbusto",
+      "title": "Arbusto"
+    },
+    {
+      "id": "canteiro",
+      "title": "Canteiro de flores"
+    },
+    {
+      "id": "construcao-casa",
+      "title": "Casa"
+    },
+    {
+      "id": "construcao-celeiro",
+      "title": "Celeiro"
+    },
+    {
+      "id": "construcao-moinho",
+      "title": "Moinho"
+    },
+    {
+      "id": "construcao-poco",
+      "title": "Poço"
+    },
+    {
+      "id": "construcao-torre",
+      "title": "Torre de vigia"
+    },
+    {
+      "id": "construcao-feno",
+      "title": "Monte de feno"
+    },
+    {
+      "id": "construcao-tenda",
+      "title": "Tenda"
+    }
+  ],
+  "stats": {
+    "total": 321,
+    "lights": 0,
+    "groups": {
+      "Catálogo": 321
+    },
+    "entries": 18,
+    "collidable": 200
+  },
+  "overview": {
+    "normal": "catalogo-todos.png",
+    "colisao": "catalogo-todos-colisao.png"
+  },
+  "entries": [
+    {
+      "id": "fonte",
+      "title": "Fonte com a estátua clássica",
+      "group": "Estátua",
+      "prop": "fountainStatue",
+      "kind": null,
+      "origin": [
+        -150,
+        0,
+        -60
+      ],
+      "pad": 0,
+      "range": [
+        1,
+        42
+      ],
+      "padSize": [
+        30,
+        30
+      ],
+      "center": [
+        -150,
+        13.324,
+        -60
+      ],
+      "size": [
+        22,
+        26.849,
+        22
+      ],
+      "parts": 41,
+      "collidable": 32,
+      "collidableParts": [
+        "Base do Pedestal",
+        "Bica",
+        "Borda",
+        "Braço Esquerdo",
+        "Braço Levantado",
+        "Cabeça da Estátua",
+        "Corpo do Pedestal",
+        "Degrau da Fonte",
+        "Fundo da Fonte",
+        "Mureta",
+        "Perna Direita",
+        "Perna Esquerda",
+        "Pilar do Canto",
+        "Remate do Pilar",
+        "Tampo do Pedestal",
+        "Topo da Cabeça",
+        "Tronco da Estátua"
+      ],
+      "images": {
+        "normal": "catalogo-fonte.png",
+        "colisao": "catalogo-fonte-colisao.png"
+      }
+    },
+    {
+      "id": "arvore-carvalho",
+      "title": "Carvalho",
+      "group": "Árvores",
+      "prop": "plantTree",
+      "kind": "carvalho",
+      "origin": [
+        -90,
+        0,
+        -60
+      ],
+      "pad": 42,
+      "range": [
+        43,
+        49
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        -90,
+        6.599,
+        -60
+      ],
+      "size": [
+        11.556,
+        13.198,
+        11.556
+      ],
+      "parts": 6,
+      "collidable": 1,
+      "collidableParts": [
+        "Tronco"
+      ],
+      "images": {
+        "normal": "catalogo-arvore-carvalho.png",
+        "colisao": "catalogo-arvore-carvalho-colisao.png"
+      }
+    },
+    {
+      "id": "arvore-pinheiro",
+      "title": "Pinheiro",
+      "group": "Árvores",
+      "prop": "plantTree",
+      "kind": "pinheiro",
+      "origin": [
+        -30,
+        0,
+        -60
+      ],
+      "pad": 49,
+      "range": [
+        50,
+        60
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        -30,
+        9.321,
+        -60
+      ],
+      "size": [
+        12.097,
+        18.642,
+        12.097
+      ],
+      "parts": 10,
+      "collidable": 1,
+      "collidableParts": [
+        "Tronco"
+      ],
+      "images": {
+        "normal": "catalogo-arvore-pinheiro.png",
+        "colisao": "catalogo-arvore-pinheiro-colisao.png"
+      }
+    },
+    {
+      "id": "arvore-betula",
+      "title": "Bétula",
+      "group": "Árvores",
+      "prop": "plantTree",
+      "kind": "betula",
+      "origin": [
+        30,
+        0,
+        -60
+      ],
+      "pad": 60,
+      "range": [
+        61,
+        69
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        30,
+        7.927,
+        -60
+      ],
+      "size": [
+        6.268,
+        15.853,
+        6.268
+      ],
+      "parts": 8,
+      "collidable": 1,
+      "collidableParts": [
+        "Tronco"
+      ],
+      "images": {
+        "normal": "catalogo-arvore-betula.png",
+        "colisao": "catalogo-arvore-betula-colisao.png"
+      }
+    },
+    {
+      "id": "arvore-cerejeira",
+      "title": "Cerejeira",
+      "group": "Árvores",
+      "prop": "plantTree",
+      "kind": "cerejeira",
+      "origin": [
+        90,
+        0,
+        -60
+      ],
+      "pad": 69,
+      "range": [
+        70,
+        78
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        90,
+        3.959,
+        -60
+      ],
+      "size": [
+        13.589,
+        7.916,
+        13.589
+      ],
+      "parts": 8,
+      "collidable": 1,
+      "collidableParts": [
+        "Tronco"
+      ],
+      "images": {
+        "normal": "catalogo-arvore-cerejeira.png",
+        "colisao": "catalogo-arvore-cerejeira-colisao.png"
+      }
+    },
+    {
+      "id": "arvore-redonda",
+      "title": "Árvore redonda",
+      "group": "Árvores",
+      "prop": "plantTree",
+      "kind": "redonda",
+      "origin": [
+        150,
+        0,
+        -60
+      ],
+      "pad": 78,
+      "range": [
+        79,
+        84
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        150,
+        6.428,
+        -60
+      ],
+      "size": [
+        12.256,
+        12.856,
+        12.256
+      ],
+      "parts": 5,
+      "collidable": 1,
+      "collidableParts": [
+        "Tronco"
+      ],
+      "images": {
+        "normal": "catalogo-arvore-redonda.png",
+        "colisao": "catalogo-arvore-redonda-colisao.png"
+      }
+    },
+    {
+      "id": "arvore-seca",
+      "title": "Árvore seca",
+      "group": "Árvores",
+      "prop": "plantTree",
+      "kind": "seca",
+      "origin": [
+        -150,
+        0,
+        0
+      ],
+      "pad": 84,
+      "range": [
+        85,
+        88
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        -149.047,
+        4.161,
+        0.159
+      ],
+      "size": [
+        4.857,
+        8.322,
+        4.987
+      ],
+      "parts": 3,
+      "collidable": 1,
+      "collidableParts": [
+        "Tronco"
+      ],
+      "images": {
+        "normal": "catalogo-arvore-seca.png",
+        "colisao": "catalogo-arvore-seca-colisao.png"
+      }
+    },
+    {
+      "id": "arvore-coqueiro",
+      "title": "Coqueiro",
+      "group": "Árvores",
+      "prop": "plantTree",
+      "kind": "coqueiro",
+      "origin": [
+        -90,
+        0,
+        0
+      ],
+      "pad": 88,
+      "range": [
+        89,
+        101
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        -90.41,
+        4.45,
+        0.475
+      ],
+      "size": [
+        12.039,
+        8.9,
+        11.27
+      ],
+      "parts": 12,
+      "collidable": 1,
+      "collidableParts": [
+        "Tronco"
+      ],
+      "images": {
+        "normal": "catalogo-arvore-coqueiro.png",
+        "colisao": "catalogo-arvore-coqueiro-colisao.png"
+      }
+    },
+    {
+      "id": "arvore-outono",
+      "title": "Árvore de outono",
+      "group": "Árvores",
+      "prop": "plantTree",
+      "kind": "outono",
+      "origin": [
+        -30,
+        0,
+        0
+      ],
+      "pad": 101,
+      "range": [
+        102,
+        111
+      ],
+      "padSize": [
+        28,
+        28
+      ],
+      "center": [
+        -30,
+        7.372,
+        0
+      ],
+      "size": [
+        19.256,
+        14.784,
+        19.256
+      ],
+      "parts": 9,
+      "collidable": 1,
+      "collidableParts": [
+        "Tronco"
+      ],
+      "images": {
+        "normal": "catalogo-arvore-outono.png",
+        "colisao": "catalogo-arvore-outono-colisao.png"
+      }
+    },
+    {
+      "id": "arbusto",
+      "title": "Arbusto",
+      "group": "Árvores",
+      "prop": "bush",
+      "kind": null,
+      "origin": [
+        30,
+        0,
+        0
+      ],
+      "pad": 111,
+      "range": [
+        112,
+        115
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        30.066,
+        0.978,
+        0.465
+      ],
+      "size": [
+        3.561,
+        2.057,
+        4.36
+      ],
+      "parts": 3,
+      "collidable": 0,
+      "collidableParts": [],
+      "images": {
+        "normal": "catalogo-arbusto.png",
+        "colisao": "catalogo-arbusto-colisao.png"
+      }
+    },
+    {
+      "id": "canteiro",
+      "title": "Canteiro de flores",
+      "group": "Árvores",
+      "prop": "flowerPatch",
+      "kind": null,
+      "origin": [
+        90,
+        0,
+        0
+      ],
+      "pad": 115,
+      "range": [
+        116,
+        124
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        89.994,
+        0.843,
+        0.145
+      ],
+      "size": [
+        3.089,
+        1.787,
+        2.391
+      ],
+      "parts": 8,
+      "collidable": 0,
+      "collidableParts": [],
+      "images": {
+        "normal": "catalogo-canteiro.png",
+        "colisao": "catalogo-canteiro-colisao.png"
+      }
+    },
+    {
+      "id": "construcao-casa",
+      "title": "Casa",
+      "group": "Construções",
+      "prop": "building",
+      "kind": "casa",
+      "origin": [
+        150,
+        0,
+        0
+      ],
+      "pad": 124,
+      "range": [
+        125,
+        160
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        150,
+        8.65,
+        0.05
+      ],
+      "size": [
+        14.4,
+        17.5,
+        12.9
+      ],
+      "parts": 35,
+      "collidable": 34,
+      "collidableParts": [
+        "Base de Pedra",
+        "Batente",
+        "Caixilho",
+        "Chaminé",
+        "Cumeeira",
+        "Degrau",
+        "Parede",
+        "Porta",
+        "Poste de Canto",
+        "Telhado",
+        "Topo da Chaminé",
+        "Verga",
+        "Vidraça",
+        "Viga"
+      ],
+      "images": {
+        "normal": "catalogo-construcao-casa.png",
+        "colisao": "catalogo-construcao-casa-colisao.png"
+      }
+    },
+    {
+      "id": "construcao-celeiro",
+      "title": "Celeiro",
+      "group": "Construções",
+      "prop": "building",
+      "kind": "celeiro",
+      "origin": [
+        -150,
+        0,
+        60
+      ],
+      "pad": 160,
+      "range": [
+        161,
+        201
+      ],
+      "padSize": [
+        30,
+        30
+      ],
+      "center": [
+        -150.7,
+        9.7,
+        60.3
+      ],
+      "size": [
+        20.2,
+        19.6,
+        17
+      ],
+      "parts": 40,
+      "collidable": 37,
+      "collidableParts": [
+        "Base do Celeiro",
+        "Batente",
+        "Cumeeira",
+        "Fardo de Feno",
+        "Folha da Porta",
+        "Parede do Celeiro",
+        "Portinhola do Palheiro",
+        "Poste de Canto",
+        "Ripa",
+        "Soleira",
+        "Telhado",
+        "Travessa",
+        "Verga"
+      ],
+      "images": {
+        "normal": "catalogo-construcao-celeiro.png",
+        "colisao": "catalogo-construcao-celeiro-colisao.png"
+      }
+    },
+    {
+      "id": "construcao-moinho",
+      "title": "Moinho",
+      "group": "Construções",
+      "prop": "building",
+      "kind": "moinho",
+      "origin": [
+        -90,
+        0,
+        60
+      ],
+      "pad": 201,
+      "range": [
+        202,
+        230
+      ],
+      "padSize": [
+        28,
+        28
+      ],
+      "center": [
+        -90,
+        15.426,
+        60.5
+      ],
+      "size": [
+        18.904,
+        31.052,
+        11.4
+      ],
+      "parts": 28,
+      "collidable": 20,
+      "collidableParts": [
+        "Base do Moinho",
+        "Batente",
+        "Cinta de Pedra",
+        "Cubo",
+        "Degrau",
+        "Eixo",
+        "Janela",
+        "Ponta",
+        "Porta",
+        "Telhado do Moinho",
+        "Torre do Moinho",
+        "Verga"
+      ],
+      "images": {
+        "normal": "catalogo-construcao-moinho.png",
+        "colisao": "catalogo-construcao-moinho-colisao.png"
+      }
+    },
+    {
+      "id": "construcao-poco",
+      "title": "Poço",
+      "group": "Construções",
+      "prop": "building",
+      "kind": "poco",
+      "origin": [
+        -30,
+        0,
+        60
+      ],
+      "pad": 230,
+      "range": [
+        231,
+        250
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        -29.6,
+        3.9,
+        60
+      ],
+      "size": [
+        6.4,
+        8,
+        5.233
+      ],
+      "parts": 19,
+      "collidable": 16,
+      "collidableParts": [
+        "Balde",
+        "Borda do Poço",
+        "Fundo do Poço",
+        "Poste do Poço",
+        "Sarilho",
+        "Telhado do Poço"
+      ],
+      "images": {
+        "normal": "catalogo-construcao-poco.png",
+        "colisao": "catalogo-construcao-poco-colisao.png"
+      }
+    },
+    {
+      "id": "construcao-torre",
+      "title": "Torre de vigia",
+      "group": "Construções",
+      "prop": "building",
+      "kind": "torre",
+      "origin": [
+        30,
+        0,
+        60
+      ],
+      "pad": 250,
+      "range": [
+        251,
+        285
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        30,
+        13.35,
+        60
+      ],
+      "size": [
+        9.6,
+        26.9,
+        9.6
+      ],
+      "parts": 34,
+      "collidable": 26,
+      "collidableParts": [
+        "Banzo da Escada",
+        "Degrau da Escada",
+        "Parapeito",
+        "Perna",
+        "Plataforma",
+        "Ponta",
+        "Telhado da Torre"
+      ],
+      "images": {
+        "normal": "catalogo-construcao-torre.png",
+        "colisao": "catalogo-construcao-torre-colisao.png"
+      }
+    },
+    {
+      "id": "construcao-feno",
+      "title": "Monte de feno",
+      "group": "Construções",
+      "prop": "building",
+      "kind": "feno",
+      "origin": [
+        90,
+        0,
+        60
+      ],
+      "pad": 285,
+      "range": [
+        286,
+        296
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        90.15,
+        1.85,
+        60.5
+      ],
+      "size": [
+        10.3,
+        3.9,
+        7.8
+      ],
+      "parts": 10,
+      "collidable": 8,
+      "collidableParts": [
+        "Apoio",
+        "Caçamba",
+        "Eixo",
+        "Monte de Feno",
+        "Tábua Lateral",
+        "Varal"
+      ],
+      "images": {
+        "normal": "catalogo-construcao-feno.png",
+        "colisao": "catalogo-construcao-feno-colisao.png"
+      }
+    },
+    {
+      "id": "construcao-tenda",
+      "title": "Tenda",
+      "group": "Construções",
+      "prop": "building",
+      "kind": "tenda",
+      "origin": [
+        150,
+        0,
+        60
+      ],
+      "pad": 296,
+      "range": [
+        297,
+        321
+      ],
+      "padSize": [
+        24,
+        24
+      ],
+      "center": [
+        150.75,
+        3.15,
+        60.3
+      ],
+      "size": [
+        8.3,
+        6.5,
+        13.8
+      ],
+      "parts": 24,
+      "collidable": 19,
+      "collidableParts": [
+        "Caixote",
+        "Cinzas",
+        "Cumeeira",
+        "Entrada",
+        "Lona",
+        "Mastro",
+        "Pedra da Fogueira",
+        "Tronco de Sentar"
+      ],
+      "images": {
+        "normal": "catalogo-construcao-tenda.png",
+        "colisao": "catalogo-construcao-tenda-colisao.png"
+      }
+    }
+  ]
+}

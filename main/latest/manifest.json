@@ -2,87 +2,99 @@
   "views": [
     {
       "id": "overview",
-      "title": "Visão geral (corte, sem teto)"
+      "title": "Visão geral do reino"
     },
     {
-      "id": "hall",
-      "title": "Hall de entrada e posto de guarda"
+      "id": "top",
+      "title": "Mapa visto de cima (30 lotes, estradas, rio e lago)"
     },
     {
-      "id": "atrium",
-      "title": "Átrio e vão de pé-direito duplo"
+      "id": "lobby",
+      "title": "Lobby: fonte com a estátua clássica, mercado e colunas antigas"
     },
     {
-      "id": "corridor",
-      "title": "Corredor das celas (térreo, aberto até o teto)"
+      "id": "market",
+      "title": "Mercado do Lobby (altura do jogador)"
     },
     {
-      "id": "upper",
-      "title": "Galeria do 2º andar (sobre as celas do térreo)"
+      "id": "lobby-stairs",
+      "title": "Escadaria de madeira do Lobby"
     },
     {
-      "id": "gallery-view",
-      "title": "Vista da galeria para o vão"
+      "id": "fountain",
+      "title": "Fonte do Lobby: estátua do boneco clássico com o logo"
     },
     {
-      "id": "cells",
-      "title": "Fachada das celas"
+      "id": "plot",
+      "title": "Lote 27: fundação do castelo"
     },
     {
-      "id": "cell",
-      "title": "Interior de uma cela"
+      "id": "plots",
+      "title": "Lotes espalhados pelo mapa"
     },
     {
-      "id": "service",
-      "title": "Ala oeste: corredor de serviço"
+      "id": "bridge",
+      "title": "Ponte de madeira sobre o rio"
     },
     {
-      "id": "cafeteria",
-      "title": "Ala oeste: refeitório"
+      "id": "bridge-walk",
+      "title": "Atravessando a ponte (altura do jogador)"
     },
     {
-      "id": "storeroom",
-      "title": "Ala oeste: almoxarifado"
+      "id": "lake",
+      "title": "Lago e rio"
     },
     {
-      "id": "infirmary",
-      "title": "Ala oeste: enfermaria"
+      "id": "forest",
+      "title": "Floresta"
     },
     {
-      "id": "guards",
-      "title": "Sala dos guardas"
+      "id": "autumn",
+      "title": "Bosque de outono"
     },
     {
-      "id": "stairs",
-      "title": "Escada para o mezanino"
+      "id": "mountain",
+      "title": "Montanha com neve e pinheiros"
     },
     {
-      "id": "visits",
-      "title": "Sala de visitas"
+      "id": "hill",
+      "title": "Colina em terraços"
     },
     {
-      "id": "mezzanine",
-      "title": "2º andar: salas do mezanino"
+      "id": "village",
+      "title": "Vila: casas, poço, celeiro e moinho"
     },
     {
-      "id": "control",
-      "title": "Sala de controle (vidraça para o vão)"
+      "id": "village-walk",
+      "title": "Rua da vila (altura do jogador)"
     },
     {
-      "id": "office",
-      "title": "Diretoria"
+      "id": "farmland",
+      "title": "Região de fazenda: campos, espantalho e sede"
     },
     {
-      "id": "rest",
-      "title": "Sala de descanso dos guardas"
+      "id": "tower",
+      "title": "Torre de vigia na beira da estrada"
     },
     {
-      "id": "library",
-      "title": "Biblioteca (2º andar)"
+      "id": "camp",
+      "title": "Acampamento na floresta"
     },
     {
-      "id": "classroom",
-      "title": "Sala de aula (2º andar)"
+      "id": "farm",
+      "title": "Campo de trigo"
+    },
+    {
+      "id": "mine",
+      "title": "Jazida de ouro"
+    },
+    {
+      "id": "dock",
+      "title": "Cais e barco na praia"
+    },
+    {
+      "id": "beach",
+      "title": "Praia com coqueiros"
     },
     {
       "id": "build-25",
@@ -95,30 +107,64 @@
     {
       "id": "build-75",
       "title": "Montagem — 75% das etapas"
+    },
+    {
+      "id": "variante-101",
+      "title": "Variante do servidor (semente 101): vista de cima"
+    },
+    {
+      "id": "variante-101-geral",
+      "title": "Variante do servidor (semente 101): visão geral"
+    },
+    {
+      "id": "variante-2027",
+      "title": "Variante do servidor (semente 2027): vista de cima"
+    },
+    {
+      "id": "variante-2027-geral",
+      "title": "Variante do servidor (semente 2027): visão geral"
+    },
+    {
+      "id": "variante-4242",
+      "title": "Variante do servidor (semente 4242): vista de cima"
+    },
+    {
+      "id": "variante-4242-geral",
+      "title": "Variante do servidor (semente 4242): visão geral"
+    },
+    {
+      "id": "variante-77777",
+      "title": "Variante do servidor (semente 77777): vista de cima"
+    },
+    {
+      "id": "variante-77777-geral",
+      "title": "Variante do servidor (semente 77777): visão geral"
     }
   ],
   "stats": {
-    "total": 2872,
-    "lights": 86,
+    "total": 20473,
+    "lights": 0,
     "groups": {
-      "Piso": 1,
-      "Paredes": 28,
-      "Teto": 16,
-      "Estrutura": 22,
-      "Pisos": 6,
-      "Celas": 1650,
-      "Galerias": 46,
-      "Iluminação": 216,
-      "Escada": 40,
-      "Hall": 6,
-      "Salas": 385,
-      "Sala de Visitas": 55,
-      "Ala Oeste": 401
+      "Mar": 1,
+      "Terreno": 606,
+      "Lobby": 326,
+      "Estradas": 44,
+      "Pontes": 29,
+      "Lotes": 330,
+      "Trilhas": 44,
+      "Vila": 732,
+      "Vegetação": 13024,
+      "Fazendas": 489,
+      "Relevo": 4445,
+      "Recursos": 116,
+      "Costa": 45,
+      "Torres de Vigia": 170,
+      "Acampamentos": 72
     }
   },
   "manual": {
-    "parts": 2872,
-    "steps": 561,
-    "connections": 8825
+    "parts": 20473,
+    "steps": 2959,
+    "connections": 61618
   }
 }
