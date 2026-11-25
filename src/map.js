@@ -630,7 +630,13 @@ export function createWorld(seed = SEED) {
       }
     }
   }
-  const reached = (p) => seen[cellOf(p.z) * N + cellOf(p.x)] === 1;
+  // ligada = a malha chega até o piso logo dentro da porta (o centro da área pode cair fora da
+  // planta, como no meio do U do estábulo)
+  const reached = (p) => {
+    const [u, v] = PLANS[p.plan].door;
+    const [x, z] = planPoint(p, u, v - 1);
+    return seen[cellOf(z) * N + cellOf(x)] === 1;
+  };
   const plotsConnected = PLOTS.map((p, k) => plotsLinked[k] && reached(p));
   const padsConnected = PADS.map((p, k) => padsLinked[k] && reached(p));
 
