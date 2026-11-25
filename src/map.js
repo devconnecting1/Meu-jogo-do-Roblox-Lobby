@@ -396,8 +396,18 @@ export function createWorld(seed = SEED) {
       for (let f = 0.2; f < 0.85; f += 0.15) {
         const mx = Math.round((x + (nx - x) * f) / 2) * 2;
         const mz = Math.round((z + (nzz - z) * f) / 2) * 2;
-        const zx = [[x, z], [mx, z], [mx, nzz], [nx, nzz]];
-        const zz = [[x, z], [x, mz], [nx, mz], [nx, nzz]];
+        const zx = [
+          [x, z],
+          [mx, z],
+          [mx, nzz],
+          [nx, nzz],
+        ];
+        const zz = [
+          [x, z],
+          [x, mz],
+          [nx, mz],
+          [nx, nzz],
+        ];
         if (tryPath(zx, own) || tryPath(zz, own)) return true;
       }
     }
