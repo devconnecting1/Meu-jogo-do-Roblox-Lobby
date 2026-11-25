@@ -17,6 +17,9 @@
 
 import { makeBuilder } from './builder.js';
 import { C } from './palette.js';
+import { buildShop } from './props/lojas.js';
+import { buildCastle } from './props/castelos.js';
+import { buildStatue } from './props/estatua.js';
 
 export const DIM = Object.freeze({
   half: 400, // a grade do terreno cobre x,z ∈ [-400, 400]
@@ -120,14 +123,15 @@ const KEEP_SURF = new Set(['pedra', 'pedraEscura', 'lote', 'loteBorda', 'area', 
 /**
  * Plantas das construções: cada área de construção tem o formato do prédio que vai receber, como
  * as construções reais (nada de quadrado igual para tudo). Coordenadas locais em studs, com a frente
- * (porta, alpendre, portão) para +z; partes são retângulos [x0, z0, x1, z1] e círculos { c: [x, z], r }.
+ * (porta, alpendre, portão) para +z; partes são retângulos [x0, z0, x1, z1] e círculos { c: [x, z], r };
+ * `door` é o ponto [u, v] da borda da planta onde fica a porta principal (a estrada chega ali).
  * Lojas em volta do Lobby cabem em 24×24; castelos cabem em 32×32.
  */
 export const PLANS = Object.freeze({
   // prédios do Lobby (lojas e serviços); bordas em múltiplos de 4 para cobrir células inteiras
   taverna: {
     name: 'Taverna',
-    group: 'loja',
+    group: 'loja', door: [6, 0],
     parts: [
       [-12, -12, 12, 0],
       [-12, 0, 0, 12],
@@ -135,7 +139,7 @@ export const PLANS = Object.freeze({
   }, // salão + ala em L
   ferraria: {
     name: 'Ferraria',
-    group: 'loja',
+    group: 'loja', door: [-4, 8],
     parts: [
       [-12, -8, 4, 8],
       [4, -4, 12, 4],
@@ -143,7 +147,7 @@ export const PLANS = Object.freeze({
   }, // oficina + forja
   mercado: {
     name: 'Mercado Coberto',
-    group: 'loja',
+    group: 'loja', door: [0, 12],
     parts: [
       [-12, -8, 12, 4],
       [-4, 4, 4, 12],
@@ -151,16 +155,16 @@ export const PLANS = Object.freeze({
   }, // salão + alpendre
   capela: {
     name: 'Capela',
-    group: 'loja',
+    group: 'loja', door: [0, 12],
     parts: [
       [-4, -12, 4, 12],
       [-12, -8, 12, -4],
     ],
   }, // nave + transepto
-  torreMago: { name: 'Torre do Mago', group: 'loja', parts: [{ c: [0, 0], r: 12 }] }, // torre redonda
+  torreMago: { name: 'Torre do Mago', group: 'loja', door: [0, 12], parts: [{ c: [0, 0], r: 12 }] }, // torre redonda
   estabulo: {
     name: 'Estábulo',
-    group: 'loja',
+    group: 'loja', door: [0, -4],
     parts: [
       [-12, -12, 12, -4],
       [-12, -4, -4, 12],
@@ -169,7 +173,7 @@ export const PLANS = Object.freeze({
   }, // U
   banco: {
     name: 'Banco',
-    group: 'loja',
+    group: 'loja', door: [0, 8],
     parts: [
       [-8, -12, 8, 4],
       [-4, 4, 4, 8],
@@ -177,7 +181,7 @@ export const PLANS = Object.freeze({
   }, // cofre + escadaria
   guilda: {
     name: 'Salão da Guilda',
-    group: 'loja',
+    group: 'loja', door: [0, 12],
     parts: [
       [-12, -4, 12, 4],
       [-8, -8, 8, 8],
@@ -187,21 +191,21 @@ export const PLANS = Object.freeze({
   // castelos dos jogadores e dos bots
   fortaleza: {
     name: 'Fortaleza com Torres',
-    group: 'castelo',
+    group: 'castelo', door: [0, 12],
     parts: [[-8, -8, 8, 8], { c: [-8, -8], r: 8 }, { c: [8, -8], r: 8 }, { c: [-8, 8], r: 8 }, { c: [8, 8], r: 8 }],
   },
   casteloL: {
     name: 'Castelo em L',
-    group: 'castelo',
+    group: 'castelo', door: [8, 0],
     parts: [
       [-16, -16, 16, 0],
       [-16, 0, 0, 16],
     ],
   },
-  casteloRedondo: { name: 'Castelo Redondo', group: 'castelo', parts: [{ c: [0, 0], r: 16 }] },
+  casteloRedondo: { name: 'Castelo Redondo', group: 'castelo', door: [0, 16], parts: [{ c: [0, 0], r: 16 }] },
   castelaoPatio: {
     name: 'Castelo com Pátio',
-    group: 'castelo',
+    group: 'castelo', door: [0, 16],
     parts: [
       [-16, -12, 16, 8],
       [-4, 8, 4, 16],
@@ -209,7 +213,7 @@ export const PLANS = Object.freeze({
   },
   cidadela: {
     name: 'Cidadela em Cruz',
-    group: 'castelo',
+    group: 'castelo', door: [0, 16],
     parts: [
       [-16, -8, 16, 8],
       [-4, -16, 4, 16],
@@ -217,7 +221,7 @@ export const PLANS = Object.freeze({
   },
   casteloU: {
     name: 'Castelo em U',
-    group: 'castelo',
+    group: 'castelo', door: [0, -4],
     parts: [
       [-16, -16, 16, -4],
       [-16, -4, -4, 16],
@@ -226,7 +230,7 @@ export const PLANS = Object.freeze({
   },
   forteT: {
     name: 'Forte em T',
-    group: 'castelo',
+    group: 'castelo', door: [0, 16],
     parts: [
       [-16, -16, 16, -4],
       [-4, -4, 4, 16],
@@ -265,6 +269,13 @@ export function planRects(p) {
     const [bx, bz] = rot90(x1, z1, p.rot);
     return [p.x + Math.min(ax, bx), p.z + Math.min(az, bz), p.x + Math.max(ax, bx), p.z + Math.max(az, bz)];
   });
+}
+
+/** Ponto do mundo logo na frente da porta principal (1 célula para fora da planta): a estrada chega ali. */
+export function doorPoint(p) {
+  const [u, v] = PLANS[p.plan].door;
+  const [dx, dz] = rot90(u, v + 2, p.rot);
+  return [p.x + dx, p.z + dz];
 }
 
 /** Giro que vira a frente (+z) da construção em (x, z) para o centro do vale (o Lobby). */
@@ -473,8 +484,9 @@ export function createWorld(seed = SEED) {
   // --- Estradas: 4 saídas retas da praça e cada área/lote ligado ao ponto mais perto da malha ---
   const ROADS = []; // trechos retos [[x0, z0], [x1, z1]]
   const halfW = DIM.road / 2;
+  // a estrada nunca atravessa uma construção: nem as outras (com folga de 8) nem a própria (sai da porta)
   const blockedBy = (x, z, own) =>
-    PLOTS.some((p) => p !== own && inPlan(p, x, z, 8)) || PADS.some((p) => p !== own && inPlan(p, x, z, 8));
+    PLOTS.some((p) => inPlan(p, x, z, p === own ? 0 : 8)) || PADS.some((p) => inPlan(p, x, z, p === own ? 0 : 8));
   const legOk = ([ax, az], [bx, bz], own) => {
     const len = Math.hypot(bx - ax, bz - az);
     if (len < 1) return true;
@@ -632,8 +644,8 @@ export function createWorld(seed = SEED) {
     for (let k = 0; k + 1 < turns.length; k++) drawLeg(turns[k], turns[k + 1]);
     return true;
   }
-  const padsLinked = PADS.map((p) => connect(p.x, p.z, p));
-  const plotsLinked = PLOTS.map((p) => connect(p.x, p.z, p));
+  const padsLinked = PADS.map((p) => connect(...doorPoint(p), p));
+  const plotsLinked = PLOTS.map((p) => connect(...doorPoint(p), p));
 
   // --- Manchas de grama escura e terraços de grama (degraus de 2 studs), longe das áreas planas ---
   const flatNear = (i, j, rad) => {
@@ -724,12 +736,24 @@ export function createWorld(seed = SEED) {
   }
 
   /** Zonas que nenhuma peça com colisão pode invadir: pisos das áreas e dos lotes, saída sul e spawn. */
+  /** Monta as construções num construtor descartável só para colher as zonas de passagem. */
+  let cachedZones = null;
+  function buildingZones() {
+    if (!cachedZones) {
+      const scratch = makeBuilder();
+      cachedZones = [
+        ...PADS.flatMap((p) => buildShop(scratch, p, land)),
+        ...PLOTS.flatMap((p) => buildCastle(scratch, p, land)),
+      ];
+    }
+    return cachedZones;
+  }
+
   function clearanceZones() {
     const zones = [];
     const box = (name, x0, x1, z0, z1, y0, h) => zones.push({ name, min: [x0, y0, z0], max: [x1, land + h, z1] });
-    for (const p of [...PLOTS, ...PADS]) {
-      for (const [x0, z0, x1, z1] of planRects(p)) box(p.name, x0, x1, z0, z1, land + 0.05, 14);
-    }
+    // portas, corredores e salões das construções (cada prédio declara as suas passagens)
+    zones.push(...buildingZones());
     // acima do piso de spawn (1 stud de altura): o jogador nasce e sai andando para o sul
     box('Caminho do Spawn', -4, 4, DIM.daisR + 1, DIM.ringRoad[0], land + 1.05, 10);
     box('Spawn', -3.5, 3.5, 20.5, 27.5, land + 1.05, 8);
@@ -824,6 +848,11 @@ export function createWorld(seed = SEED) {
     // spawn no lado sul da praça
     const [sx, sy, sz] = PLAZA.spawn;
     b.box('Lobby', 'SpawnLocation', [sx, sy + 0.5, sz], [8, 1, 8], C.pxStoneDark, { className: 'SpawnLocation' });
+    // estátua de Luvitlua (o perfil do dono do jogo) no estrado do meio da praça, de frente para o spawn
+    buildStatue(b, 0, land + 1, 0);
+    // construções com interior: os 8 prédios do Lobby e os 30 castelos, cada um na sua planta
+    for (const p of PADS) buildShop(b, p, land);
+    for (const p of PLOTS) buildCastle(b, p, land);
 
     let terraces = 0;
     for (let j = 0; j < N; j++)

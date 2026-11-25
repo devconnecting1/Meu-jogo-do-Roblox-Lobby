@@ -13,7 +13,7 @@ Mapa base de um jogo de estratégia no estilo **Lords Mobile** no Roblox. **Fase
 
 ## O que tem
 
-- **Vale procedural:** um planalto de até 720×720 studs com o vale no meio. Cada servidor sorteia uma semente: o formato do vale, os penhascos, as lagoas, os lotes, as estradas e os terraços mudam.
+- **Mapa fixo:** um planalto com o vale no meio, sempre igual em todo servidor (sem geração procedural nem sorteio de mapa).
 - **Lobby** no centro: praça de pedra clara com faixas escuras pixeladas, estrado no meio (lugar da futura construção central) e o spawn.
 - **Áreas com a planta do prédio:** 8 áreas em volta da praça, cada uma com o formato da construção que vai receber (taverna em L, capela em cruz, torre redonda, estábulo em U, mercado com alpendre…), e **30 lotes de castelo** (20 jogadores e 10 bots) com 7 plantas diferentes (fortaleza com torres, castelo em L, redondo, com pátio, em cruz, em U e em T), todos planos, com borda de pedra e a frente virada para o Lobby.
 - **Estradas de terra** com borda serrilhada ligando a praça a todas as áreas e lotes; passagem de pedra sobre as lagoas.
@@ -21,7 +21,7 @@ Mapa base de um jogo de estratégia no estilo **Lords Mobile** no Roblox. **Fase
 - **Estilo voxel liso:** SmoothPlastic sem studs, grama com manchas escuras em blocos, paleta quente (`src/palette.js`, grupo `px…`).
 - **Luz de fim de tarde** (Lighting Future, sombra nítida, neblina leve no horizonte).
 - **Manual de montagem:** o CI gera etapas de até 8 peças e verifica que cada uma se apoia no que já foi montado.
-- **Fuzz de 100 mil mapas:** um workflow separado (*Actions → Fuzz de mapas → Run workflow*, e toda segunda-feira) testa as regras de layout em 100 mil sementes; todo PR testa 26 sementes. Veja [docs/FUZZ.md](docs/FUZZ.md).
+- **Construções com interior:** os 8 prédios do Lobby e os 30 castelos, cada um na sua planta, com porta de entrada, piso, móveis, lareira acesa e telhado (`src/props/lojas.js`, `src/props/castelos.js`).
 
 **Guardados:** o Reino clássico até a versão 21 (ilha com vilas, fazendas, biomas, montanhas, Lobby com lojas e fonte, catálogo de peças, Plastic com studs) está no branch [`arquivo/reino-classico`](https://github.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/tree/arquivo/reino-classico), e a prisão do projeto anterior no [`arquivo/prisao`](https://github.com/devconnecting1/Meu-jogo-do-Roblox-Lobby/tree/arquivo/prisao).
 

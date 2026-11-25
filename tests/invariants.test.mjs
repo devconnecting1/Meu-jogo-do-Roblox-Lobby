@@ -1,16 +1,13 @@
-// Fuzz rápido de sementes (roda em todo PR, no job "test"): as regras de layout valem para
-// qualquer semente, não só para a padrão. O fuzz grande (100 mil sementes) é o workflow
-// separado .github/workflows/fuzz.yml (veja docs/FUZZ.md).
+// Invariantes do mapa fixo do Vale (layout e construção completa), as mesmas de src/invariants.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createWorld, SEED } from '../src/map.js';
 import { layoutProblems, fullProblems } from '../src/invariants.js';
 
-/** Sementes da camada barata: a padrão e 25 seguidas a partir da 1. */
-const LAYOUT_SEEDS = [SEED, ...Array.from({ length: 25 }, (_, k) => k + 1)];
+/** O mapa é fixo: só a semente do Vale. */
+const LAYOUT_SEEDS = [SEED];
 
-/** Sementes da camada cara (Parts): a padrão e mais duas. */
-const FULL_SEEDS = [SEED, 7, 12345];
+const FULL_SEEDS = [SEED];
 
 const report = (seed, layer, problems) =>
   `semente ${seed} (${layer}): ${problems.length} problema(s)\n${problems.join('\n')}`;

@@ -63,6 +63,20 @@ test('Lobby no centro: praça de pedra com faixas, estrado e spawn sobre a praç
   assert.ok(Math.hypot(s.position[0], s.position[2]) < DIM.plazaR - 8, 'spawn dentro da praça');
 });
 
+test('estátua de Luvitlua no estrado: pedestal, nome em letras de pixel e espada de gelo acesa', () => {
+  const st = parts.filter((p) => p.model.startsWith('Lobby/Estátua de Luvitlua'));
+  assert.ok(st.length >= 60, `estátua com só ${st.length} peças`);
+  const letters = new Set(st.filter((p) => p.name.startsWith('Letra ')).map((p) => p.name.slice(6)));
+  for (const ch of 'LUVITA') assert.ok(letters.has(ch), `placa sem a letra ${ch}`);
+  const topY = Math.max(...st.map((p) => p.position[1] + p.size[1] / 2));
+  assert.ok(topY >= DIM.land + 25, `estátua baixa (${topY})`);
+  const blade = st.find((p) => p.name === 'Lâmina');
+  assert.ok(blade && blade.material === 'Neon' && blade.light, 'lâmina de gelo sem brilho');
+  for (const p of st) {
+    for (const i of [0, 2]) assert.ok(Math.abs(p.position[i]) + p.size[i] / 2 <= 7.5 + 1e-6, `${p.name} fora do estrado`);
+  }
+});
+
 test('8 áreas de construção em volta da praça, planas e ligadas ao Lobby', () => {
   assert.equal(PADS.length, DIM.pads);
   for (const p of PADS) {

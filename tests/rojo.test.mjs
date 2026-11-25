@@ -3,7 +3,6 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildMap } from '../src/map.js';
-import { VARIANT_SEEDS, variantName } from '../src/variants.js';
 import { toRojoModel, partJson, ENUM } from '../src/rojo.js';
 import { rotationMatrix } from '../src/builder.js';
 
@@ -76,34 +75,10 @@ test('projeto: Lighting Future, dia claro e efeitos sutis', () => {
   assert.ok(atm.Density >= 0.2 && atm.Density <= 0.4, 'neblina: o horizonte some suave, mas o mapa continua visível');
 });
 
-test('projeto: mapa principal no Workspace, variantes no ServerStorage e um único script de sorteio', () => {
+test('projeto: um mapa fixo no Workspace, sem scripts nem mapas extras', () => {
   const services = Object.keys(project.tree).filter((k) => !k.startsWith('$'));
-  assert.deepEqual(services.sort(), ['Lighting', 'ServerScriptService', 'ServerStorage', 'Workspace']);
+  assert.deepEqual(services.sort(), ['Lighting', 'Workspace']);
   assert.equal(project.tree.Workspace['Reino'].$path, 'build/Reino.model.json');
-  // as variantes do projeto são exatamente as de src/variants.js
-  const mapas = project.tree.ServerStorage.Mapas;
-  const names = Object.keys(mapas).filter((k) => !k.startsWith('$'));
-  assert.deepEqual(names.sort(), VARIANT_SEEDS.map(variantName).sort());
-  for (const n of names) assert.equal(mapas[n].$path, `build/Mapas/${n}.model.json`);
-  // um script só, no servidor, sem gameplay: não cria instâncias, não mexe em jogador nem em UI
-  const sss = project.tree.ServerScriptService;
-  const scripts = Object.keys(sss).filter((k) => !k.startsWith('$'));
-  assert.deepEqual(scripts, ['EscolherMapa']);
-  assert.match(sss.EscolherMapa.$path, /\.server\.luau$/);
-  const src = readFileSync(new URL(`../${sss.EscolherMapa.$path}`, import.meta.url), 'utf8');
-  for (const banned of [
-    'Instance.new',
-    'Players',
-    'RemoteEvent',
-    'RemoteFunction',
-    'Gui',
-    'Humanoid',
-    'DataStore',
-    'HttpService',
-  ]) {
-    assert.ok(!src.includes(banned), `o script de sorteio não pode usar ${banned}`);
-  }
-  assert.ok(src.includes('ServerStorage') && src.includes('Mapas'), 'o script sorteia entre os mapas do ServerStorage');
   const raw = JSON.stringify(project.tree.Lighting) + JSON.stringify(project.tree.Workspace);
   for (const banned of ['Gui', 'Humanoid', 'Sky"']) assert.ok(!raw.includes(banned), `projeto tem ${banned}`);
 });

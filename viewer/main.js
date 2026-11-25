@@ -2,7 +2,7 @@
 // Usado no navegador (GitHub Pages / prévia do PR) e pelo CI para gerar as capturas.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { createWorld, SEED, DIM } from '../src/map.js';
+import { createWorld, SEED, DIM, PLANS, doorPoint } from '../src/map.js';
 import { stats as countStats } from '../src/builder.js';
 import { buildManual } from '../src/manual.js';
 import { isWet, surfaceMaterial } from './surfaces.js';
@@ -44,9 +44,9 @@ scene.add(sun, sun.target);
 // ---------------------------------------------------------------------------
 // Aparência (viewer/surfaces.js): material do Roblox desenhado por shader em coordenadas da peça
 // (Grass, Cobblestone, WoodPlanks, Brick...) e studs no topo das peças Plastic; tudo instanciado.
-// #seed=123 mostra outra variante do mapa (cada servidor do jogo usa uma semente)
+// o mapa é fixo: sempre o mesmo Vale
 const params = new URLSearchParams(location.hash.slice(1));
-const seed = Number(params.get('seed')) || SEED;
+const seed = SEED;
 const world = createWorld(seed);
 const { PLOTS, PADS, PONDS } = world;
 const { parts } = world.buildMap();
@@ -114,6 +114,8 @@ const VIEWS = [
   },
   { id: 'lobby', title: 'Lobby: praça de pedra com o estrado no meio', ...look(0, 0, 60, 52, 80, 4) },
   { id: 'lobby-walk', title: 'Chegando na praça (altura do jogador)', pos: [0, 9, 74], target: [0, 6, 0] },
+  { id: 'estatua', title: 'Estátua de Luvitlua no estrado', pos: [7, 14, 30], target: [0, 18, 0] },
+  { id: 'estatua-placa', title: 'Placa com o nome LUVITLUA', pos: [0, 8.5, 16], target: [0, 8.5, 0] },
   { id: 'pads', title: 'Áreas de construção em volta da praça', ...look(pad.x, pad.z, 40, 34, 46, 4) },
   { id: 'plot', title: `${plot.name}: lote do castelo`, ...look(plot.x, plot.z, 40, 30, 48, 4) },
   {
@@ -140,6 +142,26 @@ const add = (v) => v && VIEWS.push(v);
     pos: [cx * (best.r - 90), 22, cz * (best.r - 90)],
     target: [cx * (best.r + 20), best.h * 0.6, cz * (best.r + 20)],
   });
+}
+// construções: fachada de cada prédio do Lobby e de cada tipo de castelo, e o interior visto da porta
+const facade = (p, dist, h) => {
+  const [dx, dz] = doorPoint(p);
+  const [fx, fz] = [dx - p.x, dz - p.z];
+  const len = Math.hypot(fx, fz) || 1;
+  return { pos: [p.x + (fx / len) * dist, h, p.z + (fz / len) * dist], target: [p.x, 9, p.z] };
+};
+const inside = (p) => {
+  const [dx, dz] = doorPoint(p);
+  return { pos: [dx, DIM.land + 5.5, dz], target: [p.x, DIM.land + 3.5, p.z] };
+};
+for (const p of PADS) {
+  add({ id: `predio-${p.plan}`, title: `${PLANS[p.plan].name} (fachada)`, ...facade(p, 40, 22) });
+  add({ id: `predio-${p.plan}-dentro`, title: `${PLANS[p.plan].name} (interior, da porta)`, ...inside(p) });
+}
+for (const plan of new Set(PLOTS.map((p) => p.plan))) {
+  const p = PLOTS.find((q) => q.plan === plan);
+  add({ id: `castelo-${plan}`, title: `${p.name}: ${PLANS[plan].name} (fachada)`, ...facade(p, 52, 30) });
+  add({ id: `castelo-${plan}-dentro`, title: `${p.name}: ${PLANS[plan].name} (interior, do portão)`, ...inside(p) });
 }
 if (PONDS.length) {
   const [p] = PONDS;

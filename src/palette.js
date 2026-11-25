@@ -100,6 +100,29 @@ export const C = Object.freeze({
   pxCliffLight: [168, 118, 82],
   pxMoss: [92, 128, 62],
   pxWater: [86, 150, 170],
+
+  // Construções do Vale (voxel liso): madeira, reboco, pedra de muro, telhados, ferro, tecidos e luz
+  pxWood: [128, 88, 58],
+  pxWoodDark: [92, 62, 44],
+  pxWoodLight: [164, 122, 82],
+  pxPlaster: [214, 198, 168],
+  pxStoneWall: [140, 132, 120],
+  pxStoneWallDark: [104, 98, 90],
+  pxRoofRed: [148, 82, 68],
+  pxRoofSlate: [76, 88, 98],
+  pxRoofTeal: [64, 104, 104],
+  pxThatch: [196, 160, 98],
+  pxIron: [70, 70, 76],
+  pxGold: [200, 168, 92],
+  pxClothRed: [146, 80, 68],
+  pxClothBlue: [78, 98, 140],
+  pxCream: [228, 214, 186],
+  pxWindowLit: [236, 206, 124], // janela acesa (cor quente, sem Neon)
+  pxFire: [232, 150, 106], // chama (Neon com luz, só em lareira/forja/tocha)
+  pxBook: [120, 70, 60],
+  pxHay: [206, 176, 104],
+  pxIce: [170, 210, 228], // espada de gelo da estátua de Luvitlua
+  pxArmor: [58, 60, 70], // armadura escura da estátua
 });
 
 /** Saturação HSV (0..1) de uma cor [r,g,b]. */
