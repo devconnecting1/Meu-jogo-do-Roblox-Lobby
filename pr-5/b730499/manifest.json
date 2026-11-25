@@ -1,0 +1,139 @@
+{
+  "views": [
+    {
+      "id": "overview",
+      "title": "Visão geral do Vale"
+    },
+    {
+      "id": "top",
+      "title": "Vale visto de cima (Lobby, 8 lojas, estradas e lagoas)"
+    },
+    {
+      "id": "lobby",
+      "title": "Lobby: praça de pedra com o estrado no meio"
+    },
+    {
+      "id": "lobby-walk",
+      "title": "Chegando na praça (altura do jogador)"
+    },
+    {
+      "id": "estatua",
+      "title": "Estátua de Luvitlua (boneco R6) no estrado"
+    },
+    {
+      "id": "estatua-placa",
+      "title": "Placa com o nome LUVITLUA"
+    },
+    {
+      "id": "pads",
+      "title": "Lojas em volta da praça à noite"
+    },
+    {
+      "id": "road",
+      "title": "Saída da praça à noite (altura do jogador)"
+    },
+    {
+      "id": "cliffs",
+      "title": "Penhascos de rocha em blocos cercando o vale"
+    },
+    {
+      "id": "predio-padaria",
+      "title": "Padaria (fachada)"
+    },
+    {
+      "id": "predio-padaria-dentro",
+      "title": "Padaria (interior)"
+    },
+    {
+      "id": "predio-banco",
+      "title": "Banco (fachada)"
+    },
+    {
+      "id": "predio-banco-dentro",
+      "title": "Banco (interior)"
+    },
+    {
+      "id": "predio-ferraria",
+      "title": "Ferraria (fachada)"
+    },
+    {
+      "id": "predio-ferraria-dentro",
+      "title": "Ferraria (interior)"
+    },
+    {
+      "id": "predio-estabulo",
+      "title": "Estábulo (fachada)"
+    },
+    {
+      "id": "predio-estabulo-dentro",
+      "title": "Estábulo (interior)"
+    },
+    {
+      "id": "predio-mercado",
+      "title": "Mercado Coberto (fachada)"
+    },
+    {
+      "id": "predio-mercado-dentro",
+      "title": "Mercado Coberto (interior)"
+    },
+    {
+      "id": "predio-guilda",
+      "title": "Salão da Guilda (fachada)"
+    },
+    {
+      "id": "predio-guilda-dentro",
+      "title": "Salão da Guilda (interior)"
+    },
+    {
+      "id": "predio-taverna",
+      "title": "Taverna (fachada)"
+    },
+    {
+      "id": "predio-taverna-dentro",
+      "title": "Taverna (interior)"
+    },
+    {
+      "id": "predio-torreMago",
+      "title": "Torre do Mago (fachada)"
+    },
+    {
+      "id": "predio-torreMago-dentro",
+      "title": "Torre do Mago (interior)"
+    },
+    {
+      "id": "pond",
+      "title": "Lagoa com passagem de pedra"
+    },
+    {
+      "id": "build-25",
+      "title": "Montagem — 25% das etapas"
+    },
+    {
+      "id": "build-50",
+      "title": "Montagem — 50% das etapas"
+    },
+    {
+      "id": "build-75",
+      "title": "Montagem — 75% das etapas"
+    }
+  ],
+  "stats": {
+    "total": 10103,
+    "lights": 32,
+    "groups": {
+      "Mar": 1,
+      "Penhascos": 4476,
+      "Terreno": 3211,
+      "Estradas": 507,
+      "Áreas": 280,
+      "Lobby": 295,
+      "Água": 20,
+      "Construções": 1313
+    }
+  },
+  "manual": {
+    "parts": 10103,
+    "steps": 1392,
+    "connections": 57209
+  }
+}
